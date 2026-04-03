@@ -95,9 +95,32 @@ Track C — Polish & Launch
 
 ### 0.4 Legal copy _(draft when ready — doesn't block UI)_
 
-- [ ] Accuracy disclaimer (footer + PDF + email per PRD)
-- [ ] Privacy policy (analytics, email, share URLs)
-- [ ] Terms; footer line: independent guide / no affiliation
+**Accuracy & liability disclaimer:**
+
+- [ ] Prominent disclaimer on every page with winery data (footer, results, detail, plan, PDF, email): "Sonoma Sip is an independent guide. We are not affiliated with, endorsed by, or sponsored by any winery listed. Information may be outdated or inaccurate — always verify details directly with the winery before visiting."
+- [ ] Winery detail page: dedicated disclaimer block near the CTA, not just footer
+- [ ] Shared plan / PDF: disclaimer as first or last line of the document
+
+**Terms of Service — key clauses:**
+
+- [ ] **Independent guide / no affiliation:** Sonoma Sip is an independent informational resource. We are not agents, representatives, or affiliates of any winery. Listing does not imply endorsement in either direction.
+- [ ] **No guarantee of accuracy:** All winery information (hours, prices, policies, availability, amenities) is provided for informational purposes only. We make reasonable efforts to keep data current but cannot guarantee accuracy. Users must verify details with wineries before visiting.
+- [ ] **Third-party content:** Winery names, descriptions, and details are sourced from publicly available information. All trademarks belong to their respective owners. If a winery wishes to update or remove their listing, they can contact us.
+- [ ] **Winery opt-out / update process:** Clear contact method (email) for wineries to request corrections, updates, or removal of their listing. Commit to processing requests within a reasonable timeframe (e.g., 7 business days).
+- [ ] **Limitation of liability:** Sonoma Sip is not liable for any damages arising from reliance on information provided, including but not limited to incorrect hours, prices, policies, or closures.
+- [ ] **User-generated content:** If users can submit reviews/reports in the future, include clause reserving right to moderate and disclaiming responsibility for user content.
+
+**Privacy policy:**
+
+- [ ] Analytics data collection (Plausible/PostHog — cookie-light)
+- [ ] Email collection (only if user opts into email share)
+- [ ] Share URL data (what's stored, how long, who can access)
+- [ ] No sale of personal data
+- [ ] CCPA compliance (California users)
+
+**Footer legal line (all pages):**
+
+- [ ] "Sonoma Sip is an independent guide — not affiliated with any listed winery. Verify details before visiting."
 
 ### 0.5 Design system
 
@@ -230,21 +253,20 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [x] Retake Quiz + Browse all wineries links at bottom of results
 - [ ] Loading skeleton matching card layout shape
 
-### 3.5.5 Winery detail page _(use `/ui` skill)_
+### 3.5.5 Winery detail page ✅
 
-- [ ] Breadcrumb: Home > Wineries > [Name]
-- [ ] Hero: winery name (Cormorant h1), region badge, vibe tagline
-- [ ] Visual placeholder: warm gradient band or vine pattern (photos later)
-- [ ] About section: editorial story from mock data
-- [ ] Hours: clean table/grid (Mon–Sun + times), status indicator (Open/Closed)
-- [ ] Tasting experiences: cards with type, description, price, duration
-- [ ] Flights table: shadcn Table — flight name, wines, price, format
-- [ ] Logistics grid: icon + label for parking, group size, noise level, reservation type
-- [ ] Accessibility row: dog/kid/wheelchair with clear icons and labels
-- [ ] Ratings: star display + count
-- [ ] Primary CTA: "Book a Tasting" (wine bg, large, external link icon)
-- [ ] "You Might Also Like" — 2-3 related winery cards
-- [ ] Responsive: single column mobile, two-column desktop for some sections
+- [x] Two-column split layout: sticky left sidebar (name, region, rating, CTA, features, amenities) + right scrollable content
+- [x] Breadcrumb: Home > Wineries > [Name]
+- [x] Star rating display with count
+- [x] "Book a Tasting" primary CTA with external link
+- [x] About section with editorial story + varietal badges
+- [x] Flight cards: name, description, price, duration, wine count, format, food pairing badge
+- [x] Hours table: Mon–Sun with open/close times, closed indicator
+- [x] Logistics: parking, group size, noise level, reservation type
+- [x] Amenity badges: dog/kid/wheelchair/food/outdoor/views (active vs inactive styling)
+- [x] Nearby Wineries: up to 3 related cards from same region
+- [x] Responsive: collapses to single column on mobile
+- [x] Static generation via generateStaticParams for all 8 mock wineries
 
 ### 3.5.6 Browse / directory page _(use `/ui` skill)_
 
@@ -267,6 +289,22 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [ ] Action bar: Copy Link, Print/PDF, Email (styled, non-functional)
 - [ ] Disclaimer footer: "Verify details before visiting"
 - [ ] OG meta tags for link previews
+
+### 3.5.9 Map integration (Mapbox GL)
+
+_Custom-styled Mapbox map that matches the Sonoma palette. Used on results page and shared plan page._
+
+- [ ] Install `react-map-gl` + `mapbox-gl`: `pnpm add react-map-gl mapbox-gl`
+- [ ] Create Mapbox account + API token; add `NEXT_PUBLIC_MAPBOX_TOKEN` to `.env.example`
+- [ ] Design custom Mapbox Studio style: cream/linen terrain, muted greens for vegetation, wine-colored roads or labels, warm tones matching the site palette
+- [ ] Create `src/components/map/sonoma-map.tsx` — reusable map component with Sonoma center, zoom bounds, and custom style URL
+- [ ] Custom map markers: wine-colored pins with rank numbers (matching the result card gold badges)
+- [ ] Marker popups: winery name, region, price range, link to detail page
+- [ ] Replace map placeholder on results page (`src/app/results/page.tsx`) with real Mapbox map
+- [ ] Replace map placeholder on shared plan page (`src/app/plan/[id]/page.tsx`)
+- [ ] Responsive: map fills container on desktop, collapsible on mobile with "Show Map" toggle
+- [ ] Performance: lazy-load map component, only initialize when visible
+- [ ] Restrict Mapbox token to app domain(s) via Mapbox dashboard
 
 ### 3.5.8 Design QA pass
 
@@ -436,6 +474,36 @@ _Build every screen using mock data. No real database, no real matching engine. 
 
 - [ ] Doc: import from `docs/*.xlsx`, rollback via backup
 - [ ] Optional: protected admin import trigger
+
+### 7.4 Data freshness & automated verification
+
+_Winery info changes: hours shift seasonally, flights get repriced, wineries close or go members-only, reservation URLs break. We need automated + manual processes to keep data trustworthy._
+
+**Automated checks (scheduled jobs):**
+
+- [ ] **URL health check** (weekly): Hit every `bookingUrl` in the database. Flag 4xx/5xx/timeout as broken. Write results to `data_health_checks` table. Alert via email or dashboard.
+- [ ] **Google Places sync** (weekly/biweekly): Pull `business_status` (OPERATIONAL / CLOSED_TEMPORARILY / CLOSED_PERMANENTLY), current `opening_hours`, `rating`, `review_count`. Auto-flag wineries where Google hours diverge from our hours by >1 hour. Auto-update ratings. Never auto-update hours — flag for manual review.
+- [ ] **Price drift detection** (monthly): If Google Places or a scraping service exposes pricing, compare against our `min_flight_price`/`max_flight_price`. Flag >20% drift for review.
+- [ ] **Stale data alert**: Flag any winery not manually verified in >90 days. Surface in admin dashboard.
+
+**Manual review cadence:**
+
+- [ ] **Quarterly audit** (Jan, Apr, Jul, Oct): Spot-check 15-20 wineries across all regions. Verify hours, prices, reservation policy, and amenity flags against winery websites. Update database. Log audit in `import_runs`.
+- [ ] **Seasonal hours update** (Mar + Nov): Many wineries shift to summer/winter hours. Bulk review all hours against winery websites before each season change.
+- [ ] **Annual full audit** (January): Full pass on all 68 wineries. Verify every field. Remove permanently closed wineries. Add new notable wineries.
+
+**Schema support:**
+
+- [ ] Add `last_verified_at` timestamp column to `wineries` table
+- [ ] Add `data_health_checks` table: `winery_id`, `check_type` (url_health | places_sync | manual_audit), `status`, `details_json`, `checked_at`
+- [ ] Add `verification_notes` text column for auditor comments
+- [ ] Admin dashboard or simple script to surface flagged wineries
+
+**User-facing transparency:**
+
+- [ ] Show "Last verified: {date}" on winery detail page (when `last_verified_at` is set)
+- [ ] Accuracy disclaimer on every page with winery data (already planned in 0.4)
+- [ ] "Report an issue" link on winery detail page — simple email or form to flag outdated info
 
 ---
 
