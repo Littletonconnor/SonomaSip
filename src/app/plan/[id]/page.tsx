@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   MapPin,
@@ -27,6 +28,37 @@ function formatDate(dateStr: string) {
     month: 'long',
     day: 'numeric',
   });
+}
+
+function getPlan(_id: string) {
+  return MOCK_PLAN;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const plan = getPlan(id);
+  const wineryNames = plan.results.map((r) => r.winery.name);
+  const description = `A ${plan.results.length}-stop Sonoma County wine day: ${wineryNames.join(', ')}. Curated by Sonoma Sip.`;
+
+  return {
+    title: `Wine Day Itinerary — ${plan.results.length} Stops`,
+    description,
+    openGraph: {
+      title: `Wine Day Itinerary — ${plan.results.length} Stops`,
+      description,
+      type: 'website',
+      siteName: 'Sonoma Sip',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `Wine Day Itinerary — ${plan.results.length} Stops`,
+      description,
+    },
+  };
 }
 
 export default async function SharedPlanPage({ params }: { params: Promise<{ id: string }> }) {
