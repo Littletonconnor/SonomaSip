@@ -294,16 +294,16 @@ _Build every screen using mock data. No real database, no real matching engine. 
 
 _Custom-styled Mapbox map that matches the Sonoma palette. Used on results page and shared plan page._
 
-- [ ] Install `react-map-gl` + `mapbox-gl`: `pnpm add react-map-gl mapbox-gl`
-- [ ] Create Mapbox account + API token; add `NEXT_PUBLIC_MAPBOX_TOKEN` to `.env.example`
-- [ ] Design custom Mapbox Studio style: cream/linen terrain, muted greens for vegetation, wine-colored roads or labels, warm tones matching the site palette
-- [ ] Create `src/components/map/sonoma-map.tsx` — reusable map component with Sonoma center, zoom bounds, and custom style URL
-- [ ] Custom map markers: wine-colored pins with rank numbers (matching the result card gold badges)
-- [ ] Marker popups: winery name, region, price range, link to detail page
-- [ ] Replace map placeholder on results page (`src/app/results/page.tsx`) with real Mapbox map
-- [ ] Replace map placeholder on shared plan page (`src/app/plan/[id]/page.tsx`)
-- [ ] Responsive: map fills container on desktop, collapsible on mobile with "Show Map" toggle
-- [ ] Performance: lazy-load map component, only initialize when visible
+- [x] Install `react-map-gl` + `mapbox-gl`: `pnpm add react-map-gl mapbox-gl`
+- [x] Create Mapbox account + API token; add `NEXT_PUBLIC_MAPBOX_TOKEN` to `.env.example`
+- [x] Design custom Mapbox Studio style: "Dawn Wine Country" — warm golden parchment terrain, lush storybook greens, terracotta roads, dawn-tinted hillshade. Published as `mapbox://styles/littletonconnor/cmnj990w1004z01sla3326exf`
+- [x] Create `src/components/map/sonoma-map.tsx` — reusable map component with auto-fit bounds, lazy loading (IntersectionObserver), interactive legend with flyTo, and `reuseMaps` for performance
+- [x] Custom map markers: wine-colored circular dots (`size-7`) with Inter font rank numbers, `ring-2 ring-white`, darker wine on select
+- [x] Marker popups: frosted glass card (matching hero card style), winery name + region, custom close button, `rounded-xl` with warm shadow
+- [x] Replace map placeholder on results page (`src/app/results/page.tsx`) with real Mapbox map + legend
+- [x] Replace map placeholder on shared plan page (`src/app/plan/[id]/page.tsx`) via `PlanMap` client wrapper
+- [x] Responsive: map fills container on desktop, collapsible on mobile with "Show Map" toggle using `AnimatePresence`
+- [x] Performance: lazy-load map component via `next/dynamic` + `IntersectionObserver`, only initialize when visible
 - [ ] Restrict Mapbox token to app domain(s) via Mapbox dashboard
 
 ### 3.5.8 Design QA pass
@@ -442,7 +442,7 @@ _Custom-styled Mapbox map that matches the Sonoma palette. Used on results page 
 - [ ] Share: insert `shared_itineraries` → Supabase
 - [ ] PDF: text-first print route / CSS; v2: Mapbox Static image
 - [ ] Email: send via Resend/Postmark with share URL + summary
-- [ ] Rate limit share create + email by IP
+- [ ] Rate limit share create + email by IP _(see Phase 7.5 for comprehensive rate limiting plan)_
 
 ---
 
@@ -504,6 +504,73 @@ _Winery info changes: hours shift seasonally, flights get repriced, wineries clo
 - [ ] Show "Last verified: {date}" on winery detail page (when `last_verified_at` is set)
 - [ ] Accuracy disclaimer on every page with winery data (already planned in 0.4)
 - [ ] "Report an issue" link on winery detail page — simple email or form to flag outdated info
+
+---
+
+## Phase 7.5 — Rate limiting & abuse protection _(pre-launch requirement)_
+
+_Every third-party service has usage-based pricing. Every server action has compute cost. Rate limiting is not optional — it's a launch blocker. Budget context: Mapbox free tier = 50K map loads/mo, Supabase free tier = 50K monthly active users + 500MB DB + 5GB bandwidth, Resend free tier = 100 emails/day, Vercel free tier = 100GB bandwidth/mo._
+
+### 7.5.1 Client-side map load protection
+
+- [ ] **Session-based map load cap:** Track map initializations per browser session in `sessionStorage`. After N loads (e.g., 20) in a single session, show a static map image (Mapbox Static Images API — 50K free/mo) instead of the interactive GL map. Display a message: "Interactive map limit reached for this session. Refresh tomorrow for full access."
+- [ ] **`reuseMaps` prop:** Enable on `react-map-gl` `<Map>` to reuse GL context across soft navigations instead of re-initializing (avoids counting new map loads on back/forward)
+- [ ] **Lazy-load only:** Map component mounts via `IntersectionObserver` — never loads unless user scrolls to it. This alone prevents map loads from bots/crawlers hitting the page
+- [ ] **Bot/crawler exclusion:** Check `navigator.webdriver` and common bot user-agent patterns client-side before mounting the map. Bots get the static placeholder only
+
+### 7.5.2 Server-side rate limiting (API routes / server actions)
+
+- [ ] **Choose rate limiting library:** `@upstash/ratelimit` (Redis-backed, serverless-native, works with Vercel) or `next-rate-limit` (simpler, in-memory). Upstash has a generous free tier (10K commands/day). Decision: Upstash for production, in-memory for dev
+- [ ] **Rate limit middleware:** Create `src/lib/rate-limit.ts` utility that wraps the chosen library. Accept `identifier` (IP or fingerprint), `limit`, and `window` params. Return `{ success, remaining, reset }`
+- [ ] **IP extraction:** Use `headers().get('x-forwarded-for')` (Vercel sets this) with fallback to `x-real-ip`. Hash the IP before storing (privacy)
+
+### 7.5.3 Per-endpoint rate limits
+
+| Endpoint / Action | Limit | Window | Reason |
+|---|---|---|---|
+| Quiz submit (server action) | 10 | 1 hour | Prevents matching engine abuse (compute cost) |
+| Share/itinerary create | 5 | 1 hour | Prevents DB write spam (Supabase row count) |
+| Email send (share via email) | 3 | 1 hour | Resend free tier = 100/day total. Strictest limit |
+| PDF generate | 5 | 1 hour | Server-side rendering cost |
+| Page views (results/plan) | 60 | 1 hour | General abuse prevention |
+| API health check | 30 | 1 minute | Prevent monitoring abuse |
+
+- [ ] Apply rate limits to quiz submit server action
+- [ ] Apply rate limits to share/itinerary create server action
+- [ ] Apply rate limits to email send server action
+- [ ] Apply rate limits to PDF generation route
+- [ ] Return proper `429 Too Many Requests` with `Retry-After` header
+- [ ] User-friendly rate limit UI: show a gentle message ("You've been busy! Please wait a few minutes before trying again.") instead of a raw error
+
+### 7.5.4 Global abuse protection
+
+- [ ] **Vercel Edge Middleware rate limiting:** Add `middleware.ts` at the project root with a sliding window rate limit on all routes. Generous global limit (e.g., 200 requests/minute per IP) to catch automated scrapers without affecting real users
+- [ ] **Vercel WAF / Firewall Rules:** If on Vercel Pro, configure firewall rules to block known bot networks and suspicious traffic patterns. On free tier, rely on middleware
+- [ ] **CSRF protection:** All server actions should validate origin header. Next.js does this by default for Server Actions, but verify it's not disabled
+- [ ] **Honeypot fields:** Add hidden form fields to the quiz and email forms. Any submission with these filled is a bot — reject silently
+
+### 7.5.5 Third-party cost monitoring & alerts
+
+- [ ] **Mapbox usage dashboard:** Set up billing alerts in Mapbox dashboard at 50%, 80%, and 95% of free tier (25K, 40K, 47.5K map loads)
+- [ ] **Supabase usage monitoring:** Monitor DB size, bandwidth, and row counts in Supabase dashboard. Alert at 80% of free tier limits
+- [ ] **Resend email monitoring:** Track daily email count. Alert at 80 emails/day (80% of 100/day free limit)
+- [ ] **Vercel bandwidth monitoring:** Track bandwidth usage. Alert at 80GB/mo (80% of 100GB free tier)
+- [ ] **Monthly cost review:** Calendar reminder to review all service dashboards on the 1st of each month
+
+### 7.5.6 Emergency kill switches
+
+- [ ] **Map kill switch:** Environment variable `NEXT_PUBLIC_DISABLE_MAP=true` that replaces the interactive map with a static image globally. Flip in Vercel dashboard if Mapbox costs spike
+- [ ] **Email kill switch:** `DISABLE_EMAIL=true` that disables the email share feature entirely. Returns a friendly "Email sharing is temporarily unavailable" message
+- [ ] **Share kill switch:** `DISABLE_SHARE_CREATE=true` that prevents new itinerary creation while still allowing existing shares to be viewed
+- [ ] **Read-only mode:** Single `MAINTENANCE_MODE=true` flag that disables all write operations (share, email, quiz submit) while keeping the site browsable
+
+### 7.5.7 Testing & validation
+
+- [ ] Load test rate limits locally: script that sends N requests in rapid succession, verify 429s fire at correct thresholds
+- [ ] Verify rate limit headers are present in responses (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`)
+- [ ] Test kill switches: flip each env var, verify graceful degradation
+- [ ] Test bot detection: verify crawlers get static content, not interactive maps
+- [ ] Document rate limits in README or ops runbook for future reference
 
 ---
 
