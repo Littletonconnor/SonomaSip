@@ -562,27 +562,27 @@ _Focused on what's actually cheap for a Next.js app with sampled logscope events
 
 ### Analytics (Browser Clicks/Events)
 
-| Platform | Free Tier | Cost at ~1M events/mo | Best For |
-|---|---|---|---|
-| **PostHog** | 1M events/mo, 5K session replays | $0 | All-in-one: analytics, replay, feature flags. Has a Next.js SDK |
-| **OpenPanel** | Self-hosted = unlimited, free | ~$90/mo cloud | Open-source Mixpanel alternative. Self-host on a $5 VPS |
-| **Umami** | Self-hosted = unlimited, free | $20/mo cloud | Lightweight privacy-focused web analytics. No cookies |
+| Platform      | Free Tier                        | Cost at ~1M events/mo | Best For                                                        |
+| ------------- | -------------------------------- | --------------------- | --------------------------------------------------------------- |
+| **PostHog**   | 1M events/mo, 5K session replays | $0                    | All-in-one: analytics, replay, feature flags. Has a Next.js SDK |
+| **OpenPanel** | Self-hosted = unlimited, free    | ~$90/mo cloud         | Open-source Mixpanel alternative. Self-host on a $5 VPS         |
+| **Umami**     | Self-hosted = unlimited, free    | $20/mo cloud          | Lightweight privacy-focused web analytics. No cookies           |
 
 ### Logs / Observability (Server-Side)
 
-| Platform | Free Tier | Notes |
-|---|---|---|
-| **Axiom** | **500 GB/mo ingest**, 30-day retention | Absurdly generous. Has a Vercel/Next.js integration. Top pick |
-| **SigNoz** | Self-hosted = unlimited | Open-source Datadog alternative. OpenTelemetry native |
-| **HyperDX** | 3 GB/mo cloud, self-hosted = free | Combines session replay + logs + traces |
-| **OpenObserve** | Self-hosted = free | Claims 140x less storage than Elasticsearch. Single binary |
+| Platform        | Free Tier                              | Notes                                                         |
+| --------------- | -------------------------------------- | ------------------------------------------------------------- |
+| **Axiom**       | **500 GB/mo ingest**, 30-day retention | Absurdly generous. Has a Vercel/Next.js integration. Top pick |
+| **SigNoz**      | Self-hosted = unlimited                | Open-source Datadog alternative. OpenTelemetry native         |
+| **HyperDX**     | 3 GB/mo cloud, self-hosted = free      | Combines session replay + logs + traces                       |
+| **OpenObserve** | Self-hosted = free                     | Claims 140x less storage than Elasticsearch. Single binary    |
 
 ### Error Tracking
 
-| Platform | Free Tier | Notes |
-|---|---|---|
+| Platform      | Free Tier                        | Notes                               |
+| ------------- | -------------------------------- | ----------------------------------- |
 | **GlitchTip** | 1K events/mo, self-hosted = free | Sentry-compatible SDK, much cheaper |
-| **Sentry** | 5K errors/mo | The standard, but costs add up fast |
+| **Sentry**    | 5K errors/mo                     | The standard, but costs add up fast |
 
 ### Recommendation for This Setup
 
@@ -593,6 +593,7 @@ _Focused on what's actually cheap for a Next.js app with sampled logscope events
 3. Use logscope's `createSamplingFilter` with `keepWhen` conditions so **errors and slow requests are never sampled away**, only the routine info/debug logs get thinned out
 
 **Fully self-hosted ($5-20/mo VPS):**
+
 - Umami (analytics) + SigNoz (logs/traces) + GlitchTip (errors)
 
 ### How It'd Work with logscope
@@ -600,20 +601,20 @@ _Focused on what's actually cheap for a Next.js app with sampled logscope events
 The sampling strategy is the key — multiple sinks with different sampling rates:
 
 ```typescript
-import { configure, createSamplingFilter, getConsoleSink, withFilter } from 'logscope'
+import { configure, createSamplingFilter, getConsoleSink, withFilter } from 'logscope';
 
 const sampling = createSamplingFilter({
   rates: {
-    trace: 0.01,    // 1% of trace
-    debug: 0.05,    // 5% of debug
-    info: 0.1,      // 10% of info
+    trace: 0.01, // 1% of trace
+    debug: 0.05, // 5% of debug
+    info: 0.1, // 10% of info
     // warning, error, fatal = 100% (default)
   },
   keepWhen: [
     (r) => (r.properties.status as number) >= 500,
     (r) => (r.properties.duration as number) > 2000,
   ],
-})
+});
 ```
 
 Then your PostHog sink and Axiom sink both get the sampled stream — errors always come through, routine logs are thinned to keep you in free tiers.
