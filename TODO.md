@@ -152,108 +152,209 @@ Track C — Polish & Launch
 
 ## Phase 3.5 — UI Prototype with Mock Data ← CURRENT FOCUS
 
-_Build every screen using mock data. No real database, no real matching engine. Validate the experience, then wire up the backend._
+_Build every screen using mock data. No real database, no real matching engine. Validate the experience, then wire up the backend. Every page must look like it was designed by a professional designer._
 
-> **REMINDER:** Use the `/ui` skill for every screen. Each page must look like it was designed by a professional designer — polished typography, intentional spacing, beautiful component composition, responsive at every breakpoint.
+> **MANDATORY:** Use the `/ui` skill for every page build. Reference shadcn docs (https://ui.shadcn.com/docs/components) for component APIs. Reference Aceternity UI (https://ui.aceternity.com/) for animated component inspiration.
+
+### 3.5.0 Animation & visual infrastructure
+
+- [ ] Install Framer Motion: `pnpm add motion`
+- [ ] Create `src/components/ui/animated-section.tsx` — scroll-triggered fade-in-up wrapper
+- [ ] Create gradient/texture utilities:
+  - Warm mesh gradient hero background (burgundy → gold, using CSS gradients)
+  - Subtle noise texture overlay (SVG filter or CSS)
+  - Section divider patterns (gentle wave or vine SVG from Haikei)
+- [ ] Create `src/components/layout/navbar.tsx` — sticky nav with blur, logo, links, CTA
+- [ ] Create `src/components/layout/footer.tsx` — reusable footer with branding + legal
+- [ ] Generate SVG illustrations/icons for feature sections (Lucide icons + custom wine-themed SVGs)
+
+**Visual resources:**
+- Gradients: https://csshero.org/mesher/ (mesh), https://haikei.app/ (waves/blobs)
+- Icons: Lucide React (already installed)
+- Illustrations: https://undraw.co/ (recolor to Sonoma palette)
+- Patterns: https://heropatterns.com/ (subtle SVG backgrounds)
 
 ### 3.5.1 Mock data & types
 
-- [ ] TypeScript types: `Winery`, `Flight`, `QuizAnswers`, `MatchResult` in `src/lib/types.ts`
-- [ ] Mock data: 6–8 representative wineries in `src/lib/mock-data.ts`
-  - Cover: different price ranges, regions (Russian River, Dry Creek, Sonoma Valley, etc.)
-  - Cover: vibes (intimate, lively, family-friendly, luxury), reservation types, members-only
-  - Cover: dog/kid/wheelchair flags, food pairings, outdoor seating
-- [ ] Mock flights: 2–3 per winery (different formats, price points)
-- [ ] Mock quiz results: pre-computed ranked lists for demo purposes
+- [ ] TypeScript types in `src/lib/types.ts`:
+  - `Winery` — all fields needed for detail page (name, slug, region, story, hours, lat/lng, reservation type, noise level, features, ratings, etc.)
+  - `Flight` — name, price, duration, wines included, format, food pairing
+  - `QuizAnswers` — step-by-step form state
+  - `MatchResult` — winery + score + reasons array
+- [ ] Mock data in `src/lib/mock-data.ts`: 6–8 representative wineries
+  - Cover: different price ranges ($25–$200+)
+  - Cover: regions (Russian River, Dry Creek, Sonoma Valley, Alexander Valley, Carneros)
+  - Cover: vibes (intimate, lively, family-friendly, luxury, educational)
+  - Cover: reservation types (walk-in, appointment, members-only)
+  - Cover: accessibility (dog/kid/wheelchair), food pairings, outdoor seating, views
+- [ ] Mock flights: 2–3 per winery with different formats and prices
+- [ ] Mock quiz results: 2 pre-computed ranked lists for different personas
 
-### 3.5.2 Landing page _(use `/ui` skill)_
+### 3.5.2 Landing page _(use `/ui` skill — this is the most important page)_
 
-- [ ] Hero: bold Cormorant heading, compelling subtext, warm gradient or textured background
-- [ ] Primary + secondary CTAs (quiz / browse) with clear visual hierarchy
-- [ ] How-it-works: 3 steps with icons or illustrations, clean card layout
-- [ ] Social proof section: "68 curated wineries", key differentiators
-- [ ] Featured wineries teaser: 3–4 cards from mock data
-- [ ] Footer: disclaimer text, privacy/terms links, Sonoma Sip branding
-- [ ] Design polish: consistent vertical rhythm, elegant transitions, breathing whitespace
+**Navigation (sticky):**
+- [ ] Logo (left) — "Sonoma Sip" wordmark in Cormorant
+- [ ] Links (center): How It Works, Wineries, About
+- [ ] CTA button (right): "Plan Your Visit" (wine bg)
+- [ ] Mobile: hamburger menu + sticky bottom CTA bar after scrolling past hero
+- [ ] Sticky nav has backdrop-blur + semi-transparent background on scroll
+
+**Hero section:**
+- [ ] Announcement pill: "Covering 68+ Sonoma County wineries" (subtle, above headline)
+- [ ] Headline: benefit-focused, NOT just the app name (e.g. "Your Perfect Sonoma Wine Day, Planned in Minutes")
+- [ ] Subheadline: 1-2 sentences explaining the quiz → match → plan flow
+- [ ] Primary CTA: "Plan Your Visit" (large, wine bg, hover scale effect)
+- [ ] Secondary CTA: "Browse Wineries" (outline variant)
+- [ ] Background: warm mesh gradient (burgundy/gold) with subtle noise texture
+- [ ] Optional: animated gradient shift or subtle parallax
+
+**Social proof / stats bar:**
+- [ ] "68 curated wineries | Personalized matches | Free to use"
+- [ ] Or logo-style trust indicators
+- [ ] Subtle separator from hero
+
+**How It Works (3 steps):**
+- [ ] Step cards with Lucide icons (Wine, BarChart3, MapPin or similar)
+- [ ] Step numbers in gold with connecting visual flow
+- [ ] Brief, punchy copy per step
+- [ ] Scroll-triggered staggered entrance animation
+
+**Features bento grid:**
+- [ ] 4-6 tiles highlighting key benefits with icons:
+  - "Matches Your Taste" (grape/wine icon)
+  - "Budget-Aware" (dollar icon)
+  - "Group-Friendly" (users icon)
+  - "Map Your Day" (map icon)
+  - "Real Details" (info icon — hours, policies, accessibility)
+  - "Share Your Plan" (share icon — print, email, link)
+- [ ] Varied tile sizes (bento layout, not uniform grid)
+- [ ] Subtle hover effect on tiles
+
+**Featured wineries teaser:**
+- [ ] "Discover Sonoma's Best" heading
+- [ ] 3-4 winery cards from mock data (name, region, tagline, price hint)
+- [ ] "View All Wineries →" link
+- [ ] Cards with warm shadow, hover lift
+
+**Final CTA section:**
+- [ ] Full-width gradient background (wine → bark)
+- [ ] "Ready to discover your perfect Sonoma day?" headline
+- [ ] Repeated "Plan Your Visit" CTA
+- [ ] Cream text on dark gradient
+
+**Footer:**
+- [ ] Sonoma Sip logo/wordmark
+- [ ] Navigation links: How It Works, Wineries, Privacy, Terms
+- [ ] Disclaimer: "Independent guide. Verify details before visiting."
+- [ ] "Made with love in Sonoma County"
+- [ ] Clean, warm design with bark/cream palette
+
+**Cross-cutting:**
+- [ ] Scroll-triggered fade-in animations on all sections
+- [ ] Smooth anchor scrolling for "How It Works" nav link
 - [ ] Responsive: pixel-perfect at 375px, 768px, 1024px, 1440px
+- [ ] Mobile sticky CTA bar (appears after scrolling past hero)
+- [ ] Page loads in <3 seconds (CSS gradients, no heavy images)
 
 ### 3.5.3 Quiz flow _(use `/ui` skill)_
 
-- [ ] Quiz shell: centered card layout, warm background, clear progress
-- [ ] Stepper: visual progress bar with step labels, current step highlighted in wine color
-- [ ] Step 1: Varietals — beautiful multi-select chips/toggles for wine types (Pinot Noir, Chardonnay, Cab, etc.)
-- [ ] Step 2: Vibe — card-based selection with icons (relaxed, educational, celebratory, adventurous, etc.)
-- [ ] Step 3: Budget — elegant price range selector (slider or tappable bands)
-- [ ] Step 4: Must-haves — toggle switches for views, food, outdoor seating, dog/kid/wheelchair
-- [ ] Step 5: Region / stops — region selector (map or cards) + "how many wineries" stepper
-- [ ] Step 6: Members-only toggle (default off) + optional group size field
-- [ ] Navigation: Back/Next buttons with per-step validation, disabled state when invalid
-- [ ] Transitions: smooth step transitions (fade or slide)
-- [ ] `sessionStorage` persistence (resume mid-quiz on page refresh)
-- [ ] Submit → navigate to `/results` with mock ranked data
-- [ ] Design polish: each step should feel delightful, not like a boring form
-- [ ] Responsive: full-width on mobile, constrained card on desktop
+- [ ] Quiz shell: centered card on cream background, max-width-lg
+- [ ] Stepper: visual progress bar with labeled steps, current step in wine, completed in gold
+- [ ] Step 1 — Varietals: multi-select chips/toggles (Pinot Noir, Chardonnay, Cabernet, Zinfandel, Sparkling, Rosé, etc.)
+- [ ] Step 2 — Vibe: card-based selection with icons (Relaxed & Scenic, Educational, Celebratory, Adventurous, Social & Lively)
+- [ ] Step 3 — Budget: tappable price bands or elegant slider ($, $$, $$$, $$$$)
+- [ ] Step 4 — Must-haves: toggle switches with icons (Views, Food/Pairing, Outdoor Seating, Dog-Friendly, Kid-Friendly, Wheelchair Accessible)
+- [ ] Step 5 — Region & Stops: region card selector + number-of-wineries stepper (1-5)
+- [ ] Step 6 — Extras: members-only toggle (off by default), group size field
+- [ ] Navigation: Back (ghost) / Next (primary) buttons, Next disabled until valid
+- [ ] Step transitions: smooth fade/slide animation between steps
+- [ ] `sessionStorage` persistence — resume on refresh
+- [ ] Submit: loading state → navigate to `/results` with mock data
+- [ ] Design: each step feels delightful and considered, not like a boring form
+- [ ] Responsive: full-width card on mobile, constrained centered card on desktop
 
 ### 3.5.4 Results page _(use `/ui` skill)_
 
-- [ ] Split layout: scrollable winery list (left) + map area (right)
-- [ ] Map: placeholder with Sonoma region illustration or static image (Mapbox wired later)
-- [ ] Winery result cards: rank badge (gold circle), winery name, region tag, price range
-- [ ] Match reasons: top-3 plain-language reasons per card ("Great for dog lovers", "Budget-friendly Pinot")
-- [ ] Badges: pill-style for "Reservation Required", "Members Only", "Dog Friendly", "Walk-In Welcome"
-- [ ] Card interactions: hover lift, click → `/wineries/[slug]`
-- [ ] "Your Preferences" summary at top (collapsible)
-- [ ] Empty state: friendly illustration + CTA to relax filters
-- [ ] Loading skeletons matching card layout
-- [ ] Mobile: stacked list with sticky "Show Map" toggle button
-- [ ] Action bar: Share, Print, Email buttons
-- [ ] Responsive: side-by-side on desktop, stacked on mobile/tablet
+**Layout:**
+- [ ] Desktop: scrollable list (left, ~60%) + map area (right, ~40%) — sticky map
+- [ ] Mobile: stacked list with sticky "Show Map" toggle button at bottom
+- [ ] Tablet: stacked or side-by-side depending on orientation
+
+**Header area:**
+- [ ] "Your Recommendations" heading with count ("5 wineries matched")
+- [ ] Collapsible "Your Preferences" summary (badges showing quiz choices)
+- [ ] Action bar: Share, Print, Email buttons (outline style)
+
+**Map area:**
+- [ ] Static placeholder: Sonoma region SVG illustration or gradient card with "Map coming soon"
+- [ ] Shows approximate winery locations as dots (use lat/lng from mock data)
+
+**Result cards:**
+- [ ] Rank badge: gold circle with number (#1, #2, etc.)
+- [ ] Winery name (Cormorant), region tag (badge), price range
+- [ ] Top-3 match reasons in plain language ("Perfect for Pinot lovers", "Great views & outdoor seating")
+- [ ] Feature badges: pills for "Reservation Required", "Walk-In", "Dog Friendly", "Members Only"
+- [ ] Hover: subtle lift + shadow
+- [ ] Click: navigate to `/wineries/[slug]`
+
+**Empty state:**
+- [ ] Friendly message: "No wineries matched your preferences"
+- [ ] Illustration or icon
+- [ ] CTA: "Try relaxing your filters" → back to quiz
+
+**Skeletons:**
+- [ ] Loading skeleton matching card layout shape
 
 ### 3.5.5 Winery detail page _(use `/ui` skill)_
 
-- [ ] Hero section: winery name (Cormorant heading), region badge, tagline/vibe description
-- [ ] Photo placeholder: warm gradient or pattern (real photos later)
-- [ ] About/Story section: editorial description from mock data
-- [ ] Hours section: clean table or grid showing days + times
-- [ ] Tasting experiences: cards for each experience type (seated, bar, outdoor, private)
-- [ ] Flights table: formatted pricing table with flight name, wines included, price, duration
-- [ ] Logistics grid: parking, group size, noise level, reservation type — with icons
-- [ ] Accessibility: dog/kid/wheelchair indicators with clear icons
-- [ ] Ratings summary: star rating + review count (if available)
-- [ ] Primary CTA: prominent "Book a Tasting" button → reservation URL (new tab)
-- [ ] Secondary section: "Pairs Well With" — 2-3 related winery cards
-- [ ] Breadcrumb: Wineries > [Winery Name]
-- [ ] Responsive: single column on mobile, two-column sections on desktop
+- [ ] Breadcrumb: Home > Wineries > [Name]
+- [ ] Hero: winery name (Cormorant h1), region badge, vibe tagline
+- [ ] Visual placeholder: warm gradient band or vine pattern (photos later)
+- [ ] About section: editorial story from mock data
+- [ ] Hours: clean table/grid (Mon–Sun + times), status indicator (Open/Closed)
+- [ ] Tasting experiences: cards with type, description, price, duration
+- [ ] Flights table: shadcn Table — flight name, wines, price, format
+- [ ] Logistics grid: icon + label for parking, group size, noise level, reservation type
+- [ ] Accessibility row: dog/kid/wheelchair with clear icons and labels
+- [ ] Ratings: star display + count
+- [ ] Primary CTA: "Book a Tasting" (wine bg, large, external link icon)
+- [ ] "You Might Also Like" — 2-3 related winery cards
+- [ ] Responsive: single column mobile, two-column desktop for some sections
 
 ### 3.5.6 Browse / directory page _(use `/ui` skill)_
 
-- [ ] Page header: "All Wineries" with count badge
-- [ ] View toggle: grid / list layout switch
-- [ ] Sort controls: name (A-Z), price (low-high), region
-- [ ] Filter sidebar/drawer: region checkboxes, price range, feature toggles
-- [ ] Winery cards: name, region, price range, key features, thumbnail placeholder
+- [ ] Page header: "All Wineries" + count badge ("68 wineries")
+- [ ] View toggle: grid / compact list switch
+- [ ] Sort dropdown: Name A-Z, Price Low-High, Region
+- [ ] Filter panel: region checkboxes, price range, feature toggles (dog, food, views, walk-in)
+- [ ] Desktop: filter sidebar (left) + grid (right)
+- [ ] Mobile: filter drawer (sheet from bottom) + full-width cards
+- [ ] Winery cards: name, region, price, 2-3 feature badges, gradient placeholder image
 - [ ] Cards link to `/wineries/[slug]`
-- [ ] Responsive: filter drawer on mobile, sidebar on desktop
 
 ### 3.5.7 Shared plan page _(use `/ui` skill)_
 
 - [ ] `/plan/[id]`: read-only view of a mock itinerary
 - [ ] Header: "Your Sonoma Sip Plan" + "Generated on {date}"
-- [ ] Preferences summary: what the user asked for
-- [ ] Ordered list of recommended wineries with rank, reasons, and key details
-- [ ] Map placeholder showing winery locations
-- [ ] Action bar: Copy link, Print/PDF, Email — styled but non-functional for now
-- [ ] Branding footer: Sonoma Sip disclaimer
+- [ ] Preferences summary: badges showing what was asked for
+- [ ] Ordered winery list: rank, name, region, match reasons, key details
+- [ ] Map placeholder
+- [ ] Action bar: Copy Link, Print/PDF, Email (styled, non-functional)
+- [ ] Disclaimer footer: "Verify details before visiting"
+- [ ] OG meta tags for link previews
 
 ### 3.5.8 Design QA pass
 
-- [ ] All pages use consistent typography scale (Cormorant headings, Inter body)
-- [ ] Color usage: wine for primary actions, gold for accents, cream/linen backgrounds throughout
-- [ ] Consistent spacing rhythm across all pages
-- [ ] Hover/focus/active states on all interactive elements
-- [ ] Dark mode renders correctly on every page
-- [ ] No default browser styles leaking through
-- [ ] No layout shifts or janky transitions
+- [ ] Typography: Cormorant Garamond on all headings, Inter on all body text, consistent scale
+- [ ] Colors: wine for primary actions, gold for accents/badges, cream/linen backgrounds, bark for emphasis
+- [ ] Spacing: consistent vertical rhythm (16/24/32/48/64/96px sections)
+- [ ] States: hover, focus, active, disabled on every interactive element
+- [ ] Dark mode: every page renders correctly with inverted Sonoma palette
+- [ ] Animations: scroll-triggered fade-ins, hover lifts, smooth transitions everywhere
+- [ ] Performance: no layout shifts (CLS = 0), no FOUT, <3s load
+- [ ] Responsive QA: test at 375px, 768px, 1024px, 1440px — pixel-perfect at each
+- [ ] Accessibility: keyboard navigation works, focus rings visible, WCAG AA contrast
+- [ ] No default browser styles, no unstyled flash, no broken layouts
 
 ---
 
