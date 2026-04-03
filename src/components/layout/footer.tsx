@@ -9,15 +9,15 @@ const footerLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-card">
+    <footer className="border-border bg-card border-t">
       <div className="mx-auto max-w-6xl px-6 py-12">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           {/* Brand */}
           <div className="max-w-xs">
-            <Link href="/" className="font-heading text-xl font-semibold tracking-tight text-bark">
+            <Link href="/" className="font-heading text-bark text-xl font-semibold tracking-tight">
               Sonoma Sip
             </Link>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
               Your personalized Sonoma County winery guide. Independent recommendations based on
               curated data — no partnerships, no paid placement.
             </p>
@@ -26,13 +26,13 @@ export function Footer() {
           {/* Links */}
           <div className="flex gap-12">
             <div>
-              <h4 className="text-sm font-semibold text-foreground">Navigate</h4>
+              <h4 className="text-foreground text-sm font-semibold">Navigate</h4>
               <ul className="mt-3 flex flex-col gap-2.5">
                 {footerLinks.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -44,8 +44,8 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 border-t border-border pt-6">
-          <div className="flex flex-col items-center justify-between gap-3 text-xs text-muted-foreground md:flex-row">
+        <div className="border-border mt-10 border-t pt-6">
+          <div className="text-muted-foreground flex flex-col items-center justify-between gap-3 text-xs md:flex-row">
             <p>
               Sonoma Sip is an independent guide. Hours, prices, and policies change — always verify
               before visiting.

@@ -27,13 +27,13 @@ export function Navbar() {
         className={cn(
           'fixed top-0 right-0 left-0 z-50 transition-all duration-300',
           scrolled
-            ? 'border-b border-border/50 bg-background/80 backdrop-blur-xl'
+            ? 'border-border/50 bg-background/80 border-b backdrop-blur-xl'
             : 'bg-transparent',
         )}
       >
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           {/* Logo */}
-          <Link href="/" className="font-heading text-xl font-semibold tracking-tight text-bark">
+          <Link href="/" className="font-heading text-bark text-xl font-semibold tracking-tight">
             Sonoma Sip
           </Link>
 
@@ -43,7 +43,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
               >
                 {link.label}
               </Link>
@@ -56,7 +56,7 @@ export function Navbar() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="inline-flex items-center justify-center rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground md:hidden"
+            className="text-muted-foreground hover:text-foreground inline-flex items-center justify-center rounded-lg p-2 transition-colors md:hidden"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           >
             {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -65,19 +65,19 @@ export function Navbar() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden">
+          <div className="border-border/50 bg-background/95 border-t backdrop-blur-xl md:hidden">
             <div className="flex flex-col gap-1 px-6 py-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="text-muted-foreground hover:bg-accent hover:text-foreground rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="mt-2 border-t border-border/50 pt-3">
+              <div className="border-border/50 mt-2 border-t pt-3">
                 <Button className="w-full" asChild>
                   <Link href="/quiz" onClick={() => setMobileOpen(false)}>
                     Plan Your Visit
@@ -92,7 +92,7 @@ export function Navbar() {
       {/* Mobile sticky bottom CTA — appears after scrolling past hero */}
       <div
         className={cn(
-          'fixed right-0 bottom-0 left-0 z-40 border-t border-border/50 bg-background/95 px-4 py-3 backdrop-blur-xl transition-all duration-300 md:hidden',
+          'border-border/50 bg-background/95 fixed right-0 bottom-0 left-0 z-40 border-t px-4 py-3 backdrop-blur-xl transition-all duration-300 md:hidden',
           scrolled ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0',
         )}
       >

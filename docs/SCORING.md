@@ -6,9 +6,9 @@ This document is **engineering-owned**: persona weights, filter rules, normaliza
 
 ## Status
 
-- [ ] Initial spec drafted  
-- [ ] Weights and formulas implemented in code  
-- [ ] Golden tests passing  
+- [ ] Initial spec drafted
+- [ ] Weights and formulas implemented in code
+- [ ] Golden tests passing
 
 ## Required sections (fill as you implement)
 

@@ -51,6 +51,7 @@ pnpm dlx shadcn@latest add <component> --diff # Preview changes before overwriti
 ## Workflow Rules
 
 ### Task Tracking
+
 - **Always read `TODO.md` before starting work.** It is the source of truth for what needs to be done.
 - **Check off items in `TODO.md` when they are completed.** Keep it up to date.
 
@@ -70,13 +71,15 @@ This applies to: landing pages, page sections, component creation, layout change
 **If the MCP server is down, do not proceed with UI work.** Ask the user to fix the connection first. Writing UI code without ui.sh guidance produces generic, AI-looking output that will need to be redone.
 
 ### Reference Docs
+
 - **Product requirements:** `docs/PRD.md` — goals, scope, user flows, policies
 - **Matching logic:** `docs/SCORING.md` — filters, weights, scoring formula
 - **Editorial data:** `docs/sonoma-winery-database-complete.xlsx` — 68 curated wineries
 
 ### Code Standards
+
 - TypeScript strict mode
 - Absolute imports via `@/`
 - Prettier for formatting (run `pnpm format` before committing)
 - Single quotes, semicolons, trailing commas
-- **No unnecessary comments.** Do not add comments that restate what the code does. Only comment to explain *why* something non-obvious is done. No section dividers, no "// Component" or "// Styles" markers, no TODO/FIXME unless tracking a real issue.
+- **No unnecessary comments.** Do not add comments that restate what the code does. Only comment to explain _why_ something non-obvious is done. No section dividers, no "// Component" or "// Styles" markers, no TODO/FIXME unless tracking a real issue.

@@ -16,81 +16,85 @@
   /* --- shadcn semantic tokens → Sonoma palette --- */
 
   /* Surfaces */
-  --background: oklch(0.9771 0.0073 80.70);       /* cream */
-  --foreground: oklch(0.3308 0.0154 37.27);        /* text */
-  --card: oklch(0.9568 0.0118 79.76);              /* linen */
-  --card-foreground: oklch(0.3308 0.0154 37.27);   /* text */
-  --popover: oklch(0.9771 0.0073 80.70);           /* cream */
-  --popover-foreground: oklch(0.3308 0.0154 37.27);/* text */
+  --background: oklch(0.9771 0.0073 80.7); /* cream */
+  --foreground: oklch(0.3308 0.0154 37.27); /* text */
+  --card: oklch(0.9568 0.0118 79.76); /* linen */
+  --card-foreground: oklch(0.3308 0.0154 37.27); /* text */
+  --popover: oklch(0.9771 0.0073 80.7); /* cream */
+  --popover-foreground: oklch(0.3308 0.0154 37.27); /* text */
 
   /* Primary = wine */
-  --primary: oklch(0.4008 0.0948 15.07);           /* wine */
-  --primary-foreground: oklch(0.9771 0.0073 80.70);/* cream */
+  --primary: oklch(0.4008 0.0948 15.07); /* wine */
+  --primary-foreground: oklch(0.9771 0.0073 80.7); /* cream */
 
   /* Secondary = linen/fog */
-  --secondary: oklch(0.9568 0.0118 79.76);         /* linen */
-  --secondary-foreground: oklch(0.3308 0.0154 37.27);/* text */
+  --secondary: oklch(0.9568 0.0118 79.76); /* linen */
+  --secondary-foreground: oklch(0.3308 0.0154 37.27); /* text */
 
   /* Muted = fog */
-  --muted: oklch(0.9148 0.0149 80.70);             /* fog */
-  --muted-foreground: oklch(0.6724 0.0191 81.30);  /* stone/text-muted */
+  --muted: oklch(0.9148 0.0149 80.7); /* fog */
+  --muted-foreground: oklch(0.6724 0.0191 81.3); /* stone/text-muted */
 
   /* Accent = linen (hover states) */
-  --accent: oklch(0.9568 0.0118 79.76);            /* linen */
-  --accent-foreground: oklch(0.2340 0.0357 42.44); /* bark */
+  --accent: oklch(0.9568 0.0118 79.76); /* linen */
+  --accent-foreground: oklch(0.234 0.0357 42.44); /* bark */
 
   /* Destructive */
   --destructive: oklch(0.577 0.245 27.325);
 
   /* Borders & inputs */
-  --border: oklch(0.9148 0.0149 80.70);            /* fog */
-  --input: oklch(0.9148 0.0149 80.70);             /* fog */
-  --ring: oklch(0.4008 0.0948 15.07);              /* wine (focus rings) */
+  --border: oklch(0.9148 0.0149 80.7); /* fog */
+  --input: oklch(0.9148 0.0149 80.7); /* fog */
+  --ring: oklch(0.4008 0.0948 15.07); /* wine (focus rings) */
 
   /* Charts — Sonoma palette */
-  --chart-1: oklch(0.4008 0.0948 15.07);           /* wine */
-  --chart-2: oklch(0.7499 0.0854 82.08);           /* gold */
-  --chart-3: oklch(0.6980 0.0452 138.82);          /* sage */
-  --chart-4: oklch(0.5707 0.0526 72.66);           /* oak */
-  --chart-5: oklch(0.7713 0.0524 31.86);           /* blush */
+  --chart-1: oklch(0.4008 0.0948 15.07); /* wine */
+  --chart-2: oklch(0.7499 0.0854 82.08); /* gold */
+  --chart-3: oklch(0.698 0.0452 138.82); /* sage */
+  --chart-4: oklch(0.5707 0.0526 72.66); /* oak */
+  --chart-5: oklch(0.7713 0.0524 31.86); /* blush */
 
   /* Radius */
   --radius: 0.625rem;
 
   /* Sidebar */
-  --sidebar: oklch(0.9568 0.0118 79.76);           /* linen */
-  --sidebar-foreground: oklch(0.3308 0.0154 37.27);/* text */
-  --sidebar-primary: oklch(0.4008 0.0948 15.07);   /* wine */
-  --sidebar-primary-foreground: oklch(0.9771 0.0073 80.70);/* cream */
-  --sidebar-accent: oklch(0.9148 0.0149 80.70);    /* fog */
-  --sidebar-accent-foreground: oklch(0.2340 0.0357 42.44);/* bark */
-  --sidebar-border: oklch(0.9148 0.0149 80.70);    /* fog */
-  --sidebar-ring: oklch(0.4008 0.0948 15.07);      /* wine */
+  --sidebar: oklch(0.9568 0.0118 79.76); /* linen */
+  --sidebar-foreground: oklch(0.3308 0.0154 37.27); /* text */
+  --sidebar-primary: oklch(0.4008 0.0948 15.07); /* wine */
+  --sidebar-primary-foreground: oklch(0.9771 0.0073 80.7); /* cream */
+  --sidebar-accent: oklch(0.9148 0.0149 80.7); /* fog */
+  --sidebar-accent-foreground: oklch(0.234 0.0357 42.44); /* bark */
+  --sidebar-border: oklch(0.9148 0.0149 80.7); /* fog */
+  --sidebar-ring: oklch(0.4008 0.0948 15.07); /* wine */
 
   /* --- Sonoma extended tokens --- */
 
-  --color-cream: oklch(0.9771 0.0073 80.70);
+  --color-cream: oklch(0.9771 0.0073 80.7);
   --color-linen: oklch(0.9568 0.0118 79.76);
-  --color-fog: oklch(0.9148 0.0149 80.70);
+  --color-fog: oklch(0.9148 0.0149 80.7);
   --color-text: oklch(0.3308 0.0154 37.27);
-  --color-text-muted: oklch(0.6724 0.0191 81.30);
-  --color-bark: oklch(0.2340 0.0357 42.44);
+  --color-text-muted: oklch(0.6724 0.0191 81.3);
+  --color-bark: oklch(0.234 0.0357 42.44);
   --color-dusk: oklch(0.3416 0.0352 248.91);
   --color-wine: oklch(0.4008 0.0948 15.07);
-  --color-wine-dark: oklch(0.3435 0.0787 9.20);
-  --color-wine-light: oklch(0.4660 0.1065 14.24);
+  --color-wine-dark: oklch(0.3435 0.0787 9.2);
+  --color-wine-light: oklch(0.466 0.1065 14.24);
   --color-gold: oklch(0.7499 0.0854 82.08);
   --color-gold-light: oklch(0.8213 0.0708 83.03);
-  --color-sage: oklch(0.6980 0.0452 138.82);
+  --color-sage: oklch(0.698 0.0452 138.82);
   --color-sage-light: oklch(0.7844 0.0376 138.98);
   --color-oak: oklch(0.5707 0.0526 72.66);
   --color-blush: oklch(0.7713 0.0524 31.86);
-  --color-stone: oklch(0.6724 0.0191 81.30);
+  --color-stone: oklch(0.6724 0.0191 81.3);
 
   /* Warm shadows */
-  --shadow-warm: 0 1px 3px 0 oklch(0.2340 0.0357 42.44 / 0.06), 0 1px 2px -1px oklch(0.2340 0.0357 42.44 / 0.06);
-  --shadow-warm-md: 0 4px 6px -1px oklch(0.2340 0.0357 42.44 / 0.07), 0 2px 4px -2px oklch(0.2340 0.0357 42.44 / 0.05);
-  --shadow-warm-lg: 0 10px 15px -3px oklch(0.2340 0.0357 42.44 / 0.07), 0 4px 6px -4px oklch(0.2340 0.0357 42.44 / 0.05);
+  --shadow-warm:
+    0 1px 3px 0 oklch(0.234 0.0357 42.44 / 0.06), 0 1px 2px -1px oklch(0.234 0.0357 42.44 / 0.06);
+  --shadow-warm-md:
+    0 4px 6px -1px oklch(0.234 0.0357 42.44 / 0.07), 0 2px 4px -2px oklch(0.234 0.0357 42.44 / 0.05);
+  --shadow-warm-lg:
+    0 10px 15px -3px oklch(0.234 0.0357 42.44 / 0.07),
+    0 4px 6px -4px oklch(0.234 0.0357 42.44 / 0.05);
 }
 
 @theme inline {
@@ -166,11 +170,11 @@
 
 .dark {
   /* Surfaces */
-  --background: oklch(0.1979 0.0106 39.22);         /* dm cream */
-  --foreground: oklch(0.9335 0.0086 67.58);          /* dm text */
-  --card: oklch(0.2330 0.0144 57.45);                /* dm linen */
+  --background: oklch(0.1979 0.0106 39.22); /* dm cream */
+  --foreground: oklch(0.9335 0.0086 67.58); /* dm text */
+  --card: oklch(0.233 0.0144 57.45); /* dm linen */
   --card-foreground: oklch(0.9335 0.0086 67.58);
-  --popover: oklch(0.2330 0.0144 57.45);
+  --popover: oklch(0.233 0.0144 57.45);
   --popover-foreground: oklch(0.9335 0.0086 67.58);
 
   /* Primary = wine (lighter for dark mode) */
@@ -178,16 +182,16 @@
   --primary-foreground: oklch(0.1979 0.0106 39.22);
 
   /* Secondary */
-  --secondary: oklch(0.2727 0.0174 55.51);           /* dm fog */
+  --secondary: oklch(0.2727 0.0174 55.51); /* dm fog */
   --secondary-foreground: oklch(0.9335 0.0086 67.58);
 
   /* Muted */
   --muted: oklch(0.2727 0.0174 55.51);
-  --muted-foreground: oklch(0.5625 0.0117 67.52);    /* dm stone */
+  --muted-foreground: oklch(0.5625 0.0117 67.52); /* dm stone */
 
   /* Accent */
   --accent: oklch(0.2727 0.0174 55.51);
-  --accent-foreground: oklch(0.9568 0.0118 79.76);   /* dm bark */
+  --accent-foreground: oklch(0.9568 0.0118 79.76); /* dm bark */
 
   /* Destructive */
   --destructive: oklch(0.704 0.191 22.216);
@@ -195,7 +199,7 @@
   /* Borders & inputs */
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.6058 0.1392 15.99);                /* dm wine */
+  --ring: oklch(0.6058 0.1392 15.99); /* dm wine */
 
   /* Charts */
   --chart-1: oklch(0.6058 0.1392 15.99);
@@ -205,7 +209,7 @@
   --chart-5: oklch(0.7713 0.0524 31.86);
 
   /* Sidebar */
-  --sidebar: oklch(0.2330 0.0144 57.45);
+  --sidebar: oklch(0.233 0.0144 57.45);
   --sidebar-foreground: oklch(0.9335 0.0086 67.58);
   --sidebar-primary: oklch(0.6058 0.1392 15.99);
   --sidebar-primary-foreground: oklch(0.1979 0.0106 39.22);
@@ -216,7 +220,7 @@
 
   /* Sonoma extended — dark mode */
   --color-cream: oklch(0.1979 0.0106 39.22);
-  --color-linen: oklch(0.2330 0.0144 57.45);
+  --color-linen: oklch(0.233 0.0144 57.45);
   --color-fog: oklch(0.2727 0.0174 55.51);
   --color-text: oklch(0.9335 0.0086 67.58);
   --color-text-muted: oklch(0.5625 0.0117 67.52);
@@ -228,7 +232,7 @@
   --color-gold: oklch(0.8213 0.0708 83.03);
   --color-gold-light: oklch(0.7499 0.0854 82.08);
   --color-sage: oklch(0.7844 0.0376 138.98);
-  --color-sage-light: oklch(0.6980 0.0452 138.82);
+  --color-sage-light: oklch(0.698 0.0452 138.82);
   --color-oak: oklch(0.6993 0.0426 69.46);
   --color-blush: oklch(0.7713 0.0524 31.86);
   --color-stone: oklch(0.5625 0.0117 67.52);
@@ -249,7 +253,12 @@
   html {
     @apply font-sans;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-heading), Georgia, serif;
     line-height: 1.2;
     letter-spacing: 0.01em;
@@ -264,15 +273,15 @@
   background:
     radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.4008 0.0948 15.07 / 0.12), transparent),
     radial-gradient(ellipse 60% 40% at 80% 50%, oklch(0.7499 0.0854 82.08 / 0.08), transparent),
-    radial-gradient(ellipse 50% 60% at 20% 60%, oklch(0.6980 0.0452 138.82 / 0.06), transparent);
+    radial-gradient(ellipse 50% 60% at 20% 60%, oklch(0.698 0.0452 138.82 / 0.06), transparent);
 }
 
 .gradient-cta {
   background: linear-gradient(
     135deg,
-    oklch(0.2340 0.0357 42.44) 0%,
-    oklch(0.3435 0.0787 9.20) 50%,
-    oklch(0.2340 0.0357 42.44) 100%
+    oklch(0.234 0.0357 42.44) 0%,
+    oklch(0.3435 0.0787 9.2) 50%,
+    oklch(0.234 0.0357 42.44) 100%
   );
 }
 

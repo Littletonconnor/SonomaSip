@@ -8,11 +8,11 @@ The first version focuses on **68 hand-curated wineries** in Sonoma County. It i
 
 ## Documentation
 
-| Doc | What it is |
-|-----|------------|
-| [`docs/PRD.md`](docs/PRD.md) | Product requirements—goals, scope, flows, policies (no implementation detail). |
-| [`TODO.md`](TODO.md) | Engineering checklist: stack, phases, and delivery tasks. |
-| [`docs/README.md`](docs/README.md) | Index of spreadsheets and supporting files in `docs/`. |
+| Doc                                | What it is                                                                     |
+| ---------------------------------- | ------------------------------------------------------------------------------ |
+| [`docs/PRD.md`](docs/PRD.md)       | Product requirements—goals, scope, flows, policies (no implementation detail). |
+| [`TODO.md`](TODO.md)               | Engineering checklist: stack, phases, and delivery tasks.                      |
+| [`docs/README.md`](docs/README.md) | Index of spreadsheets and supporting files in `docs/`.                         |
 
 ## Data
 
