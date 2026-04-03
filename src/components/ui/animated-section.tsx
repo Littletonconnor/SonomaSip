@@ -74,13 +74,7 @@ export function StaggerChildren({ children, className, staggerDelay = 0.1 }: Sta
   );
 }
 
-export function StaggerItem({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <motion.div
       variants={{
