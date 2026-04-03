@@ -54,8 +54,20 @@ pnpm dlx shadcn@latest add <component> --diff # Preview changes before overwriti
 - **Always read `TODO.md` before starting work.** It is the source of truth for what needs to be done.
 - **Check off items in `TODO.md` when they are completed.** Keep it up to date.
 
-### UI Work
-- **Always use the `/ui` skill** when doing any UI or frontend work. This skill is at `.claude/skills/ui/SKILL.md` and uses the `uidotsh` MCP tool. It must be invoked for component creation, page layout, styling, and any visual implementation.
+### UI Work — MANDATORY ui.sh Usage
+
+**CRITICAL: ALL UI work MUST use the ui.sh MCP tools. No exceptions.**
+
+Before writing ANY UI code (components, pages, layouts, styling), you MUST:
+
+1. **Verify the uidotsh MCP server is connected** by calling `mcp__uidotsh__uidotsh_fetch` with `uidotsh://ui`. If this call fails, STOP and tell the user the MCP server is not connected. Do NOT write UI code without it.
+2. **Load the ui skill** by fetching `uidotsh://ui` and following its routing instructions to load the appropriate design guidelines.
+3. **Load design guidelines** for the specific work — always fetch `uidotsh://ui/design-guidelines/general` plus any relevant component guidelines before writing markup.
+4. **Use the ui-picker workflow** (`uidotsh://ui/ui-picker`) for any new design or exploratory UI work. Generate multiple variants with `data-uidotsh-pick` / `data-uidotsh-option` attributes and let the user choose in-browser.
+
+This applies to: landing pages, page sections, component creation, layout changes, styling updates, responsive work, dark mode, and any visual implementation.
+
+**If the MCP server is down, do not proceed with UI work.** Ask the user to fix the connection first. Writing UI code without ui.sh guidance produces generic, AI-looking output that will need to be redone.
 
 ### Reference Docs
 - **Product requirements:** `docs/PRD.md` — goals, scope, user flows, policies
