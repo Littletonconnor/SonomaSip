@@ -85,6 +85,14 @@ Phase 0 (spec, ERD, design, SCORING draft)
 - [ ] Key screens: landing, quiz step, results split, detail, print
 - [ ] Imagery policy (avoid implying winery endorsement)
 
+### 0.5b shadcn/ui integration
+
+- [ ] Install shadcn/ui (`pnpm dlx shadcn@latest init`)
+- [ ] Configure shadcn theme with Sonoma tokens (wine, gold, sage, bark, cream, etc.)
+- [ ] Replace hand-rolled Button, Card, Badge with shadcn versions
+- [ ] Add additional primitives: Slider, Stepper, Modal/Dialog, Toast, Skeleton, Chip/Toggle
+- [ ] Verify all components render with Sonoma palette
+
 ### 0.6 Data model
 
 - [ ] ERD: `wineries`, `flights`, normalization vs JSONB decision
