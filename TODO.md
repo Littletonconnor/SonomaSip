@@ -268,16 +268,17 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [x] Responsive: collapses to single column on mobile
 - [x] Static generation via generateStaticParams for all 8 mock wineries
 
-### 3.5.6 Browse / directory page _(use `/ui` skill)_
+### 3.5.6 Browse / directory page ✅
 
-- [ ] Page header: "All Wineries" + count badge ("68 wineries")
-- [ ] View toggle: grid / compact list switch
-- [ ] Sort dropdown: Name A-Z, Price Low-High, Region
-- [ ] Filter panel: region checkboxes, price range, feature toggles (dog, food, views, walk-in)
-- [ ] Desktop: filter sidebar (left) + grid (right)
-- [ ] Mobile: filter drawer (sheet from bottom) + full-width cards
-- [ ] Winery cards: name, region, price, 2-3 feature badges, gradient placeholder image
-- [ ] Cards link to `/wineries/[slug]`
+- [x] Page header: "All Wineries" + dynamic count
+- [x] Sort dropdown: Name A–Z, Price Low/High, Highest Rated (custom styled select per ui.sh guidelines)
+- [x] Filter panel: 5 region buttons + 5 feature toggles (walk-in, dog, kid, food, views)
+- [x] Desktop: sticky left filter sidebar (220px) + 3-column card grid
+- [x] Mobile: collapsible filter panel with active count badge
+- [x] Winery cards: name, rating, tagline, region, price range, up to 3 feature badges
+- [x] Cards link to `/wineries/[slug]`, hover shadow transition, staggered animation
+- [x] Empty state: "No wineries match" + clear filters button
+- [x] Clear all filters link when any filter is active
 
 ### 3.5.7 Shared plan page _(use `/ui` skill)_
 
