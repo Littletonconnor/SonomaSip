@@ -67,3 +67,4 @@ pnpm dlx shadcn@latest add <component> --diff # Preview changes before overwriti
 - Absolute imports via `@/`
 - Prettier for formatting (run `pnpm format` before committing)
 - Single quotes, semicolons, trailing commas
+- **No unnecessary comments.** Do not add comments that restate what the code does. Only comment to explain *why* something non-obvious is done. No section dividers, no "// Component" or "// Styles" markers, no TODO/FIXME unless tracking a real issue.
