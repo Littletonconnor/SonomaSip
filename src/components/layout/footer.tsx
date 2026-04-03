@@ -1,54 +1,79 @@
 import Link from 'next/link';
+import { WineGlassLogo } from '@/components/layout/navbar';
 
-const footerLinks = [
+const navLinks = [
   { href: '/#how-it-works', label: 'How It Works' },
   { href: '/wineries', label: 'Wineries' },
+];
+
+const legalLinks = [
   { href: '/privacy', label: 'Privacy' },
   { href: '/terms', label: 'Terms' },
 ];
 
 export function Footer() {
   return (
-    <footer className="border-border bg-card border-t">
-      <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-          {/* Brand */}
-          <div className="max-w-xs">
-            <Link href="/" className="font-heading text-bark text-xl font-semibold tracking-tight">
-              Sonoma Sip
+    <footer className="border-t border-gold/20 bg-card">
+      <div className="mx-auto max-w-6xl px-6 py-14">
+        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
+          <div>
+            <Link
+              href="/"
+              aria-label="Homepage"
+              className="flex items-center gap-2.5"
+            >
+              <WineGlassLogo className="h-7 w-auto" />
+              <span className="font-heading text-lg font-medium tracking-wide text-bark">
+                Sonoma Sip
+              </span>
             </Link>
-            <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-              Your personalized Sonoma County winery guide. Independent recommendations based on
-              curated data — no partnerships, no paid placement.
+            <p className="mt-4 max-w-[36ch] text-sm text-muted-foreground">
+              An independent guide to Sonoma County wine country. We recommend
+              based on fit, not who pays us.
             </p>
           </div>
 
-          {/* Links */}
-          <div className="flex gap-12">
-            <div>
-              <h4 className="text-foreground text-sm font-semibold">Navigate</h4>
-              <ul className="mt-3 flex flex-col gap-2.5">
-                {footerLinks.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <nav aria-label="Site links">
+            <h4 className="font-heading text-sm font-medium tracking-wide text-bark">
+              Explore
+            </h4>
+            <ul role="list" className="mt-4 flex flex-col gap-2.5">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Legal links">
+            <h4 className="font-heading text-sm font-medium tracking-wide text-bark">
+              Legal
+            </h4>
+            <ul role="list" className="mt-4 flex flex-col gap-2.5">
+              {legalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-border mt-10 border-t pt-6">
-          <div className="text-muted-foreground flex flex-col items-center justify-between gap-3 text-xs md:flex-row">
+        <div className="mt-12 border-t border-gold/20 pt-6">
+          <div className="flex flex-col items-center justify-between gap-3 text-xs tracking-wide text-muted-foreground md:flex-row">
             <p>
-              Sonoma Sip is an independent guide. Hours, prices, and policies change — always verify
-              before visiting.
+              Independent guide. Verify hours and policies before visiting.
             </p>
             <p className="shrink-0">Made with care in Sonoma County</p>
           </div>

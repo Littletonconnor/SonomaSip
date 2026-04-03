@@ -51,7 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="flex min-h-full flex-col">
         <TooltipProvider>
           <Navbar />
-          <div className="flex flex-1 flex-col pt-16">{children}</div>
+          <div className="flex flex-1 flex-col pt-14">{children}</div>
           <Footer />
         </TooltipProvider>
       </body>
