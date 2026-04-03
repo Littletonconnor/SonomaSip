@@ -252,7 +252,7 @@ function FilterPanel({
                 key={r}
                 type="button"
                 onClick={() => toggleRegion(r)}
-                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all ${
+                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all focus-visible:outline-2 focus-visible:outline-wine ${
                   active
                     ? 'bg-wine/10 text-wine font-medium'
                     : 'text-stone hover:bg-fog hover:text-bark'
@@ -274,7 +274,7 @@ function FilterPanel({
                 key={f.key}
                 type="button"
                 onClick={() => toggleFeature(f.key)}
-                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all ${
+                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all focus-visible:outline-2 focus-visible:outline-wine ${
                   active
                     ? 'bg-wine/10 text-wine font-medium'
                     : 'text-stone hover:bg-fog hover:text-bark'

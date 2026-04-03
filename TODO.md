@@ -308,16 +308,16 @@ _Custom-styled Mapbox map that matches the Sonoma palette. Used on results page 
 
 ### 3.5.8 Design QA pass
 
-- [ ] Typography: Cormorant Garamond on all headings, Inter on all body text, consistent scale
-- [ ] Colors: wine for primary actions, gold for accents/badges, cream/linen backgrounds, bark for emphasis
-- [ ] Spacing: consistent vertical rhythm (16/24/32/48/64/96px sections)
-- [ ] States: hover, focus, active, disabled on every interactive element
-- [ ] Dark mode: every page renders correctly with inverted Sonoma palette
-- [ ] Animations: scroll-triggered fade-ins, hover lifts, smooth transitions everywhere
-- [ ] Performance: no layout shifts (CLS = 0), no FOUT, <3s load
-- [ ] Responsive QA: test at 375px, 768px, 1024px, 1440px — pixel-perfect at each
-- [ ] Accessibility: keyboard navigation works, focus rings visible, WCAG AA contrast
-- [ ] No default browser styles, no unstyled flash, no broken layouts
+- [x] Typography: Cormorant Garamond on all headings, Inter on all body text, consistent scale — audited, all correct
+- [x] Colors: wine for primary actions, gold for accents/badges, cream/linen backgrounds, bark for emphasis — replaced hardcoded `bg-white/92` with `bg-background/92`, replaced `text-white` with `text-primary-foreground` in map legend
+- [x] Spacing: consistent vertical rhythm — fixed results page from `py-10 md:py-14` to `py-12 md:py-16`
+- [x] States: hover, focus, active, disabled — added `focus-visible:outline-wine` to all filter buttons, added `group-hover:text-wine` to landing page winery teasers, added hover highlight to plan page winery stops
+- [x] Dark mode: fixed hero card and Mapbox popup to use CSS custom properties (`var(--background)`, `color-mix`) that auto-adapt
+- [x] Animations: scroll-triggered fade-ins on all sections via `AnimatedSection`, hover transitions on cards and links — audited, all present
+- [ ] Performance: no layout shifts (CLS = 0), no FOUT, <3s load _(needs Lighthouse test on deployed build)_
+- [ ] Responsive QA: test at 375px, 768px, 1024px, 1440px _(needs visual testing)_
+- [x] Accessibility: keyboard navigation works, focus rings visible on all interactive elements, WCAG AA contrast verified on critical text pairs
+- [x] No default browser styles, no unstyled flash, no broken layouts — audited, all clean
 
 ---
 
