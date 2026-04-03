@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSessionStorage } from '@/hooks/use-session-storage';
 import { motion, AnimatePresence, type Variants } from 'motion/react';
 import {
   Dog,
@@ -110,9 +111,11 @@ const fadeUpVariants: Variants = {
 
 export default function QuizPage() {
   const router = useRouter();
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<QuizAnswers>(defaultAnswers);
+  const [step, setStep, { hydrated: stepHydrated }] = useSessionStorage('quiz-step', 0);
+  const [answers, setAnswers, { hydrated: answersHydrated, remove: clearAnswers }] =
+    useSessionStorage<QuizAnswers>('quiz-answers', defaultAnswers);
   const [direction, setDirection] = useState(1);
+  const hydrated = stepHydrated && answersHydrated;
 
   const toggleVarietal = useCallback((v: Varietal) => {
     setAnswers((prev) => ({
@@ -187,6 +190,10 @@ export default function QuizPage() {
 
   const isLast = step === 3;
   const progress = ((step + 1) / 4) * 100;
+
+  if (!hydrated) {
+    return <div className="min-h-[calc(100dvh-3.5rem)]" />;
+  }
 
   return (
     <div className="min-h-[calc(100dvh-3.5rem)]">

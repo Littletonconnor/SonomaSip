@@ -245,6 +245,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+  button,
+  [role='button'],
+  a {
+    cursor: pointer;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans), system-ui, sans-serif;
