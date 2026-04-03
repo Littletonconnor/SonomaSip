@@ -51,11 +51,11 @@ Phase 0 (spec, ERD, design, SCORING draft)
 
 ### 0.1 Repository & tooling
 
-- [ ] Git init; `.gitignore` (`.env*`, `node_modules`, `.next`, `.vercel`, Supabase temp)
-- [ ] Package manager (**pnpm**); `engines` / `.nvmrc` for Node
-- [ ] EditorConfig, Prettier, ESLint (Next-compatible)
-- [ ] Root `README.md`: dev commands, env setup, link to `docs/`
-- [ ] `.env.example` (no secrets)
+- [x] Git init; `.gitignore` (`.env*`, `node_modules`, `.next`, `.vercel`, Supabase temp)
+- [x] Package manager (**pnpm**); `engines` / `.nvmrc` for Node
+- [x] EditorConfig, Prettier, ESLint (Next-compatible)
+- [x] Root `README.md`: dev commands, env setup, link to `docs/`
+- [x] `.env.example` (no secrets)
 
 ### 0.2 Service accounts
 
@@ -179,10 +179,10 @@ Phase 0 (spec, ERD, design, SCORING draft)
 
 ### 3.1 Bootstrap
 
-- [ ] `create-next-app` App Router + TS + ESLint
-- [ ] Absolute imports `@/`
-- [ ] Styling system (Tailwind or CSS modules)—one consistent approach
-- [ ] Root layout, providers
+- [x] `create-next-app` App Router + TS + ESLint
+- [x] Absolute imports `@/`
+- [x] Styling system (Tailwind or CSS modules)—one consistent approach
+- [x] Root layout, providers
 
 ### 3.2 Config
 
