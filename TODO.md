@@ -68,9 +68,9 @@ Phase 0 (spec, ERD, design, SCORING draft)
 
 ### 0.3 Routes & errors
 
-- [ ] Route list: `/`, quiz entry, results, `/plan/[shareId]`, `/wineries`, `/wineries/[slug]`, print/PDF route, legal pages
-- [ ] Quiz URL strategy (single entry + client step state vs nested routes)
-- [ ] `not-found` / `error` UI
+- [x] Route list: `/`, quiz entry, results, `/plan/[shareId]`, `/wineries`, `/wineries/[slug]`, print/PDF route, legal pages
+- [x] Quiz URL strategy (single entry + client step state vs nested routes)
+- [x] `not-found` / `error` UI
 
 ### 0.4 Legal copy
 
