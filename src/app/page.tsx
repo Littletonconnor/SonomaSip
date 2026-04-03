@@ -1,10 +1,92 @@
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Container } from '@/components/ui/container';
+
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-6">
-      <h1 className="text-4xl font-bold tracking-tight">Sonoma Sip</h1>
-      <p className="mt-4 max-w-md text-center text-lg text-zinc-600 dark:text-zinc-400">
-        Your personalized Sonoma County winery guide. Coming soon.
-      </p>
-    </main>
+    <>
+      {/* Hero */}
+      <section className="flex flex-1 flex-col items-center justify-center py-24 md:py-32">
+        <Container className="flex flex-col items-center text-center">
+          <p className="text-sm font-medium tracking-widest text-wine uppercase">
+            Sonoma County Winery Guide
+          </p>
+          <h1 className="mt-4 text-5xl font-semibold tracking-tight text-bark md:text-6xl lg:text-7xl">
+            Sonoma Sip
+          </h1>
+          <p className="mt-6 max-w-xl text-lg text-text-muted md:text-xl">
+            Answer a few questions about your wine preferences, budget, and group — and get a
+            personalized, ranked list of Sonoma County wineries that fit.
+          </p>
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+            <Link href="/quiz">
+              <Button size="lg">Plan Your Visit</Button>
+            </Link>
+            <Link href="/wineries">
+              <Button variant="secondary" size="lg">
+                Browse All Wineries
+              </Button>
+            </Link>
+          </div>
+        </Container>
+      </section>
+
+      {/* How it works */}
+      <section className="border-t border-fog bg-linen py-16 md:py-24">
+        <Container>
+          <h2 className="text-center text-3xl font-semibold text-bark md:text-4xl">
+            How It Works
+          </h2>
+          <div className="mt-12 grid gap-8 md:grid-cols-3">
+            {[
+              {
+                step: '01',
+                title: 'Tell Us Your Preferences',
+                description:
+                  'Varietals, vibe, budget, must-haves — a short quiz to understand what matters to you.',
+              },
+              {
+                step: '02',
+                title: 'Get Matched',
+                description:
+                  'Our matching engine scores 68 curated wineries and ranks the best fits with clear reasons why.',
+              },
+              {
+                step: '03',
+                title: 'Plan & Share',
+                description:
+                  'View your results on a map, read winery details, then share, print, or email your plan.',
+              },
+            ].map((item) => (
+              <div key={item.step} className="text-center md:text-left">
+                <span className="text-sm font-medium text-gold">{item.step}</span>
+                <h3 className="mt-2 text-xl font-semibold text-bark">{item.title}</h3>
+                <p className="mt-3 text-text-muted">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-fog py-8">
+        <Container>
+          <div className="flex flex-col items-center justify-between gap-4 text-sm text-text-muted md:flex-row">
+            <p>
+              Sonoma Sip is an independent guide. Verify hours, prices, and policies before
+              visiting.
+            </p>
+            <div className="flex gap-6">
+              <Link href="/privacy" className="transition-colors hover:text-text">
+                Privacy
+              </Link>
+              <Link href="/terms" className="transition-colors hover:text-text">
+                Terms
+              </Link>
+            </div>
+          </div>
+        </Container>
+      </footer>
+    </>
   );
 }

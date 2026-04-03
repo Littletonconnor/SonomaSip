@@ -80,8 +80,8 @@ Phase 0 (spec, ERD, design, SCORING draft)
 
 ### 0.5 Design system
 
-- [ ] Fonts, color tokens, spacing (WCAG AA on controls)
-- [ ] Component inventory: Button, Chip, Slider, Stepper, Card, Modal, Toast, Skeleton, list row, map callout
+- [x] Fonts, color tokens, spacing (WCAG AA on controls)
+- [x] Component inventory: Button, Chip, Slider, Stepper, Card, Modal, Toast, Skeleton, list row, map callout
 - [ ] Key screens: landing, quiz step, results split, detail, print
 - [ ] Imagery policy (avoid implying winery endorsement)
 

@@ -1,25 +1,126 @@
 @import 'tailwindcss';
 
+/* ============================================================
+   Sonoma Sip — Design Tokens
+   Warm, organic palette inspired by Sonoma County wine country:
+   golden hills, morning fog, vineyard sage, redwood bark, wine.
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Backgrounds */
+  --color-cream: #faf7f2;
+  --color-linen: #f5f0e8;
+  --color-fog: #e8e2d8;
+
+  /* Text */
+  --color-text: #3d3330;
+  --color-text-muted: #9c9589;
+
+  /* Darks */
+  --color-bark: #2c1810;
+  --color-dusk: #2a3a4a;
+
+  /* Accent — Wine */
+  --color-wine: #722f37;
+  --color-wine-dark: #5a2530;
+  --color-wine-light: #8b3d47;
+
+  /* Accent — Gold */
+  --color-gold: #c9a96e;
+  --color-gold-light: #dbc190;
+
+  /* Accent — Sage */
+  --color-sage: #90a58a;
+  --color-sage-light: #adbfa8;
+
+  /* Supplementary */
+  --color-oak: #8b7355;
+  --color-blush: #d4a9a0;
+  --color-stone: #9c9589;
+
+  /* Shadows (warm-tinted) */
+  --shadow-warm: 0 1px 3px 0 rgb(44 24 16 / 0.06), 0 1px 2px -1px rgb(44 24 16 / 0.06);
+  --shadow-warm-md: 0 4px 6px -1px rgb(44 24 16 / 0.07), 0 2px 4px -2px rgb(44 24 16 / 0.05);
+  --shadow-warm-lg: 0 10px 15px -3px rgb(44 24 16 / 0.07), 0 4px 6px -4px rgb(44 24 16 / 0.05);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Backgrounds */
+  --color-cream: var(--color-cream);
+  --color-linen: var(--color-linen);
+  --color-fog: var(--color-fog);
+
+  /* Text */
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+
+  /* Darks */
+  --color-bark: var(--color-bark);
+  --color-dusk: var(--color-dusk);
+
+  /* Wine accent */
+  --color-wine: var(--color-wine);
+  --color-wine-dark: var(--color-wine-dark);
+  --color-wine-light: var(--color-wine-light);
+
+  /* Gold accent */
+  --color-gold: var(--color-gold);
+  --color-gold-light: var(--color-gold-light);
+
+  /* Sage accent */
+  --color-sage: var(--color-sage);
+  --color-sage-light: var(--color-sage-light);
+
+  /* Supplementary */
+  --color-oak: var(--color-oak);
+  --color-blush: var(--color-blush);
+  --color-stone: var(--color-stone);
+
+  /* Typography */
+  --font-heading: var(--font-heading);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  /* Shadows */
+  --shadow-warm: var(--shadow-warm);
+  --shadow-warm-md: var(--shadow-warm-md);
+  --shadow-warm-lg: var(--shadow-warm-lg);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-cream: #1a1412;
+    --color-linen: #231c17;
+    --color-fog: #2e251f;
+    --color-text: #ede8e3;
+    --color-text-muted: #9c9589;
+    --color-bark: #f5f0e8;
+    --color-stone: #7a746e;
+    --color-wine: #c75a65;
+    --color-wine-dark: #a8484f;
+    --color-wine-light: #d4737b;
+    --color-gold: #dbc190;
+    --color-gold-light: #c9a96e;
+    --color-sage: #adbfa8;
+    --color-sage-light: #90a58a;
+    --color-oak: #b09a82;
+    --color-blush: #d4a9a0;
+    --color-dusk: #8ea4b8;
+
+    --shadow-warm: 0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+    --shadow-warm-md: 0 4px 6px -1px rgb(0 0 0 / 0.25), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+    --shadow-warm-lg: 0 10px 15px -3px rgb(0 0 0 / 0.25), 0 4px 6px -4px rgb(0 0 0 / 0.2);
   }
 }
 
+/* Base typography */
 body {
-  background: var(--background);
-  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading), Georgia, serif;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 }
