@@ -2,6 +2,8 @@
 
 **Purpose:** Technical implementation tracker. Check boxes as work completes. Product intent, policies, and metrics definitions: **[`docs/PRD.md`](docs/PRD.md)**. Matching math: **[`docs/SCORING.md`](docs/SCORING.md)**.
 
+> **UI WORK RULE:** Always invoke the `/ui` skill (`.claude/skills/ui/SKILL.md`) when building or modifying any page, component, or visual element. Every screen must look like a professional designer built it.
+
 ---
 
 ## References
@@ -27,6 +29,7 @@
 | Layer | Choice |
 |-------|--------|
 | App | Next.js (App Router), TypeScript |
+| Components | shadcn/ui (Radix primitives, Tailwind v4) |
 | Database | Supabase (PostgreSQL) |
 | Map | Mapbox GL (`react-map-gl` or equivalent) |
 | Email | Resend or Postmark (pick one) |
@@ -36,17 +39,29 @@
 
 ---
 
-## Dependency graph
+## Approach: UI-first with mock data
+
+Build the full user experience with mock data first. Validate that every screen feels right. Then wire up the real backend (Supabase, import, matching engine).
 
 ```
-Phase 0 (spec, ERD, design, SCORING draft)
+Track A — UI Prototype (current focus)
+  Phase 0 (spec, design) ✅
+    → Phase 3 (Next.js shell) ✅
+    → Phase 3.5 (all screens with mock data) ← YOU ARE HERE
+    → Validate & iterate
+
+Track B — Backend (after UI is validated)
+  Phase 0.6 (data model / ERD)
+    → Phase 0.7 (SCORING.md spec)
     → Phase 1 (Supabase schema + RLS + types)
-    → Phase 2 (importer from docs/*.xlsx → Postgres)
-    → Phase 3 (Next.js shell)
-    → Phase 4 (matching engine + tests)  ⟵ can use fixtures after Phase 2 shape is stable
-    → Phase 5 (UX: quiz → results → detail → share/PDF/email)
-    → Phase 6 (SEO / perf)
-    → Phase 7 (ops: Places sync optional, backups, runbooks)
+    → Phase 2 (import from Excel)
+    → Phase 4 (matching engine + tests)
+
+Wire Up: Replace mock data with real Supabase queries + matching engine
+
+Track C — Polish & Launch
+  Phase 6 (SEO / perf)
+    → Phase 7 (ops)
     → Phase 8 (a11y, QA, launch)
     → Phase 9 (post-MVP)
 ```
@@ -63,7 +78,7 @@ Phase 0 (spec, ERD, design, SCORING draft)
 - [x] Root `README.md`: dev commands, env setup, link to `docs/`
 - [x] `.env.example` (no secrets)
 
-### 0.2 Service accounts
+### 0.2 Service accounts _(manual — do when needed)_
 
 - [ ] Supabase project (note ref, DB password, region)
 - [ ] Vercel project linked to repo
@@ -78,7 +93,7 @@ Phase 0 (spec, ERD, design, SCORING draft)
 - [x] Quiz URL strategy (single entry + client step state vs nested routes)
 - [x] `not-found` / `error` UI
 
-### 0.4 Legal copy
+### 0.4 Legal copy _(draft when ready — doesn't block UI)_
 
 - [ ] Accuracy disclaimer (footer + PDF + email per PRD)
 - [ ] Privacy policy (analytics, email, share URLs)
@@ -88,7 +103,7 @@ Phase 0 (spec, ERD, design, SCORING draft)
 
 - [x] Fonts, color tokens, spacing (WCAG AA on controls)
 - [x] Component inventory: Button, Chip, Slider, Stepper, Card, Modal, Toast, Skeleton, list row, map callout
-- [ ] Key screens: landing, quiz step, results split, detail, print
+- [ ] Key screens: landing, quiz step, results split, detail, print _(covered by Phase 3.5)_
 - [ ] Imagery policy (avoid implying winery endorsement)
 
 ### 0.5b shadcn/ui integration
@@ -102,7 +117,147 @@ Phase 0 (spec, ERD, design, SCORING draft)
 - [x] Add shadcn documentation references to TODO.md
 - [ ] Verify components render correctly with Sonoma palette (visual check)
 
-### 0.6 Data model
+---
+
+## Phase 3 — Next.js foundation
+
+### 3.1 Bootstrap
+
+- [x] `create-next-app` App Router + TS + ESLint
+- [x] Absolute imports `@/`
+- [x] Styling system (Tailwind or CSS modules)—one consistent approach
+- [x] Root layout, providers
+
+### 3.2 Config
+
+- [ ] `env.ts` with Zod validation; separate public vs server secrets
+
+### 3.3 CI
+
+- [ ] `pnpm typecheck`, `lint`, `test` in CI
+
+---
+
+## Phase 3.4 — App fundamentals (favicon, PWA, meta)
+
+- [ ] **Favicon:** Generate favicon set (favicon.ico, apple-touch-icon.png, favicon-16x16.png, favicon-32x32.png) — wine-themed icon
+- [ ] **Web app manifest:** `public/manifest.json` with app name, theme color (wine), background color (cream), icons, display: standalone
+- [ ] **PWA meta tags:** `<meta name="theme-color">`, `<meta name="apple-mobile-web-app-capable">`, `<link rel="manifest">`
+- [ ] **OG / social meta:** Default Open Graph image, title, description for link previews
+- [ ] **Viewport:** Ensure proper mobile viewport, safe-area-inset for notched devices
+- [ ] **Loading states:** Global loading indicator or skeleton for route transitions
+- [ ] **Offline support (stretch):** Service worker for basic offline page if feasible
+
+---
+
+## Phase 3.5 — UI Prototype with Mock Data ← CURRENT FOCUS
+
+_Build every screen using mock data. No real database, no real matching engine. Validate the experience, then wire up the backend._
+
+> **REMINDER:** Use the `/ui` skill for every screen. Each page must look like it was designed by a professional designer — polished typography, intentional spacing, beautiful component composition, responsive at every breakpoint.
+
+### 3.5.1 Mock data & types
+
+- [ ] TypeScript types: `Winery`, `Flight`, `QuizAnswers`, `MatchResult` in `src/lib/types.ts`
+- [ ] Mock data: 6–8 representative wineries in `src/lib/mock-data.ts`
+  - Cover: different price ranges, regions (Russian River, Dry Creek, Sonoma Valley, etc.)
+  - Cover: vibes (intimate, lively, family-friendly, luxury), reservation types, members-only
+  - Cover: dog/kid/wheelchair flags, food pairings, outdoor seating
+- [ ] Mock flights: 2–3 per winery (different formats, price points)
+- [ ] Mock quiz results: pre-computed ranked lists for demo purposes
+
+### 3.5.2 Landing page _(use `/ui` skill)_
+
+- [ ] Hero: bold Cormorant heading, compelling subtext, warm gradient or textured background
+- [ ] Primary + secondary CTAs (quiz / browse) with clear visual hierarchy
+- [ ] How-it-works: 3 steps with icons or illustrations, clean card layout
+- [ ] Social proof section: "68 curated wineries", key differentiators
+- [ ] Featured wineries teaser: 3–4 cards from mock data
+- [ ] Footer: disclaimer text, privacy/terms links, Sonoma Sip branding
+- [ ] Design polish: consistent vertical rhythm, elegant transitions, breathing whitespace
+- [ ] Responsive: pixel-perfect at 375px, 768px, 1024px, 1440px
+
+### 3.5.3 Quiz flow _(use `/ui` skill)_
+
+- [ ] Quiz shell: centered card layout, warm background, clear progress
+- [ ] Stepper: visual progress bar with step labels, current step highlighted in wine color
+- [ ] Step 1: Varietals — beautiful multi-select chips/toggles for wine types (Pinot Noir, Chardonnay, Cab, etc.)
+- [ ] Step 2: Vibe — card-based selection with icons (relaxed, educational, celebratory, adventurous, etc.)
+- [ ] Step 3: Budget — elegant price range selector (slider or tappable bands)
+- [ ] Step 4: Must-haves — toggle switches for views, food, outdoor seating, dog/kid/wheelchair
+- [ ] Step 5: Region / stops — region selector (map or cards) + "how many wineries" stepper
+- [ ] Step 6: Members-only toggle (default off) + optional group size field
+- [ ] Navigation: Back/Next buttons with per-step validation, disabled state when invalid
+- [ ] Transitions: smooth step transitions (fade or slide)
+- [ ] `sessionStorage` persistence (resume mid-quiz on page refresh)
+- [ ] Submit → navigate to `/results` with mock ranked data
+- [ ] Design polish: each step should feel delightful, not like a boring form
+- [ ] Responsive: full-width on mobile, constrained card on desktop
+
+### 3.5.4 Results page _(use `/ui` skill)_
+
+- [ ] Split layout: scrollable winery list (left) + map area (right)
+- [ ] Map: placeholder with Sonoma region illustration or static image (Mapbox wired later)
+- [ ] Winery result cards: rank badge (gold circle), winery name, region tag, price range
+- [ ] Match reasons: top-3 plain-language reasons per card ("Great for dog lovers", "Budget-friendly Pinot")
+- [ ] Badges: pill-style for "Reservation Required", "Members Only", "Dog Friendly", "Walk-In Welcome"
+- [ ] Card interactions: hover lift, click → `/wineries/[slug]`
+- [ ] "Your Preferences" summary at top (collapsible)
+- [ ] Empty state: friendly illustration + CTA to relax filters
+- [ ] Loading skeletons matching card layout
+- [ ] Mobile: stacked list with sticky "Show Map" toggle button
+- [ ] Action bar: Share, Print, Email buttons
+- [ ] Responsive: side-by-side on desktop, stacked on mobile/tablet
+
+### 3.5.5 Winery detail page _(use `/ui` skill)_
+
+- [ ] Hero section: winery name (Cormorant heading), region badge, tagline/vibe description
+- [ ] Photo placeholder: warm gradient or pattern (real photos later)
+- [ ] About/Story section: editorial description from mock data
+- [ ] Hours section: clean table or grid showing days + times
+- [ ] Tasting experiences: cards for each experience type (seated, bar, outdoor, private)
+- [ ] Flights table: formatted pricing table with flight name, wines included, price, duration
+- [ ] Logistics grid: parking, group size, noise level, reservation type — with icons
+- [ ] Accessibility: dog/kid/wheelchair indicators with clear icons
+- [ ] Ratings summary: star rating + review count (if available)
+- [ ] Primary CTA: prominent "Book a Tasting" button → reservation URL (new tab)
+- [ ] Secondary section: "Pairs Well With" — 2-3 related winery cards
+- [ ] Breadcrumb: Wineries > [Winery Name]
+- [ ] Responsive: single column on mobile, two-column sections on desktop
+
+### 3.5.6 Browse / directory page _(use `/ui` skill)_
+
+- [ ] Page header: "All Wineries" with count badge
+- [ ] View toggle: grid / list layout switch
+- [ ] Sort controls: name (A-Z), price (low-high), region
+- [ ] Filter sidebar/drawer: region checkboxes, price range, feature toggles
+- [ ] Winery cards: name, region, price range, key features, thumbnail placeholder
+- [ ] Cards link to `/wineries/[slug]`
+- [ ] Responsive: filter drawer on mobile, sidebar on desktop
+
+### 3.5.7 Shared plan page _(use `/ui` skill)_
+
+- [ ] `/plan/[id]`: read-only view of a mock itinerary
+- [ ] Header: "Your Sonoma Sip Plan" + "Generated on {date}"
+- [ ] Preferences summary: what the user asked for
+- [ ] Ordered list of recommended wineries with rank, reasons, and key details
+- [ ] Map placeholder showing winery locations
+- [ ] Action bar: Copy link, Print/PDF, Email — styled but non-functional for now
+- [ ] Branding footer: Sonoma Sip disclaimer
+
+### 3.5.8 Design QA pass
+
+- [ ] All pages use consistent typography scale (Cormorant headings, Inter body)
+- [ ] Color usage: wine for primary actions, gold for accents, cream/linen backgrounds throughout
+- [ ] Consistent spacing rhythm across all pages
+- [ ] Hover/focus/active states on all interactive elements
+- [ ] Dark mode renders correctly on every page
+- [ ] No default browser styles leaking through
+- [ ] No layout shifts or janky transitions
+
+---
+
+## Phase 0.6 — Data model _(after UI is validated)_
 
 - [ ] ERD: `wineries`, `flights`, normalization vs JSONB decision
 - [ ] Column mapping from **`docs/sonoma-winery-database-complete.xlsx`** (every sheet)
@@ -137,7 +292,7 @@ Phase 0 (spec, ERD, design, SCORING draft)
 
 ---
 
-## Phase 1 — Supabase: schema, RLS, types
+## Phase 1 — Supabase: schema, RLS, types _(after UI + data model)_
 
 ### 1.1 CLI & clients
 
@@ -167,7 +322,7 @@ Phase 0 (spec, ERD, design, SCORING draft)
 
 ---
 
-## Phase 2 — Data ingestion
+## Phase 2 — Data ingestion _(after Supabase schema)_
 
 ### 2.1 Importer
 
@@ -192,26 +347,7 @@ Phase 0 (spec, ERD, design, SCORING draft)
 
 ---
 
-## Phase 3 — Next.js foundation
-
-### 3.1 Bootstrap
-
-- [x] `create-next-app` App Router + TS + ESLint
-- [x] Absolute imports `@/`
-- [x] Styling system (Tailwind or CSS modules)—one consistent approach
-- [x] Root layout, providers
-
-### 3.2 Config
-
-- [ ] `env.ts` with Zod validation; separate public vs server secrets
-
-### 3.3 CI
-
-- [ ] `pnpm typecheck`, `lint`, `test` in CI
-
----
-
-## Phase 4 — Matching engine (TypeScript)
+## Phase 4 — Matching engine (TypeScript) _(after data import)_
 
 ### 4.1 Modules
 
@@ -234,43 +370,15 @@ Phase 0 (spec, ERD, design, SCORING draft)
 
 ---
 
-## Phase 5 — Product UI & flows
+## Phase 5 — Wire up: replace mock data with real backend
 
-### 5.1 Landing
-
-- [ ] Hero, how-it-works, CTA → quiz
-- [ ] Secondary CTA → `/wineries`
-- [ ] Footer: disclaimer + legal links
-
-### 5.2 Quiz
-
-- [ ] Steps: varietals, vibe, budget, must-haves, region/stops, **members-only toggle (default off)**, optional group fields
-- [ ] Zod schemas per step + full object
-- [ ] `sessionStorage` hydrate/debounce
-- [ ] Stepper: Back/Next + validation
-- [ ] Submit → server → results navigation (avoid huge query strings)
-
-### 5.3 Results
-
-- [ ] Split layout: list + Mapbox; mobile stack/tabs
-- [ ] Markers + clustering + fit bounds
-- [ ] Cards: rank, top-3 reasons, price hint, badges (reservation, members-only)
-- [ ] Empty state + CTA to relax filters
-- [ ] Loading skeletons
-
-### 5.4 Winery detail
-
-- [ ] `/wineries/[slug]` — `generateStaticParams` + revalidate policy
-- [ ] Sections: story, hours, experiences, flights table, logistics, ratings, pairs-well links
-- [ ] Single primary CTA → `reservation_url` (new tab)
-
-### 5.5 Share / PDF / email
-
-- [ ] Insert `shared_itineraries`: payload = prefs + ordered winery ids + version (≤ ~50KB cap); **rehydrate** from DB on read
-- [ ] `/plan/[id]`: read-only; OG tags; **Generated on {date}**
+- [ ] Replace mock data imports with Supabase queries
+- [ ] Quiz submit → server action → matching engine → results
+- [ ] Winery detail pages: `generateStaticParams` + revalidate policy
+- [ ] Share: insert `shared_itineraries` → Supabase
+- [ ] PDF: text-first print route / CSS; v2: Mapbox Static image
+- [ ] Email: send via Resend/Postmark with share URL + summary
 - [ ] Rate limit share create + email by IP
-- [ ] PDF v1: text-first print route / CSS; v2: Mapbox Static image
-- [ ] Email: link to share URL + summary (Resend/Postmark)
 
 ---
 
@@ -349,7 +457,7 @@ _Principles: retrieve from structured DB first; LLM formats/converses; no fabric
 - [ ] **RAG / tool-calling:** Expose winery rows (or search RPC) to the model; cite slugs/fields in debug mode
 - [ ] **Evals:** Golden prompts + expected winery sets; regression on hallucination / wrong filters
 - [ ] **Safety & privacy:** Prompt/PII logging policy; update privacy policy; rate limits on AI endpoints
-- [ ] **Optional:** Conversational refinement (“quieter third stop”), itinerary narrative for PDF/email (facts-only)
+- [ ] **Optional:** Conversational refinement ("quieter third stop"), itinerary narrative for PDF/email (facts-only)
 
 ---
 
@@ -357,7 +465,9 @@ _Principles: retrieve from structured DB first; LLM formats/converses; no fabric
 
 | Date | Phase | Notes |
 |------|-------|-------|
-| | | _(add a row when a phase or milestone completes)_ |
+| 2026-04-02 | 0.1, 3.1 | Scaffold: Next.js, Tailwind, pnpm, ESLint, Prettier |
+| 2026-04-02 | 0.3 | All routes + error pages |
+| 2026-04-02 | 0.5, 0.5b | Sonoma design system + shadcn/ui (all components) |
 
 ---
 
@@ -369,3 +479,5 @@ _Principles: retrieve from structured DB first; LLM formats/converses; no fabric
 | 2026-04-02 | Locked Q1–Q14 implementation targets |
 | 2026-04-02 | Split product doc to `docs/PRD.md`; moved data to `docs/`; TODO is technical-only |
 | 2026-04-02 | Phase 9.2 AI roadmap; PRD §14 + README deterministic-first note |
+| 2026-04-02 | Restructured to UI-first approach: Phase 3.5 (mock data prototype) before backend phases |
+| 2026-04-02 | Added shadcn/ui docs references |
