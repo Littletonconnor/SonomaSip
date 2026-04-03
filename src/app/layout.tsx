@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Cormorant_Garamond, Inter, Geist_Mono } from 'next/font/google';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Navbar } from '@/components/layout/navbar';
@@ -25,6 +25,13 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#722F37',
+};
+
 export const metadata: Metadata = {
   title: {
     default: 'Sonoma Sip — Your Personalized Sonoma County Winery Guide',
@@ -33,12 +40,24 @@ export const metadata: Metadata = {
   description:
     'Plan your Sonoma County winery visit. Answer a few questions and get a personalized, ranked list of wineries that fit your taste, budget, and group.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Sonoma Sip',
+  },
   openGraph: {
     title: 'Sonoma Sip — Your Personalized Sonoma County Winery Guide',
     description:
       'Answer a few questions and get a personalized, ranked list of Sonoma County wineries that fit your taste, budget, and group.',
     siteName: 'Sonoma Sip',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sonoma Sip — Your Personalized Sonoma County Winery Guide',
+    description:
+      'Answer a few questions and get a personalized, ranked list of Sonoma County wineries that fit your taste, budget, and group.',
   },
 };
 
@@ -48,7 +67,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en"
       className={`${cormorant.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
         <TooltipProvider>
           <Navbar />
           <div className="flex flex-1 flex-col pt-14">{children}</div>

@@ -1,0 +1,21 @@
+{
+  "name": "Sonoma Sip — Personalized Winery Guide",
+  "short_name": "Sonoma Sip",
+  "description": "Plan your Sonoma County winery visit. Answer a few questions and get personalized recommendations.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#722F37",
+  "background_color": "#F7F2EC",
+  "icons": [
+    {
+      "src": "/icon",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-icon",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

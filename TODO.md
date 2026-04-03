@@ -163,13 +163,12 @@ Track C — Polish & Launch
 
 ## Phase 3.4 — App fundamentals (favicon, PWA, meta)
 
-- [ ] **Favicon:** Generate favicon set (favicon.ico, apple-touch-icon.png, favicon-16x16.png, favicon-32x32.png) — wine-themed icon
-- [ ] **Web app manifest:** `public/manifest.json` with app name, theme color (wine), background color (cream), icons, display: standalone
-- [ ] **PWA meta tags:** `<meta name="theme-color">`, `<meta name="apple-mobile-web-app-capable">`, `<link rel="manifest">`
-- [ ] **OG / social meta:** Default Open Graph image, title, description for link previews
-- [ ] **Viewport:** Ensure proper mobile viewport, safe-area-inset for notched devices
-- [ ] **Loading states:** Global loading indicator or skeleton for route transitions
-- [ ] **Offline support (stretch):** Service worker for basic offline page if feasible
+- [x] **Favicon:** Dynamic icon generation via `src/app/icon.tsx` (32x32) and `src/app/apple-icon.tsx` (180x180) — wine glass on burgundy gradient
+- [x] **Web app manifest:** `public/manifest.json` with app name, theme color (wine #722F37), background color (cream #F7F2EC), icons, display: standalone
+- [x] **PWA meta tags:** Viewport with `viewportFit: cover`, `themeColor`, `appleWebApp` capable + black-translucent, manifest link — all via Next.js `Viewport` + `Metadata` exports
+- [x] **OG / social meta:** Dynamic OG image via `src/app/opengraph-image.tsx` (1200x630), Twitter card: summary_large_image, title + description
+- [x] **Viewport:** Safe-area-inset via `pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]` on body
+- [x] **Loading states:** Route-level loading skeletons for results, browse/wineries, winery detail, and shared plan — all matching actual page layout shapes
 
 ---
 
@@ -251,7 +250,7 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [x] Cards: hover shadow transition, click → `/wineries/[slug]`, staggered entrance animation
 - [x] Empty state: Search icon, friendly message, "Retake the Quiz" CTA
 - [x] Retake Quiz + Browse all wineries links at bottom of results
-- [ ] Loading skeleton matching card layout shape
+- [x] Loading skeleton matching card layout shape
 
 ### 3.5.5 Winery detail page ✅
 
@@ -289,7 +288,7 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [x] Map placeholder with positioned winery dots from lat/lng
 - [x] Numbered winery stops: rank badge, name (links to detail), region, price, rating, match reasons, feature badges, "Book a Tasting" link
 - [x] Disclaimer footer: independent guide, verify details
-- [ ] OG meta tags for link previews
+- [x] OG meta tags for link previews
 
 ### 3.5.9 Map integration (Mapbox GL)
 
@@ -562,27 +561,27 @@ _Focused on what's actually cheap for a Next.js app with sampled logscope events
 
 ### Analytics (Browser Clicks/Events)
 
-| Platform | Free Tier | Cost at ~1M events/mo | Best For |
-|---|---|---|---|
-| **PostHog** | 1M events/mo, 5K session replays | $0 | All-in-one: analytics, replay, feature flags. Has a Next.js SDK |
-| **OpenPanel** | Self-hosted = unlimited, free | ~$90/mo cloud | Open-source Mixpanel alternative. Self-host on a $5 VPS |
-| **Umami** | Self-hosted = unlimited, free | $20/mo cloud | Lightweight privacy-focused web analytics. No cookies |
+| Platform      | Free Tier                        | Cost at ~1M events/mo | Best For                                                        |
+| ------------- | -------------------------------- | --------------------- | --------------------------------------------------------------- |
+| **PostHog**   | 1M events/mo, 5K session replays | $0                    | All-in-one: analytics, replay, feature flags. Has a Next.js SDK |
+| **OpenPanel** | Self-hosted = unlimited, free    | ~$90/mo cloud         | Open-source Mixpanel alternative. Self-host on a $5 VPS         |
+| **Umami**     | Self-hosted = unlimited, free    | $20/mo cloud          | Lightweight privacy-focused web analytics. No cookies           |
 
 ### Logs / Observability (Server-Side)
 
-| Platform | Free Tier | Notes |
-|---|---|---|
-| **Axiom** | **500 GB/mo ingest**, 30-day retention | Absurdly generous. Has a Vercel/Next.js integration. Top pick |
-| **SigNoz** | Self-hosted = unlimited | Open-source Datadog alternative. OpenTelemetry native |
-| **HyperDX** | 3 GB/mo cloud, self-hosted = free | Combines session replay + logs + traces |
-| **OpenObserve** | Self-hosted = free | Claims 140x less storage than Elasticsearch. Single binary |
+| Platform        | Free Tier                              | Notes                                                         |
+| --------------- | -------------------------------------- | ------------------------------------------------------------- |
+| **Axiom**       | **500 GB/mo ingest**, 30-day retention | Absurdly generous. Has a Vercel/Next.js integration. Top pick |
+| **SigNoz**      | Self-hosted = unlimited                | Open-source Datadog alternative. OpenTelemetry native         |
+| **HyperDX**     | 3 GB/mo cloud, self-hosted = free      | Combines session replay + logs + traces                       |
+| **OpenObserve** | Self-hosted = free                     | Claims 140x less storage than Elasticsearch. Single binary    |
 
 ### Error Tracking
 
-| Platform | Free Tier | Notes |
-|---|---|---|
+| Platform      | Free Tier                        | Notes                               |
+| ------------- | -------------------------------- | ----------------------------------- |
 | **GlitchTip** | 1K events/mo, self-hosted = free | Sentry-compatible SDK, much cheaper |
-| **Sentry** | 5K errors/mo | The standard, but costs add up fast |
+| **Sentry**    | 5K errors/mo                     | The standard, but costs add up fast |
 
 ### Recommendation for This Setup
 
@@ -593,6 +592,7 @@ _Focused on what's actually cheap for a Next.js app with sampled logscope events
 3. Use logscope's `createSamplingFilter` with `keepWhen` conditions so **errors and slow requests are never sampled away**, only the routine info/debug logs get thinned out
 
 **Fully self-hosted ($5-20/mo VPS):**
+
 - Umami (analytics) + SigNoz (logs/traces) + GlitchTip (errors)
 
 ### How It'd Work with logscope
@@ -600,20 +600,20 @@ _Focused on what's actually cheap for a Next.js app with sampled logscope events
 The sampling strategy is the key — multiple sinks with different sampling rates:
 
 ```typescript
-import { configure, createSamplingFilter, getConsoleSink, withFilter } from 'logscope'
+import { configure, createSamplingFilter, getConsoleSink, withFilter } from 'logscope';
 
 const sampling = createSamplingFilter({
   rates: {
-    trace: 0.01,    // 1% of trace
-    debug: 0.05,    // 5% of debug
-    info: 0.1,      // 10% of info
+    trace: 0.01, // 1% of trace
+    debug: 0.05, // 5% of debug
+    info: 0.1, // 10% of info
     // warning, error, fatal = 100% (default)
   },
   keepWhen: [
     (r) => (r.properties.status as number) >= 500,
     (r) => (r.properties.duration as number) > 2000,
   ],
-})
+});
 ```
 
 Then your PostHog sink and Axiom sink both get the sampled stream — errors always come through, routine logs are thinned to keep you in free tiers.
