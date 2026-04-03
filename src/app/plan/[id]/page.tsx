@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { MapPin, Printer, Mail, Link2, Star, ExternalLink, Check } from 'lucide-react';
+import { Printer, Mail, Link2, Star, ExternalLink, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
+import { PlanMap } from './plan-map';
 import { mockResultsCasualCouple } from '@/lib/mock-data';
+import type { MapItem } from '@/components/map/types';
 import type { MatchResult } from '@/lib/types';
 
 const MOCK_PLAN = {
@@ -57,6 +59,19 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
   const { id } = await params;
   const plan = MOCK_PLAN;
 
+  const mapItems: MapItem[] = plan.results.map((r) => ({
+    id: r.winery.id,
+    latitude: r.winery.latitude,
+    longitude: r.winery.longitude,
+    rank: r.rank,
+    label: r.winery.name,
+    region: r.winery.region,
+    slug: r.winery.slug,
+    priceRange: `$${r.winery.minFlightPrice}–${r.winery.maxFlightPrice}`,
+    rating: r.winery.averageRating,
+    bookingUrl: r.winery.bookingUrl,
+  }));
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
       <div className="gap-12 lg:grid lg:grid-cols-[2fr_3fr]">
@@ -100,7 +115,7 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
             </div>
 
             <div className="mt-8">
-              <MapPlaceholder results={plan.results} />
+              <PlanMap items={mapItems} />
             </div>
           </AnimatedSection>
         </div>
@@ -192,39 +207,6 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
             <ExternalLink className="size-3.5" />
           </a>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function MapPlaceholder({ results }: { results: MatchResult[] }) {
-  const latRange = { min: 38.2, max: 38.85 };
-  const lngRange = { min: -123.1, max: -122.5 };
-
-  return (
-    <div className="bg-card overflow-hidden rounded-2xl ring-1 ring-black/5">
-      <div className="from-sage/10 via-linen to-gold/10 relative aspect-[4/3] bg-linear-to-br">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <MapPin className="text-stone/20 mx-auto size-6" />
-            <p className="text-stone/40 mt-1 text-sm">Map coming soon</p>
-          </div>
-        </div>
-        {results.map((r) => {
-          const x = ((r.winery.longitude - lngRange.min) / (lngRange.max - lngRange.min)) * 100;
-          const y = ((latRange.max - r.winery.latitude) / (latRange.max - latRange.min)) * 100;
-          return (
-            <div
-              key={r.winery.id}
-              className="bg-wine absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white"
-              style={{
-                left: `${Math.max(10, Math.min(90, x))}%`,
-                top: `${Math.max(10, Math.min(90, y))}%`,
-              }}
-              title={`#${r.rank} ${r.winery.name}`}
-            />
-          );
-        })}
       </div>
     </div>
   );

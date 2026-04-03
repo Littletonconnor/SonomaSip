@@ -1,14 +1,20 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { MapPin, Share2, Printer, Mail, ChevronDown, Star, Search, Check } from 'lucide-react';
+import { Share2, Printer, Mail, ChevronDown, Star, Search, Check, Map as MapIcon } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import { useSessionStorage } from '@/hooks/use-session-storage';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { mockResultsCasualCouple } from '@/lib/mock-data';
+import type { MapItem } from '@/components/map/types';
 import type { QuizAnswers, MatchResult, MustHaves } from '@/lib/types';
+
+const SonomaMap = dynamic(() => import('@/components/map/sonoma-map'), { ssr: false });
 
 const defaultAnswers: QuizAnswers = {
   selectedVarietals: [],
@@ -65,6 +71,26 @@ export default function ResultsPage() {
     if (answers.includeMembersOnly) badges.push('Members-only OK');
     return badges;
   }, [answers]);
+
+  const mapItems: MapItem[] = useMemo(
+    () =>
+      results.map((r) => ({
+        id: r.winery.id,
+        latitude: r.winery.latitude,
+        longitude: r.winery.longitude,
+        rank: r.rank,
+        label: r.winery.name,
+        region: r.winery.region,
+        slug: r.winery.slug,
+        priceRange: `$${r.winery.minFlightPrice}–${r.winery.maxFlightPrice}`,
+        rating: r.winery.averageRating,
+        bookingUrl: r.winery.bookingUrl,
+      })),
+    [results],
+  );
+
+  const isMobile = useIsMobile();
+  const [showMap, setShowMap] = useState(false);
 
   if (!hydrated) {
     return <div className="min-h-[calc(100dvh-3.5rem)]" />;
@@ -155,9 +181,36 @@ export default function ResultsPage() {
           </div>
 
           <div className="max-lg:mt-10 lg:sticky lg:top-20 lg:self-start">
-            <AnimatedSection delay={0.3} direction="right">
-              <MapPlaceholder results={results} />
-            </AnimatedSection>
+            {isMobile ? (
+              <div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mb-4 w-full gap-1.5"
+                  onClick={() => setShowMap((v) => !v)}
+                >
+                  <MapIcon className="size-3.5" />
+                  {showMap ? 'Hide Map' : 'Show Map'}
+                </Button>
+                <AnimatePresence>
+                  {showMap && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <SonomaMap items={mapItems} showLegend />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <AnimatedSection delay={0.3} direction="right">
+                <SonomaMap items={mapItems} showLegend />
+              </AnimatedSection>
+            )}
           </div>
         </div>
       </div>
@@ -239,50 +292,6 @@ function ResultCard({ result, showBorder }: { result: MatchResult; showBorder: b
         )}
       </div>
     </Link>
-  );
-}
-
-function MapPlaceholder({ results }: { results: MatchResult[] }) {
-  const latRange = { min: 38.2, max: 38.85 };
-  const lngRange = { min: -123.1, max: -122.5 };
-
-  return (
-    <div className="bg-card overflow-hidden rounded-2xl ring-1 ring-black/5">
-      <div className="from-sage/10 via-linen to-gold/10 relative aspect-[4/3] bg-linear-to-br">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <MapPin className="text-stone/20 mx-auto size-8" />
-            <p className="text-stone/40 mt-2 text-sm font-medium">Map coming soon</p>
-          </div>
-        </div>
-        {results.map((r) => {
-          const x = ((r.winery.longitude - lngRange.min) / (lngRange.max - lngRange.min)) * 100;
-          const y = ((latRange.max - r.winery.latitude) / (latRange.max - latRange.min)) * 100;
-          return (
-            <div
-              key={r.winery.id}
-              className="bg-wine absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white"
-              style={{
-                left: `${Math.max(10, Math.min(90, x))}%`,
-                top: `${Math.max(10, Math.min(90, y))}%`,
-              }}
-              title={`#${r.rank} ${r.winery.name}`}
-            />
-          );
-        })}
-      </div>
-      <div className="flex flex-col gap-2 p-5">
-        {results.map((r) => (
-          <div key={r.winery.id} className="flex items-center gap-2.5 text-sm">
-            <span className="bg-gold/20 text-bark flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-medium tabular-nums">
-              {r.rank}
-            </span>
-            <span className="text-bark truncate font-medium">{r.winery.name}</span>
-            <span className="text-stone ml-auto shrink-0 text-xs">{r.winery.region}</span>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 
