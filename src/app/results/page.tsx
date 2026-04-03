@@ -103,7 +103,7 @@ export default function ResultsPage() {
   return (
     <div className="min-h-[calc(100dvh-3.5rem)]">
       <div className="border-b border-black/5">
-        <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
+        <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
           <AnimatedSection>
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
               <div>
@@ -156,7 +156,7 @@ export default function ResultsPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
+      <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
         <div className="gap-12 lg:grid lg:grid-cols-[3fr_2fr]">
           <div>
             <StaggerChildren className="flex flex-col" staggerDelay={0.08}>

@@ -150,8 +150,8 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
   if (winery.hasFoodPairing) badges.push('Food Pairing');
 
   return (
-    <div className={`py-6 sm:py-8 ${showBorder ? 'border-t border-black/5' : ''}`}>
-      <div className="flex items-start gap-5">
+    <div className={`rounded-xl py-6 transition-colors hover:bg-linen/50 sm:py-8 ${showBorder ? 'border-t border-black/5' : ''}`}>
+      <div className="flex items-start gap-5 px-2">
         <div className="bg-gold/20 font-heading text-bark flex size-10 shrink-0 items-center justify-center rounded-full text-lg font-medium tabular-nums">
           {rank}
         </div>

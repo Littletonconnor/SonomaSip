@@ -165,7 +165,7 @@ function MapLegend({
             className={cn(
               'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums',
               selectedId === item.id
-                ? 'bg-wine text-white'
+                ? 'bg-wine text-primary-foreground'
                 : 'bg-wine/10 text-wine',
             )}
           >

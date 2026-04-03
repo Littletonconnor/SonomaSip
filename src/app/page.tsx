@@ -87,7 +87,7 @@ export default function Home() {
             </div>
 
             <div className="absolute -bottom-4 -left-6 z-10 w-64 sm:w-72 lg:-left-10">
-              <div className="shadow-warm-lg rounded-xl bg-white/92 p-5 ring-1 ring-black/5 backdrop-blur-md">
+              <div className="shadow-warm-lg rounded-xl bg-background/92 p-5 ring-1 ring-black/5 backdrop-blur-md">
                 <div className="flex items-center justify-between">
                   <p className="text-stone text-sm font-medium">Top Match</p>
                   <span className="bg-wine text-cream rounded-full px-2.5 py-0.5 text-xs font-medium tabular-nums">
@@ -252,7 +252,7 @@ export default function Home() {
                   className="group flex items-center justify-between gap-6 py-5"
                 >
                   <div>
-                    <p className="font-heading text-bark text-lg font-semibold">{winery.name}</p>
+                    <p className="font-heading text-bark text-lg font-semibold group-hover:text-wine">{winery.name}</p>
                     <p className="text-stone mt-1 text-sm">{winery.tagline}</p>
                   </div>
                   <div className="hidden shrink-0 items-center gap-3 sm:flex">
