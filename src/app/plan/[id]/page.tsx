@@ -1,14 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import {
-  MapPin,
-  Printer,
-  Mail,
-  Link2,
-  Star,
-  ExternalLink,
-  Check,
-} from 'lucide-react';
+import { MapPin, Printer, Mail, Link2, Star, ExternalLink, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import { mockResultsCasualCouple } from '@/lib/mock-data';
@@ -70,21 +62,21 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
       <div className="gap-12 lg:grid lg:grid-cols-[2fr_3fr]">
         <div className="lg:sticky lg:top-20 lg:self-start lg:pb-12">
           <AnimatedSection>
-            <p className="font-mono text-xs tracking-widest text-wine">Sonoma Sip Plan</p>
-            <h1 className="mt-2 font-heading text-3xl font-medium tracking-tight text-balance text-bark md:text-4xl">
+            <p className="text-wine font-mono text-xs tracking-widest">Sonoma Sip Plan</p>
+            <h1 className="font-heading text-bark mt-2 text-3xl font-medium tracking-tight text-balance md:text-4xl">
               Your Wine Day Itinerary
             </h1>
-            <p className="mt-2 text-sm text-stone">
+            <p className="text-stone mt-2 text-sm">
               {plan.results.length} stops &middot; Generated {formatDate(plan.createdAt)}
             </p>
 
             <div className="mt-6">
-              <p className="text-sm font-medium text-bark">Preferences</p>
+              <p className="text-bark text-sm font-medium">Preferences</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {plan.preferences.map((p) => (
                   <span
                     key={p}
-                    className="rounded-full bg-linen px-2.5 py-0.5 text-xs font-medium text-oak ring-1 ring-black/5"
+                    className="bg-linen text-oak rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-black/5"
                   >
                     {p}
                   </span>
@@ -125,7 +117,7 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
       </div>
 
       <div className="border-t border-black/5 py-8">
-        <p className="text-sm text-pretty text-stone/70">
+        <p className="text-stone/70 text-sm text-pretty">
           Sonoma Sip is an independent guide — not affiliated with any listed winery. Hours, prices,
           and policies may change. Always verify details directly with the winery before visiting.
         </p>
@@ -145,27 +137,27 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
   return (
     <div className={`py-6 sm:py-8 ${showBorder ? 'border-t border-black/5' : ''}`}>
       <div className="flex items-start gap-5">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gold/20 font-heading text-lg font-medium tabular-nums text-bark">
+        <div className="bg-gold/20 font-heading text-bark flex size-10 shrink-0 items-center justify-center rounded-full text-lg font-medium tabular-nums">
           {rank}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <Link
               href={`/wineries/${winery.slug}`}
-              className="font-heading text-xl font-medium tracking-tight text-bark hover:text-wine sm:text-2xl"
+              className="font-heading text-bark hover:text-wine text-xl font-medium tracking-tight sm:text-2xl"
             >
               {winery.name}
             </Link>
-            <span className="text-sm text-stone">{winery.region}</span>
+            <span className="text-stone text-sm">{winery.region}</span>
           </div>
 
-          <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-stone">
+          <div className="text-stone mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             <span className="tabular-nums">
               ${winery.minFlightPrice}&ndash;{winery.maxFlightPrice}
             </span>
             {winery.averageRating && (
               <span className="flex items-center gap-1">
-                <Star className="size-3.5 fill-gold text-gold" />
+                <Star className="fill-gold text-gold size-3.5" />
                 <span className="tabular-nums">{winery.averageRating}</span>
               </span>
             )}
@@ -173,8 +165,8 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
 
           <ul className="mt-3 flex flex-col gap-1" role="list">
             {matchReasons.map((reason) => (
-              <li key={reason} className="flex items-start gap-2 text-sm text-pretty text-stone">
-                <Check className="mt-0.5 size-3.5 shrink-0 text-sage" />
+              <li key={reason} className="text-stone flex items-start gap-2 text-sm text-pretty">
+                <Check className="text-sage mt-0.5 size-3.5 shrink-0" />
                 {reason}
               </li>
             ))}
@@ -183,7 +175,7 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
           {badges.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {badges.map((b) => (
-                <span key={b} className="rounded-full bg-fog/80 px-2 py-0.5 text-xs text-stone">
+                <span key={b} className="bg-fog/80 text-stone rounded-full px-2 py-0.5 text-xs">
                   {b}
                 </span>
               ))}
@@ -194,7 +186,7 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
             href={winery.bookingUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-wine hover:text-wine-dark"
+            className="text-wine hover:text-wine-dark mt-3 inline-flex items-center gap-1.5 text-sm font-medium"
           >
             Book a Tasting
             <ExternalLink className="size-3.5" />
@@ -210,12 +202,12 @@ function MapPlaceholder({ results }: { results: MatchResult[] }) {
   const lngRange = { min: -123.1, max: -122.5 };
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-card ring-1 ring-black/5">
-      <div className="relative aspect-[4/3] bg-linear-to-br from-sage/10 via-linen to-gold/10">
+    <div className="bg-card overflow-hidden rounded-2xl ring-1 ring-black/5">
+      <div className="from-sage/10 via-linen to-gold/10 relative aspect-[4/3] bg-linear-to-br">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <MapPin className="mx-auto size-6 text-stone/20" />
-            <p className="mt-1 text-sm text-stone/40">Map coming soon</p>
+            <MapPin className="text-stone/20 mx-auto size-6" />
+            <p className="text-stone/40 mt-1 text-sm">Map coming soon</p>
           </div>
         </div>
         {results.map((r) => {
@@ -224,7 +216,7 @@ function MapPlaceholder({ results }: { results: MatchResult[] }) {
           return (
             <div
               key={r.winery.id}
-              className="absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-wine ring-2 ring-white"
+              className="bg-wine absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white"
               style={{
                 left: `${Math.max(10, Math.min(90, x))}%`,
                 top: `${Math.max(10, Math.min(90, y))}%`,

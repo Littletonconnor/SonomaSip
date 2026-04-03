@@ -30,11 +30,7 @@ async function getWinery(slug: string): Promise<Winery | undefined> {
   return mockWineries.find((w) => w.slug === slug);
 }
 
-export default async function WineryDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function WineryDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const winery = await getWinery(slug);
   if (!winery) notFound();
@@ -90,7 +86,7 @@ export default async function WineryDetailPage({
     <div>
       <div className="border-b border-black/5">
         <div className="mx-auto max-w-6xl px-6 py-4">
-          <nav className="flex items-center gap-1.5 text-sm text-stone" aria-label="Breadcrumb">
+          <nav className="text-stone flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
             <Link href="/" className="hover:text-bark">
               Home
             </Link>
@@ -99,7 +95,7 @@ export default async function WineryDetailPage({
               Wineries
             </Link>
             <ChevronRight className="size-3.5" />
-            <span className="font-medium text-bark">{winery.name}</span>
+            <span className="text-bark font-medium">{winery.name}</span>
           </nav>
         </div>
       </div>
@@ -109,16 +105,16 @@ export default async function WineryDetailPage({
           <div className="lg:sticky lg:top-20 lg:self-start">
             <AnimatedSection>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-wine/10 px-3 py-1 text-xs font-medium text-wine ring-1 ring-wine/20">
+                <span className="bg-wine/10 text-wine ring-wine/20 rounded-full px-3 py-1 text-xs font-medium ring-1">
                   {winery.region}
                 </span>
-                <span className="text-sm text-stone">{winery.city}</span>
+                <span className="text-stone text-sm">{winery.city}</span>
               </div>
 
-              <h1 className="mt-4 font-heading text-3xl font-medium tracking-tight text-balance text-bark md:text-4xl">
+              <h1 className="font-heading text-bark mt-4 text-3xl font-medium tracking-tight text-balance md:text-4xl">
                 {winery.name}
               </h1>
-              <p className="mt-2 text-pretty text-stone">{winery.tagline}</p>
+              <p className="text-stone mt-2 text-pretty">{winery.tagline}</p>
 
               {winery.averageRating && (
                 <div className="mt-4 flex items-center gap-2">
@@ -130,7 +126,7 @@ export default async function WineryDetailPage({
                       />
                     ))}
                   </div>
-                  <span className="text-sm tabular-nums text-stone">
+                  <span className="text-stone text-sm tabular-nums">
                     {winery.averageRating} ({winery.ratingsCount})
                   </span>
                 </div>
@@ -143,7 +139,7 @@ export default async function WineryDetailPage({
                     <ExternalLink className="size-4" />
                   </a>
                 </Button>
-                <p className="text-center text-sm tabular-nums text-stone">
+                <p className="text-stone text-center text-sm tabular-nums">
                   ${winery.minFlightPrice}&ndash;{winery.maxFlightPrice} per flight
                 </p>
               </div>
@@ -151,9 +147,9 @@ export default async function WineryDetailPage({
               <div className="mt-8 flex flex-col gap-3">
                 {featureItems.map((item) => (
                   <div key={item.label} className="flex items-center gap-3 text-sm">
-                    <item.icon className="size-4 shrink-0 text-stone" />
+                    <item.icon className="text-stone size-4 shrink-0" />
                     <span className="text-stone">{item.label}</span>
-                    <span className="ml-auto font-medium text-bark">{item.value}</span>
+                    <span className="text-bark ml-auto font-medium">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -164,7 +160,7 @@ export default async function WineryDetailPage({
                   .map((a) => (
                     <span
                       key={a.label}
-                      className="flex items-center gap-1.5 rounded-full bg-wine/5 py-1 pr-2.5 pl-1.5 text-xs font-medium text-wine ring-1 ring-wine/10"
+                      className="bg-wine/5 text-wine ring-wine/10 flex items-center gap-1.5 rounded-full py-1 pr-2.5 pl-1.5 text-xs font-medium ring-1"
                     >
                       <a.icon className="size-3.5" />
                       {a.label}
@@ -176,13 +172,13 @@ export default async function WineryDetailPage({
 
           <div className="max-lg:mt-10">
             <AnimatedSection>
-              <h2 className="font-heading text-2xl font-medium tracking-tight text-bark">About</h2>
-              <p className="mt-4 max-w-[65ch] text-pretty text-stone">{winery.story}</p>
+              <h2 className="font-heading text-bark text-2xl font-medium tracking-tight">About</h2>
+              <p className="text-stone mt-4 max-w-[65ch] text-pretty">{winery.story}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {winery.varietals.map((v) => (
                   <span
                     key={v}
-                    className="rounded-full bg-linen px-3 py-1 text-sm font-medium text-oak ring-1 ring-black/5"
+                    className="bg-linen text-oak rounded-full px-3 py-1 text-sm font-medium ring-1 ring-black/5"
                   >
                     {v}
                   </span>
@@ -192,7 +188,7 @@ export default async function WineryDetailPage({
 
             <AnimatedSection delay={0.1}>
               <div className="mt-12 border-t border-black/5 pt-12">
-                <h2 className="font-heading text-2xl font-medium tracking-tight text-bark">
+                <h2 className="font-heading text-bark text-2xl font-medium tracking-tight">
                   Tasting Experiences
                 </h2>
                 <div className="mt-6 flex flex-col gap-4">
@@ -205,15 +201,17 @@ export default async function WineryDetailPage({
 
             <AnimatedSection delay={0.2}>
               <div className="mt-12 border-t border-black/5 pt-12">
-                <h2 className="font-heading text-2xl font-medium tracking-tight text-bark">Hours</h2>
+                <h2 className="font-heading text-bark text-2xl font-medium tracking-tight">
+                  Hours
+                </h2>
                 <div className="mt-6 flex flex-col gap-2">
                   {dayNames.map((day) => {
                     const hours = winery.hours[day];
                     return (
                       <div key={day} className="flex items-center justify-between text-sm">
-                        <span className="capitalize text-stone">{day}</span>
+                        <span className="text-stone capitalize">{day}</span>
                         {hours ? (
-                          <span className="font-medium tabular-nums text-bark">
+                          <span className="text-bark font-medium tabular-nums">
                             {hours.open} &ndash; {hours.close}
                           </span>
                         ) : (
@@ -230,10 +228,10 @@ export default async function WineryDetailPage({
       </div>
 
       {relatedWineries.length > 0 && (
-        <div className="border-t border-black/5 bg-card py-16 md:py-20">
+        <div className="bg-card border-t border-black/5 py-16 md:py-20">
           <div className="mx-auto max-w-5xl px-6">
             <AnimatedSection>
-              <h2 className="font-heading text-2xl font-medium tracking-tight text-bark">
+              <h2 className="font-heading text-bark text-2xl font-medium tracking-tight">
                 Nearby Wineries
               </h2>
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -241,13 +239,13 @@ export default async function WineryDetailPage({
                   <Link
                     key={w.slug}
                     href={`/wineries/${w.slug}`}
-                    className="group rounded-xl p-5 ring-1 ring-black/5 transition-shadow hover:shadow-warm"
+                    className="group hover:shadow-warm rounded-xl p-5 ring-1 ring-black/5 transition-shadow"
                   >
-                    <p className="font-heading text-lg font-medium text-bark group-hover:text-wine">
+                    <p className="font-heading text-bark group-hover:text-wine text-lg font-medium">
                       {w.name}
                     </p>
-                    <p className="mt-1 text-sm text-stone">{w.tagline}</p>
-                    <div className="mt-3 flex items-center gap-3 text-sm text-stone">
+                    <p className="text-stone mt-1 text-sm">{w.tagline}</p>
+                    <div className="text-stone mt-3 flex items-center gap-3 text-sm">
                       <span>{w.region}</span>
                       <span className="tabular-nums">
                         ${w.minFlightPrice}&ndash;{w.maxFlightPrice}
@@ -266,19 +264,19 @@ export default async function WineryDetailPage({
 
 function FlightCard({ flight }: { flight: Flight }) {
   return (
-    <div className="flex items-start justify-between gap-6 rounded-xl bg-linen/60 p-5 ring-1 ring-black/5 sm:p-6">
+    <div className="bg-linen/60 flex items-start justify-between gap-6 rounded-xl p-5 ring-1 ring-black/5 sm:p-6">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-heading text-lg font-medium text-bark">{flight.name}</h3>
+          <h3 className="font-heading text-bark text-lg font-medium">{flight.name}</h3>
           {flight.hasFoodPairing && (
-            <span className="flex items-center gap-1 rounded-full bg-sage/15 py-0.5 pr-2 pl-1.5 text-xs font-medium text-sage">
+            <span className="bg-sage/15 text-sage flex items-center gap-1 rounded-full py-0.5 pr-2 pl-1.5 text-xs font-medium">
               <UtensilsCrossed className="size-3" />
               Paired
             </span>
           )}
         </div>
-        <p className="mt-1 text-sm text-pretty text-stone">{flight.description}</p>
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-stone">
+        <p className="text-stone mt-1 text-sm text-pretty">{flight.description}</p>
+        <div className="text-stone mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
           <span className="flex items-center gap-1">
             <Wine className="size-3.5" />
             {flight.winesIncluded} wines
@@ -291,8 +289,8 @@ function FlightCard({ flight }: { flight: Flight }) {
         </div>
       </div>
       <div className="shrink-0 text-right">
-        <p className="font-heading text-2xl font-medium tabular-nums text-bark">${flight.price}</p>
-        <p className="text-xs text-stone">per person</p>
+        <p className="font-heading text-bark text-2xl font-medium tabular-nums">${flight.price}</p>
+        <p className="text-stone text-xs">per person</p>
       </div>
     </div>
   );

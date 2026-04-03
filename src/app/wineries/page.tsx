@@ -2,15 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import {
-  Star,
-  Dog,
-  Baby,
-  UtensilsCrossed,
-  Eye,
-  SlidersHorizontal,
-  X,
-} from 'lucide-react';
+import { Star, Dog, Baby, UtensilsCrossed, Eye, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import { mockWineries } from '@/lib/mock-data';
@@ -125,10 +117,10 @@ export default function WineriesPage() {
       <div className="border-b border-black/5">
         <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
           <AnimatedSection>
-            <h1 className="font-heading text-3xl font-medium tracking-tight text-balance text-bark md:text-4xl">
+            <h1 className="font-heading text-bark text-3xl font-medium tracking-tight text-balance md:text-4xl">
               All Wineries
             </h1>
-            <p className="mt-2 text-pretty text-stone">
+            <p className="text-stone mt-2 text-pretty">
               {filtered.length} {filtered.length === 1 ? 'winery' : 'wineries'} in Sonoma County
             </p>
           </AnimatedSection>
@@ -140,12 +132,12 @@ export default function WineriesPage() {
           <button
             type="button"
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1.5 rounded-lg bg-linen px-3 py-2 text-sm font-medium text-bark ring-1 ring-black/5 lg:hidden"
+            className="bg-linen text-bark flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium ring-1 ring-black/5 lg:hidden"
           >
             <SlidersHorizontal className="size-4" />
             Filters
             {activeFilterCount > 0 && (
-              <span className="flex size-5 items-center justify-center rounded-full bg-wine text-xs tabular-nums text-cream">
+              <span className="bg-wine text-cream flex size-5 items-center justify-center rounded-full text-xs tabular-nums">
                 {activeFilterCount}
               </span>
             )}
@@ -157,7 +149,7 @@ export default function WineriesPage() {
               aria-label="Sort wineries"
               value={sort}
               onChange={(e) => setSort(e.target.value as SortOption)}
-              className="col-span-full row-start-1 appearance-none rounded-lg bg-linen py-2 pr-8 pl-3 text-sm font-medium text-bark ring-1 ring-black/5 focus-visible:outline-2 focus-visible:outline-wine"
+              className="bg-linen text-bark focus-visible:outline-wine col-span-full row-start-1 appearance-none rounded-lg py-2 pr-8 pl-3 text-sm font-medium ring-1 ring-black/5 focus-visible:outline-2"
             >
               {(Object.keys(SORT_LABELS) as SortOption[]).map((key) => (
                 <option key={key} value={key}>
@@ -178,7 +170,7 @@ export default function WineriesPage() {
         </div>
 
         {showFilters && (
-          <div className="mt-6 rounded-xl bg-card p-6 ring-1 ring-black/5 lg:hidden">
+          <div className="bg-card mt-6 rounded-xl p-6 ring-1 ring-black/5 lg:hidden">
             <FilterPanel
               filters={filters}
               toggleRegion={toggleRegion}
@@ -205,10 +197,10 @@ export default function WineriesPage() {
           <div>
             {filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <p className="font-heading text-xl font-medium text-bark">
+                <p className="font-heading text-bark text-xl font-medium">
                   No wineries match your filters
                 </p>
-                <p className="mt-2 text-sm text-stone">
+                <p className="text-stone mt-2 text-sm">
                   Try removing some filters to see more results.
                 </p>
                 <Button variant="outline" className="mt-6" onClick={clearFilters}>
@@ -251,7 +243,7 @@ function FilterPanel({
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <p className="text-sm font-medium text-bark">Region</p>
+        <p className="text-bark text-sm font-medium">Region</p>
         <div className="mt-3 flex flex-col gap-2">
           {ALL_REGIONS.map((r) => {
             const active = filters.regions.includes(r);
@@ -262,7 +254,7 @@ function FilterPanel({
                 onClick={() => toggleRegion(r)}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all ${
                   active
-                    ? 'bg-wine/10 font-medium text-wine'
+                    ? 'bg-wine/10 text-wine font-medium'
                     : 'text-stone hover:bg-fog hover:text-bark'
                 }`}
               >
@@ -273,7 +265,7 @@ function FilterPanel({
         </div>
       </div>
       <div>
-        <p className="text-sm font-medium text-bark">Features</p>
+        <p className="text-bark text-sm font-medium">Features</p>
         <div className="mt-3 flex flex-col gap-2">
           {FEATURE_OPTIONS.map((f) => {
             const active = filters.features[f.key];
@@ -284,7 +276,7 @@ function FilterPanel({
                 onClick={() => toggleFeature(f.key)}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all ${
                   active
-                    ? 'bg-wine/10 font-medium text-wine'
+                    ? 'bg-wine/10 text-wine font-medium'
                     : 'text-stone hover:bg-fog hover:text-bark'
                 }`}
               >
@@ -299,7 +291,7 @@ function FilterPanel({
         <button
           type="button"
           onClick={clearFilters}
-          className="flex items-center gap-1.5 text-sm font-medium text-wine hover:text-wine-dark"
+          className="text-wine hover:text-wine-dark flex items-center gap-1.5 text-sm font-medium"
         >
           <X className="size-3.5" />
           Clear all filters
@@ -321,21 +313,21 @@ function WineryCard({ winery }: { winery: Winery }) {
   return (
     <Link
       href={`/wineries/${winery.slug}`}
-      className="group flex flex-col rounded-xl p-5 ring-1 ring-black/5 transition-shadow hover:shadow-warm sm:p-6"
+      className="group hover:shadow-warm flex flex-col rounded-xl p-5 ring-1 ring-black/5 transition-shadow sm:p-6"
     >
       <div className="flex items-start justify-between gap-3">
-        <h2 className="font-heading text-lg font-medium text-bark group-hover:text-wine">
+        <h2 className="font-heading text-bark group-hover:text-wine text-lg font-medium">
           {winery.name}
         </h2>
         {winery.averageRating && (
           <span className="flex shrink-0 items-center gap-1 text-sm">
-            <Star className="size-3.5 fill-gold text-gold" />
-            <span className="tabular-nums text-stone">{winery.averageRating}</span>
+            <Star className="fill-gold text-gold size-3.5" />
+            <span className="text-stone tabular-nums">{winery.averageRating}</span>
           </span>
         )}
       </div>
-      <p className="mt-1 text-sm text-stone">{winery.tagline}</p>
-      <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 text-sm text-stone">
+      <p className="text-stone mt-1 text-sm">{winery.tagline}</p>
+      <div className="text-stone mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 text-sm">
         <span>{winery.region}</span>
         <span className="tabular-nums">
           ${winery.minFlightPrice}&ndash;{winery.maxFlightPrice}
@@ -344,12 +336,12 @@ function WineryCard({ winery }: { winery: Winery }) {
       {badges.length > 0 && (
         <div className="mt-2.5 flex flex-wrap gap-1">
           {badges.slice(0, 3).map((b) => (
-            <span key={b} className="rounded-full bg-fog/80 px-2 py-0.5 text-xs text-stone">
+            <span key={b} className="bg-fog/80 text-stone rounded-full px-2 py-0.5 text-xs">
               {b}
             </span>
           ))}
           {badges.length > 3 && (
-            <span className="rounded-full bg-fog/80 px-2 py-0.5 text-xs text-stone">
+            <span className="bg-fog/80 text-stone rounded-full px-2 py-0.5 text-xs">
               +{badges.length - 3}
             </span>
           )}

@@ -185,8 +185,9 @@ export default function QuizPage() {
   }, [step]);
 
   const submit = useCallback(() => {
+    setStep(0);
     router.push('/results');
-  }, [router]);
+  }, [router, setStep]);
 
   const isLast = step === 3;
   const progress = ((step + 1) / 4) * 100;
