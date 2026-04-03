@@ -164,8 +164,8 @@ _Build every screen using mock data. No real database, no real matching engine. 
   - Warm mesh gradient hero background (burgundy → gold, using CSS gradients)
   - Subtle noise texture overlay (SVG filter or CSS)
   - Section divider patterns (gentle wave or vine SVG from Haikei)
-- [ ] Create `src/components/layout/navbar.tsx` — sticky nav with blur, logo, links, CTA
-- [ ] Create `src/components/layout/footer.tsx` — reusable footer with branding + legal
+- [x] Create `src/components/layout/navbar.tsx` — sticky nav with blur, logo, links, CTA
+- [x] Create `src/components/layout/footer.tsx` — reusable footer with branding + legal
 - [ ] Generate SVG illustrations/icons for feature sections (Lucide icons + custom wine-themed SVGs)
 
 **Visual resources:**
@@ -192,69 +192,107 @@ _Build every screen using mock data. No real database, no real matching engine. 
 
 ### 3.5.2 Landing page _(use `/ui` skill — this is the most important page)_
 
-**Navigation (sticky):**
-- [ ] Logo (left) — "Sonoma Sip" wordmark in Cormorant
-- [ ] Links (center): How It Works, Wineries, About
-- [ ] CTA button (right): "Plan Your Visit" (wine bg)
-- [ ] Mobile: hamburger menu + sticky bottom CTA bar after scrolling past hero
-- [ ] Sticky nav has backdrop-blur + semi-transparent background on scroll
+> **Section order follows high-converting landing page best practices** (sources: [involve.me](https://www.involve.me/blog/landing-page-structure), [Magic UI](https://magicui.design/blog/landing-page-sections), [Unbounce](https://unbounce.com/landing-page-examples/best-landing-page-examples/)):
+> Hero → Social Proof → How It Works → Features/Benefits → Featured Wineries → Final CTA → Footer
+> This follows the "promise → proof → action" sequence that converts best.
 
-**Hero section:**
-- [ ] Announcement pill: "Covering 68+ Sonoma County wineries" (subtle, above headline)
-- [ ] Headline: benefit-focused, NOT just the app name (e.g. "Your Perfect Sonoma Wine Day, Planned in Minutes")
-- [ ] Subheadline: 1-2 sentences explaining the quiz → match → plan flow
-- [ ] Primary CTA: "Plan Your Visit" (large, wine bg, hover scale effect)
-- [ ] Secondary CTA: "Browse Wineries" (outline variant)
-- [ ] Background: warm mesh gradient (burgundy/gold) with subtle noise texture
-- [ ] Optional: animated gradient shift or subtle parallax
+---
 
-**Social proof / stats bar:**
-- [ ] "68 curated wineries | Personalized matches | Free to use"
-- [ ] Or logo-style trust indicators
-- [ ] Subtle separator from hero
+**Section 1 — Navigation (sticky)** `src/components/layout/navbar.tsx` ✅ DONE
+- [x] Logo (left) — "Sonoma Sip" wordmark in Cormorant
+- [x] Links: How It Works, Wineries
+- [x] CTA button (right): "Plan Your Visit" (wine bg)
+- [x] Mobile: hamburger menu + sticky bottom CTA bar after scrolling past hero
+- [x] Sticky nav has backdrop-blur + semi-transparent background on scroll
 
-**How It Works (3 steps):**
-- [ ] Step cards with Lucide icons (Wine, BarChart3, MapPin or similar)
-- [ ] Step numbers in gold with connecting visual flow
-- [ ] Brief, punchy copy per step
-- [ ] Scroll-triggered staggered entrance animation
+---
 
-**Features bento grid:**
-- [ ] 4-6 tiles highlighting key benefits with icons:
+**Section 2 — Hero** `src/app/page.tsx` ✅ DONE
+- [x] Headline: benefit-focused ("Perfect Day at Sonoma County Vineyards")
+- [x] Subheadline: explains the quiz → match → plan flow
+- [x] Primary CTA: "Plan Your Visit" (large, wine bg, links to /quiz)
+- [x] Secondary CTA: "Browse all 68 wineries" (text link to /wineries)
+- [x] Photo collage: 2x2 grid with vineyard/wine imagery (Unsplash)
+- [x] Floating "Top Match" card overlay showing sample result preview
+- [x] Responsive: full-width mobile, grid layout on desktop
+
+---
+
+**Section 3 — Social Proof / Stats Bar** ← NEXT
+> _Placed directly below hero for maximum trust impact. Best practice: show numbers, trust indicators, or mini social proof before asking for deeper engagement._
+
+- [ ] Stats strip: "68 curated wineries · Personalized matches · Free to use"
+- [ ] Consider: counter-style animated numbers or icon+stat pairs
+- [ ] Subtle separator from hero (border or background shift)
+- [ ] Responsive: horizontal on desktop, stacked or scrollable on mobile
+
+---
+
+**Section 4 — How It Works (3 steps)** ✅ DONE (needs polish)
+- [x] Section label "How it works" + heading "Three questions. One perfect day."
+- [x] 3 numbered steps with gold step numbers and descriptions
+- [x] Background: card color with border-t separator
+- [ ] Add Lucide icons per step (Wine, BarChart3, MapPin or similar)
+- [ ] Add connecting visual flow between steps (line, dots, or arrow)
+- [ ] Scroll-triggered staggered entrance animation (requires Framer Motion)
+
+---
+
+**Section 5 — Features / Benefits (Why Sonoma Sip)** ✅ DONE (needs polish)
+> _Best practice: connect features to customer outcomes. Use bento grid for visual interest._
+
+- [x] Section label "Why Sonoma Sip" + heading + subheading
+- [x] 4-tile grid: 68 wineries, Honest matching, Real logistics, Independent voice
+- [x] Clean card design with border styling
+- [ ] Upgrade to bento grid layout (varied tile sizes, not uniform 2x2)
+- [ ] Add Lucide icons to each tile
+- [ ] Subtle hover effect on tiles (lift + shadow)
+- [ ] Consider expanding to 6 tiles to highlight more benefits:
   - "Matches Your Taste" (grape/wine icon)
   - "Budget-Aware" (dollar icon)
   - "Group-Friendly" (users icon)
   - "Map Your Day" (map icon)
   - "Real Details" (info icon — hours, policies, accessibility)
   - "Share Your Plan" (share icon — print, email, link)
-- [ ] Varied tile sizes (bento layout, not uniform grid)
-- [ ] Subtle hover effect on tiles
 
-**Featured wineries teaser:**
+---
+
+**Section 6 — Featured Wineries Teaser** ← NOT STARTED
+> _Show real product value. Best practice: let visitors see what they'll get before committing to the quiz._
+
 - [ ] "Discover Sonoma's Best" heading
 - [ ] 3-4 winery cards from mock data (name, region, tagline, price hint)
-- [ ] "View All Wineries →" link
-- [ ] Cards with warm shadow, hover lift
+- [ ] Cards with warm shadow, hover lift, gradient placeholder image
+- [ ] "View All Wineries →" link to /wineries
+- [ ] Responsive: horizontal scroll or grid on mobile, 3-4 col on desktop
+- [ ] Requires: mock data (3.5.1) to be done first
 
-**Final CTA section:**
-- [ ] Full-width gradient background (wine → bark)
-- [ ] "Ready to discover your perfect Sonoma day?" headline
-- [ ] Repeated "Plan Your Visit" CTA
-- [ ] Cream text on dark gradient
+---
 
-**Footer:**
-- [ ] Sonoma Sip logo/wordmark
-- [ ] Navigation links: How It Works, Wineries, Privacy, Terms
-- [ ] Disclaimer: "Independent guide. Verify details before visiting."
-- [ ] "Made with love in Sonoma County"
-- [ ] Clean, warm design with bark/cream palette
+**Section 7 — Final CTA** ✅ DONE (needs polish)
+- [x] Heading: "Ready to plan your day?"
+- [x] Subtext: "Takes about two minutes. No account, no email required."
+- [x] "Start Planning" button linking to /quiz
+- [ ] Upgrade: full-width gradient background (wine → bark) with cream text
+- [ ] Add subtle pattern or texture overlay
 
-**Cross-cutting:**
-- [ ] Scroll-triggered fade-in animations on all sections
-- [ ] Smooth anchor scrolling for "How It Works" nav link
-- [ ] Responsive: pixel-perfect at 375px, 768px, 1024px, 1440px
-- [ ] Mobile sticky CTA bar (appears after scrolling past hero)
-- [ ] Page loads in <3 seconds (CSS gradients, no heavy images)
+---
+
+**Section 8 — Footer** `src/components/layout/footer.tsx` ✅ DONE
+- [x] Sonoma Sip logo/wordmark
+- [x] Navigation links: How It Works, Wineries, Privacy, Terms
+- [x] Disclaimer: "Hours, prices, and policies change — always verify before visiting."
+- [x] "Made with care in Sonoma County"
+- [x] Clean, warm design with bark/cream palette
+
+---
+
+**Cross-cutting (all sections):**
+- [ ] Scroll-triggered fade-in animations on all sections (requires Framer Motion)
+- [x] Smooth anchor scrolling for "How It Works" nav link
+- [ ] Responsive QA: pixel-perfect at 375px, 768px, 1024px, 1440px
+- [x] Mobile sticky CTA bar (appears after scrolling past hero) — in navbar
+- [x] Page loads in <3 seconds (using optimized images, no heavy assets)
 
 ### 3.5.3 Quiz flow _(use `/ui` skill)_
 
