@@ -14,25 +14,23 @@ export default function Home() {
           <h1 className="mt-4 text-5xl font-semibold tracking-tight text-bark md:text-6xl lg:text-7xl">
             Sonoma Sip
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-text-muted md:text-xl">
+          <p className="mt-6 max-w-xl text-lg text-muted-foreground md:text-xl">
             Answer a few questions about your wine preferences, budget, and group — and get a
             personalized, ranked list of Sonoma County wineries that fit.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-            <Link href="/quiz">
-              <Button size="lg">Plan Your Visit</Button>
-            </Link>
-            <Link href="/wineries">
-              <Button variant="secondary" size="lg">
-                Browse All Wineries
-              </Button>
-            </Link>
+            <Button size="lg" asChild>
+              <Link href="/quiz">Plan Your Visit</Link>
+            </Button>
+            <Button variant="outline" size="lg" asChild>
+              <Link href="/wineries">Browse All Wineries</Link>
+            </Button>
           </div>
         </Container>
       </section>
 
       {/* How it works */}
-      <section className="border-t border-fog bg-linen py-16 md:py-24">
+      <section className="border-t border-border bg-card py-16 md:py-24">
         <Container>
           <h2 className="text-center text-3xl font-semibold text-bark md:text-4xl">
             How It Works
@@ -61,7 +59,7 @@ export default function Home() {
               <div key={item.step} className="text-center md:text-left">
                 <span className="text-sm font-medium text-gold">{item.step}</span>
                 <h3 className="mt-2 text-xl font-semibold text-bark">{item.title}</h3>
-                <p className="mt-3 text-text-muted">{item.description}</p>
+                <p className="mt-3 text-muted-foreground">{item.description}</p>
               </div>
             ))}
           </div>
@@ -69,18 +67,18 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-fog py-8">
+      <footer className="border-t border-border py-8">
         <Container>
-          <div className="flex flex-col items-center justify-between gap-4 text-sm text-text-muted md:flex-row">
+          <div className="flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
             <p>
               Sonoma Sip is an independent guide. Verify hours, prices, and policies before
               visiting.
             </p>
             <div className="flex gap-6">
-              <Link href="/privacy" className="transition-colors hover:text-text">
+              <Link href="/privacy" className="transition-colors hover:text-foreground">
                 Privacy
               </Link>
-              <Link href="/terms" className="transition-colors hover:text-text">
+              <Link href="/terms" className="transition-colors hover:text-foreground">
                 Terms
               </Link>
             </div>
