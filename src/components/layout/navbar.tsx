@@ -13,12 +13,7 @@ const navLinks = [
 
 export function WineGlassLogo({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 24 32"
-      fill="none"
-      className={className}
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 24 32" fill="none" className={className} aria-hidden="true">
       <path
         d="M5.5 1h13l-1.5 12c-.3 2.5-2.2 4.5-5 5-2.8-.5-4.7-2.5-5-5L5.5 1z"
         className="stroke-wine"
@@ -65,19 +60,13 @@ export function Navbar() {
       <header
         className={cn(
           'fixed top-0 right-0 left-0 z-50 transition-all duration-300',
-          scrolled
-            ? 'border-b border-gold/20 bg-background/80 backdrop-blur-xl'
-            : 'bg-transparent',
+          scrolled ? 'border-gold/20 bg-background/80 border-b backdrop-blur-xl' : 'bg-transparent',
         )}
       >
         <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-          <Link
-            href="/"
-            aria-label="Homepage"
-            className="flex items-center gap-2.5"
-          >
+          <Link href="/" aria-label="Homepage" className="flex items-center gap-2.5">
             <WineGlassLogo className="h-7 w-auto" />
-            <span className="font-heading text-lg font-medium tracking-wide text-bark">
+            <span className="font-heading text-bark text-lg font-medium tracking-wide">
               Sonoma Sip
             </span>
           </Link>
@@ -87,7 +76,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[0.8125rem] tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground text-[0.8125rem] tracking-wide transition-colors"
               >
                 {link.label}
               </Link>
@@ -104,14 +93,10 @@ export function Navbar() {
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="relative inline-flex items-center justify-center rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground md:hidden"
+            className="text-muted-foreground hover:text-foreground relative inline-flex items-center justify-center rounded-lg p-2 transition-colors md:hidden"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           >
-            {mobileOpen ? (
-              <X className="size-5" />
-            ) : (
-              <Menu className="size-5" />
-            )}
+            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
             <span
               className="absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden"
               aria-hidden="true"
@@ -120,21 +105,21 @@ export function Navbar() {
         </nav>
 
         {mobileOpen && (
-          <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden">
+          <div className="border-border/50 bg-background/95 border-t backdrop-blur-xl md:hidden">
             <div className="flex flex-col gap-1 px-6 py-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="px-3 py-2.5 text-[0.8125rem] tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground px-3 py-2.5 text-[0.8125rem] tracking-wide transition-colors"
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="mt-2 border-t border-border/50 pt-3">
+              <div className="border-border/50 mt-2 border-t pt-3">
                 <Button
-                  className="w-full border-wine/30 text-wine hover:bg-wine hover:text-primary-foreground"
+                  className="border-wine/30 text-wine hover:bg-wine hover:text-primary-foreground w-full"
                   variant="outline"
                   asChild
                 >
@@ -151,7 +136,7 @@ export function Navbar() {
       {/* Mobile sticky bottom CTA — appears after scrolling past hero */}
       <div
         className={cn(
-          'fixed right-0 bottom-0 left-0 z-40 border-t border-border/50 bg-background/95 px-4 py-3 backdrop-blur-xl transition-all duration-300 md:hidden',
+          'border-border/50 bg-background/95 fixed right-0 bottom-0 left-0 z-40 border-t px-4 py-3 backdrop-blur-xl transition-all duration-300 md:hidden',
           scrolled ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0',
         )}
       >

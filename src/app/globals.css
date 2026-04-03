@@ -323,12 +323,7 @@
   flex: 1;
   max-width: 120px;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    oklch(0.7499 0.0854 82.08 / 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, oklch(0.7499 0.0854 82.08 / 0.4), transparent);
 }
 
 /* Smooth scrolling */

@@ -8,34 +8,34 @@
 
 ## References
 
-| Artifact | Path / URL |
-|----------|------------|
-| Product requirements (non-technical) | `docs/PRD.md` |
-| Scoring / filters (technical) | `docs/SCORING.md` |
-| Seed / editorial data (Excel) | `docs/sonoma-winery-database-complete.xlsx` |
-| Original PRD (archive) | `docs/sonoma-winery-prd.docx` |
-| Planning workbook (archive) | `docs/sonoma-winery-website-architecture.xlsx` |
-| **shadcn/ui docs** | https://ui.shadcn.com/docs |
-| shadcn — component list | https://ui.shadcn.com/docs/components |
-| shadcn — theming (OKLCH tokens) | https://ui.shadcn.com/docs/theming |
-| shadcn — Tailwind v4 guide | https://ui.shadcn.com/docs/tailwind-v4 |
-| shadcn — CLI reference | https://ui.shadcn.com/docs/cli |
-| Next.js agent docs (in node_modules) | `node_modules/next/dist/docs/` |
+| Artifact                             | Path / URL                                     |
+| ------------------------------------ | ---------------------------------------------- |
+| Product requirements (non-technical) | `docs/PRD.md`                                  |
+| Scoring / filters (technical)        | `docs/SCORING.md`                              |
+| Seed / editorial data (Excel)        | `docs/sonoma-winery-database-complete.xlsx`    |
+| Original PRD (archive)               | `docs/sonoma-winery-prd.docx`                  |
+| Planning workbook (archive)          | `docs/sonoma-winery-website-architecture.xlsx` |
+| **shadcn/ui docs**                   | https://ui.shadcn.com/docs                     |
+| shadcn — component list              | https://ui.shadcn.com/docs/components          |
+| shadcn — theming (OKLCH tokens)      | https://ui.shadcn.com/docs/theming             |
+| shadcn — Tailwind v4 guide           | https://ui.shadcn.com/docs/tailwind-v4         |
+| shadcn — CLI reference               | https://ui.shadcn.com/docs/cli                 |
+| Next.js agent docs (in node_modules) | `node_modules/next/dist/docs/`                 |
 
 ---
 
 ## Target stack
 
-| Layer | Choice |
-|-------|--------|
-| App | Next.js (App Router), TypeScript |
-| Components | shadcn/ui (Radix primitives, Tailwind v4) |
-| Database | Supabase (PostgreSQL) |
-| Map | Mapbox GL (`react-map-gl` or equivalent) |
-| Email | Resend or Postmark (pick one) |
-| Analytics | Plausible (cookie-light); privacy policy still required |
-| Hosting | Vercel + Supabase (confirm regions) |
-| Observability | Sentry (recommended) |
+| Layer         | Choice                                                  |
+| ------------- | ------------------------------------------------------- |
+| App           | Next.js (App Router), TypeScript                        |
+| Components    | shadcn/ui (Radix primitives, Tailwind v4)               |
+| Database      | Supabase (PostgreSQL)                                   |
+| Map           | Mapbox GL (`react-map-gl` or equivalent)                |
+| Email         | Resend or Postmark (pick one)                           |
+| Analytics     | Plausible (cookie-light); privacy policy still required |
+| Hosting       | Vercel + Supabase (confirm regions)                     |
+| Observability | Sentry (recommended)                                    |
 
 ---
 
@@ -169,6 +169,7 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [x] Generate SVG illustrations/icons for feature sections (Lucide icons + custom wine-themed SVGs)
 
 **Visual resources:**
+
 - Gradients: https://csshero.org/mesher/ (mesh), https://haikei.app/ (waves/blobs)
 - Icons: Lucide React (already installed)
 - Illustrations: https://undraw.co/ (recolor to Sonoma palette)
@@ -193,6 +194,7 @@ _Build every screen using mock data. No real database, no real matching engine. 
 ### 3.5.2 Landing page _(use `/ui` skill — this is the most important page)_
 
 **Navigation (sticky):**
+
 - [ ] Logo (left) — "Sonoma Sip" wordmark in Cormorant
 - [ ] Links (center): How It Works, Wineries, About
 - [ ] CTA button (right): "Plan Your Visit" (wine bg)
@@ -200,6 +202,7 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [ ] Sticky nav has backdrop-blur + semi-transparent background on scroll
 
 **Hero section:**
+
 - [ ] Announcement pill: "Covering 68+ Sonoma County wineries" (subtle, above headline)
 - [ ] Headline: benefit-focused, NOT just the app name (e.g. "Your Perfect Sonoma Wine Day, Planned in Minutes")
 - [ ] Subheadline: 1-2 sentences explaining the quiz → match → plan flow
@@ -209,17 +212,20 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [ ] Optional: animated gradient shift or subtle parallax
 
 **Social proof / stats bar:**
+
 - [ ] "68 curated wineries | Personalized matches | Free to use"
 - [ ] Or logo-style trust indicators
 - [ ] Subtle separator from hero
 
 **How It Works (3 steps):**
+
 - [ ] Step cards with Lucide icons (Wine, BarChart3, MapPin or similar)
 - [ ] Step numbers in gold with connecting visual flow
 - [ ] Brief, punchy copy per step
 - [ ] Scroll-triggered staggered entrance animation
 
 **Features bento grid:**
+
 - [ ] 4-6 tiles highlighting key benefits with icons:
   - "Matches Your Taste" (grape/wine icon)
   - "Budget-Aware" (dollar icon)
@@ -231,18 +237,21 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [ ] Subtle hover effect on tiles
 
 **Featured wineries teaser:**
+
 - [ ] "Discover Sonoma's Best" heading
 - [ ] 3-4 winery cards from mock data (name, region, tagline, price hint)
 - [ ] "View All Wineries →" link
 - [ ] Cards with warm shadow, hover lift
 
 **Final CTA section:**
+
 - [ ] Full-width gradient background (wine → bark)
 - [ ] "Ready to discover your perfect Sonoma day?" headline
 - [ ] Repeated "Plan Your Visit" CTA
 - [ ] Cream text on dark gradient
 
 **Footer:**
+
 - [ ] Sonoma Sip logo/wordmark
 - [ ] Navigation links: How It Works, Wineries, Privacy, Terms
 - [ ] Disclaimer: "Independent guide. Verify details before visiting."
@@ -250,6 +259,7 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [ ] Clean, warm design with bark/cream palette
 
 **Cross-cutting:**
+
 - [ ] Scroll-triggered fade-in animations on all sections
 - [ ] Smooth anchor scrolling for "How It Works" nav link
 - [ ] Responsive: pixel-perfect at 375px, 768px, 1024px, 1440px
@@ -276,20 +286,24 @@ _Build every screen using mock data. No real database, no real matching engine. 
 ### 3.5.4 Results page _(use `/ui` skill)_
 
 **Layout:**
+
 - [ ] Desktop: scrollable list (left, ~60%) + map area (right, ~40%) — sticky map
 - [ ] Mobile: stacked list with sticky "Show Map" toggle button at bottom
 - [ ] Tablet: stacked or side-by-side depending on orientation
 
 **Header area:**
+
 - [ ] "Your Recommendations" heading with count ("5 wineries matched")
 - [ ] Collapsible "Your Preferences" summary (badges showing quiz choices)
 - [ ] Action bar: Share, Print, Email buttons (outline style)
 
 **Map area:**
+
 - [ ] Static placeholder: Sonoma region SVG illustration or gradient card with "Map coming soon"
 - [ ] Shows approximate winery locations as dots (use lat/lng from mock data)
 
 **Result cards:**
+
 - [ ] Rank badge: gold circle with number (#1, #2, etc.)
 - [ ] Winery name (Cormorant), region tag (badge), price range
 - [ ] Top-3 match reasons in plain language ("Perfect for Pinot lovers", "Great views & outdoor seating")
@@ -298,11 +312,13 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [ ] Click: navigate to `/wineries/[slug]`
 
 **Empty state:**
+
 - [ ] Friendly message: "No wineries matched your preferences"
 - [ ] Illustration or icon
 - [ ] CTA: "Try relaxing your filters" → back to quiz
 
 **Skeletons:**
+
 - [ ] Loading skeleton matching card layout shape
 
 ### 3.5.5 Winery detail page _(use `/ui` skill)_
@@ -564,21 +580,21 @@ _Principles: retrieve from structured DB first; LLM formats/converses; no fabric
 
 ## Progress log
 
-| Date | Phase | Notes |
-|------|-------|-------|
-| 2026-04-02 | 0.1, 3.1 | Scaffold: Next.js, Tailwind, pnpm, ESLint, Prettier |
-| 2026-04-02 | 0.3 | All routes + error pages |
-| 2026-04-02 | 0.5, 0.5b | Sonoma design system + shadcn/ui (all components) |
+| Date       | Phase     | Notes                                               |
+| ---------- | --------- | --------------------------------------------------- |
+| 2026-04-02 | 0.1, 3.1  | Scaffold: Next.js, Tailwind, pnpm, ESLint, Prettier |
+| 2026-04-02 | 0.3       | All routes + error pages                            |
+| 2026-04-02 | 0.5, 0.5b | Sonoma design system + shadcn/ui (all components)   |
 
 ---
 
 ## Changelog (this file)
 
-| Date | Change |
-|------|--------|
-| 2026-04-02 | First engineering backlog |
-| 2026-04-02 | Locked Q1–Q14 implementation targets |
-| 2026-04-02 | Split product doc to `docs/PRD.md`; moved data to `docs/`; TODO is technical-only |
-| 2026-04-02 | Phase 9.2 AI roadmap; PRD §14 + README deterministic-first note |
+| Date       | Change                                                                                   |
+| ---------- | ---------------------------------------------------------------------------------------- |
+| 2026-04-02 | First engineering backlog                                                                |
+| 2026-04-02 | Locked Q1–Q14 implementation targets                                                     |
+| 2026-04-02 | Split product doc to `docs/PRD.md`; moved data to `docs/`; TODO is technical-only        |
+| 2026-04-02 | Phase 9.2 AI roadmap; PRD §14 + README deterministic-first note                          |
 | 2026-04-02 | Restructured to UI-first approach: Phase 3.5 (mock data prototype) before backend phases |
-| 2026-04-02 | Added shadcn/ui docs references |
+| 2026-04-02 | Added shadcn/ui docs references                                                          |
