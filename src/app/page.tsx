@@ -1,90 +1,231 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Container } from '@/components/ui/container';
 
 export default function Home() {
   return (
     <>
-      {/* Hero */}
-      <section className="flex flex-1 flex-col items-center justify-center py-24 md:py-32">
-        <Container className="flex flex-col items-center text-center">
-          <p className="text-sm font-medium tracking-widest text-wine uppercase">
-            Sonoma County Winery Guide
-          </p>
-          <h1 className="mt-4 text-5xl font-semibold tracking-tight text-bark md:text-6xl lg:text-7xl">
-            Sonoma Sip
-          </h1>
-          <p className="mt-6 max-w-xl text-lg text-muted-foreground md:text-xl">
-            Answer a few questions about your wine preferences, budget, and group — and get a
-            personalized, ranked list of Sonoma County wineries that fit.
-          </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-            <Button size="lg" asChild>
-              <Link href="/quiz">Plan Your Visit</Link>
-            </Button>
-            <Button variant="outline" size="lg" asChild>
-              <Link href="/wineries">Browse All Wineries</Link>
-            </Button>
-          </div>
-        </Container>
-      </section>
-
-      {/* How it works */}
-      <section className="border-t border-border bg-card py-16 md:py-24">
-        <Container>
-          <h2 className="text-center text-3xl font-semibold text-bark md:text-4xl">
-            How It Works
-          </h2>
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {[
-              {
-                step: '01',
-                title: 'Tell Us Your Preferences',
-                description:
-                  'Varietals, vibe, budget, must-haves — a short quiz to understand what matters to you.',
-              },
-              {
-                step: '02',
-                title: 'Get Matched',
-                description:
-                  'Our matching engine scores 68 curated wineries and ranks the best fits with clear reasons why.',
-              },
-              {
-                step: '03',
-                title: 'Plan & Share',
-                description:
-                  'View your results on a map, read winery details, then share, print, or email your plan.',
-              },
-            ].map((item) => (
-              <div key={item.step} className="text-center md:text-left">
-                <span className="text-sm font-medium text-gold">{item.step}</span>
-                <h3 className="mt-2 text-xl font-semibold text-bark">{item.title}</h3>
-                <p className="mt-3 text-muted-foreground">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-border py-8">
-        <Container>
-          <div className="flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
-            <p>
-              Sonoma Sip is an independent guide. Verify hours, prices, and policies before
-              visiting.
+      <section className="lg:min-h-[calc(100dvh-4rem)]">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 pb-16 pt-12 md:pb-24 md:pt-16 lg:grid-cols-[1fr_1.2fr] lg:gap-12 lg:pb-0 lg:pt-0">
+          <div className="lg:py-28">
+            <h1 className="max-w-[20ch] font-heading text-4xl font-medium tracking-tight text-balance text-bark sm:text-5xl lg:text-6xl">
+              Perfect Day at Sonoma County Vineyards
+            </h1>
+            <p className="mt-6 max-w-[48ch] text-lg text-pretty text-stone">
+              Experience the best Sonoma County wineries, matched to your taste.
+              Take a short quiz and we&apos;ll rank 68 curated wineries by how
+              well they fit your wines, budget, and group.
             </p>
-            <div className="flex gap-6">
-              <Link href="/privacy" className="transition-colors hover:text-foreground">
-                Privacy
-              </Link>
-              <Link href="/terms" className="transition-colors hover:text-foreground">
-                Terms
+            <div className="mt-8 flex flex-wrap items-center gap-5">
+              <Button
+                size="lg"
+                className="rounded-full px-8 tracking-wide"
+                asChild
+              >
+                <Link href="/quiz">Plan Your Visit</Link>
+              </Button>
+              <Link
+                href="/wineries"
+                className="text-sm font-medium text-stone underline decoration-oak/40 underline-offset-4 transition-colors hover:text-bark hover:decoration-oak"
+              >
+                Browse all 68 wineries
               </Link>
             </div>
           </div>
-        </Container>
-      </footer>
+
+          <div className="relative lg:py-8">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-3 pt-12">
+                <div className="overflow-hidden rounded-2xl outline-1 -outline-offset-1 outline-black/5">
+                  <Image
+                    src="/hero/grapes-vine.jpg"
+                    alt=""
+                    width={1600}
+                    height={1200}
+                    className="aspect-[4/5] w-full object-cover"
+                    priority
+                    quality={90}
+                  />
+                </div>
+                <div className="overflow-hidden rounded-2xl outline-1 -outline-offset-1 outline-black/5">
+                  <Image
+                    src="/hero/vineyard-rows.jpg"
+                    alt=""
+                    width={1600}
+                    height={1200}
+                    className="aspect-square w-full object-cover"
+                    quality={90}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-3">
+                <div className="overflow-hidden rounded-2xl outline-1 -outline-offset-1 outline-black/5">
+                  <Image
+                    src="/hero/wine-tasting.jpg"
+                    alt=""
+                    width={1600}
+                    height={2400}
+                    className="aspect-[3/5] w-full object-cover object-center"
+                    priority
+                    quality={90}
+                  />
+                </div>
+                <div className="overflow-hidden rounded-2xl outline-1 -outline-offset-1 outline-black/5">
+                  <Image
+                    src="/hero/vineyard-rolling.jpg"
+                    alt=""
+                    width={1600}
+                    height={1200}
+                    className="aspect-[5/4] w-full object-cover"
+                    quality={90}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute -bottom-4 -left-6 z-10 w-64 sm:w-72 lg:-left-10">
+              <div className="rounded-xl bg-white/92 p-5 shadow-warm-lg ring-1 ring-black/5 backdrop-blur-md">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-stone">Top Match</p>
+                  <span className="rounded-full bg-wine px-2.5 py-0.5 text-xs font-medium text-cream">
+                    96%
+                  </span>
+                </div>
+                <p className="mt-2 font-heading text-lg font-medium text-bark">
+                  Dry Creek Vineyard
+                </p>
+                <p className="mt-0.5 text-sm text-oak">
+                  Dry Creek Valley &middot; Zinfandel
+                </p>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {['Picnic grounds', 'Walk-in', '$25\u201335'].map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full bg-linen px-2.5 py-0.5 text-xs text-oak ring-1 ring-black/5"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="border-t border-border/60 bg-card py-24 md:py-32">
+        <div className="mx-auto max-w-5xl px-6">
+          <p className="font-mono text-sm tracking-wide text-wine">
+            How it works
+          </p>
+          <h2 className="mt-3 max-w-[35ch] text-3xl font-semibold tracking-tight text-balance text-bark md:text-4xl">
+            Three questions. One perfect day.
+          </h2>
+          <div className="mt-16 space-y-16 md:space-y-20">
+            {[
+              {
+                number: '01',
+                title: 'Share your preferences',
+                body: 'A short, thoughtful quiz. We ask about the wines you love, the atmosphere you want, your budget, and anything your group needs.',
+              },
+              {
+                number: '02',
+                title: 'We find your matches',
+                body: 'Every winery in our curated set is scored against what you told us. You get a ranked list with honest reasons why each one fits.',
+              },
+              {
+                number: '03',
+                title: 'Take it with you',
+                body: 'Your plan shows up on a map. Check hours and policies, then share the link or email it to your group. No account required.',
+              },
+            ].map((step) => (
+              <div key={step.number} className="flex gap-6 md:gap-10">
+                <span className="shrink-0 font-heading text-4xl font-semibold text-gold/60 md:text-5xl">
+                  {step.number}
+                </span>
+                <div>
+                  <h3 className="text-xl font-semibold text-bark md:text-2xl">
+                    {step.title}
+                  </h3>
+                  <p className="mt-3 max-w-xl text-pretty text-stone">
+                    {step.body}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 md:py-32">
+        <div className="mx-auto max-w-5xl px-6">
+          <p className="font-mono text-sm tracking-wide text-wine">
+            Why Sonoma Sip
+          </p>
+          <h2 className="mt-3 max-w-[35ch] text-3xl font-semibold tracking-tight text-balance text-bark md:text-4xl">
+            We built the guide we wished existed.
+          </h2>
+          <p className="mt-4 max-w-[48ch] text-lg text-pretty text-stone">
+            Most wine country sites are ad-driven directories or booking
+            platforms. We recommend based on fit, not who pays us.
+          </p>
+          <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-2">
+            {[
+              {
+                label: '68 wineries',
+                detail:
+                  'Hand-curated with detailed tasting, pricing, and policy information.',
+              },
+              {
+                label: 'Honest matching',
+                detail:
+                  'Deterministic scoring you can trust. No black box, no paid placement.',
+              },
+              {
+                label: 'Real logistics',
+                detail:
+                  'Parking, group limits, wheelchair access, dog policies. The stuff that matters.',
+              },
+              {
+                label: 'Independent voice',
+                detail:
+                  'No winery partnerships. Recommendations are editorial, not commercial.',
+              },
+            ].map((item) => (
+              <div key={item.label} className="bg-background p-8 md:p-10">
+                <h3 className="font-heading text-lg font-semibold text-bark">
+                  {item.label}
+                </h3>
+                <p className="mt-2 text-sm text-pretty text-stone">
+                  {item.detail}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-border/60">
+        <div className="mx-auto max-w-5xl px-6 py-24 md:py-32">
+          <div className="flex flex-col items-start gap-8 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="max-w-[24ch] text-3xl font-semibold tracking-tight text-balance text-bark md:text-4xl">
+                Ready to plan your day?
+              </h2>
+              <p className="mt-3 max-w-[40ch] text-lg text-pretty text-stone">
+                Takes about two minutes. No account, no email required.
+              </p>
+            </div>
+            <Button
+              size="lg"
+              className="shrink-0 rounded-full px-10 tracking-wide"
+              asChild
+            >
+              <Link href="/quiz">Start Planning</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
