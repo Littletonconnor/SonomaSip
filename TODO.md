@@ -280,15 +280,15 @@ _Build every screen using mock data. No real database, no real matching engine. 
 - [x] Empty state: "No wineries match" + clear filters button
 - [x] Clear all filters link when any filter is active
 
-### 3.5.7 Shared plan page _(use `/ui` skill)_
+### 3.5.7 Shared plan page ✅
 
-- [ ] `/plan/[id]`: read-only view of a mock itinerary
-- [ ] Header: "Your Sonoma Sip Plan" + "Generated on {date}"
-- [ ] Preferences summary: badges showing what was asked for
-- [ ] Ordered winery list: rank, name, region, match reasons, key details
-- [ ] Map placeholder
-- [ ] Action bar: Copy Link, Print/PDF, Email (styled, non-functional)
-- [ ] Disclaimer footer: "Verify details before visiting"
+- [x] Two-column itinerary: sticky left sidebar (header, preferences, actions, map) + right scrollable winery stops
+- [x] Header: "Your Wine Day Itinerary" + stop count + generated date
+- [x] Preference badges from mock plan data
+- [x] Action bar: Copy Link, Print, Email buttons (styled, non-functional)
+- [x] Map placeholder with positioned winery dots from lat/lng
+- [x] Numbered winery stops: rank badge, name (links to detail), region, price, rating, match reasons, feature badges, "Book a Tasting" link
+- [x] Disclaimer footer: independent guide, verify details
 - [ ] OG meta tags for link previews
 
 ### 3.5.9 Map integration (Mapbox GL)
