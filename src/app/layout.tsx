@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { Cormorant_Garamond, Inter, Geist_Mono, Geist } from 'next/font/google';
+import { Cormorant_Garamond, Inter, Geist_Mono } from 'next/font/google';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import './globals.css';
-import { cn } from "@/lib/utils";
 
 const cormorant = Cormorant_Garamond({
   variable: '--font-heading',
@@ -11,7 +11,12 @@ const cormorant = Cormorant_Garamond({
   display: 'swap',
 });
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({
+  variable: '--font-sans',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
+});
 
 const geistMono = Geist_Mono({
   variable: '--font-mono',
@@ -28,9 +33,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", cormorant.variable, geistMono.variable, "font-sans", geist.variable)}
+      className={`${cormorant.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-cream text-text">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <TooltipProvider>{children}</TooltipProvider>
+      </body>
     </html>
   );
 }

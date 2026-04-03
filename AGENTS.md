@@ -25,9 +25,17 @@
 - **`docs/SCORING.md`** — Matching engine rules, weights, filter logic, worked examples
 - **`docs/sonoma-winery-database-complete.xlsx`** — Source data for 68 curated wineries
 
+### Components (shadcn/ui)
+- **All shadcn/ui components are installed** in `src/components/ui/`. Use them before building custom ones.
+- Components are source files — edit them directly. That is the intended workflow.
+- **Docs:** https://ui.shadcn.com/docs/components
+- **Theming:** Colors use OKLCH in `globals.css`. Semantic tokens map to our Sonoma palette (primary = wine, background = cream, card = linen, muted = fog).
+- Use `cn()` from `@/lib/utils` to compose Tailwind classes.
+- Add new components: `pnpm dlx shadcn@latest add <name>`
+
 ### Tech Stack
 - Next.js App Router + TypeScript (strict mode)
-- Tailwind CSS for styling
+- Tailwind CSS v4 + shadcn/ui (Radix primitives)
 - Supabase (PostgreSQL) for data
 - Mapbox GL for maps
 - pnpm as package manager

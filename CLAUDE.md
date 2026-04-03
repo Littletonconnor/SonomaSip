@@ -13,7 +13,8 @@ pnpm format:check # Prettier (check only)
 ## Stack
 
 - **Framework:** Next.js (App Router) with TypeScript
-- **Styling:** Tailwind CSS
+- **Styling:** Tailwind CSS v4
+- **Components:** shadcn/ui (Radix primitives) — all components installed in `src/components/ui/`
 - **Database:** Supabase (PostgreSQL)
 - **Map:** Mapbox GL
 - **Email:** Resend or Postmark
@@ -24,10 +25,28 @@ pnpm format:check # Prettier (check only)
 
 ```
 src/app/          # Next.js App Router pages and layouts
-src/lib/          # Shared utilities, matching engine, etc.
+src/components/ui # shadcn/ui components (source files — edit directly)
+src/lib/          # Shared utilities (cn(), matching engine, etc.)
+src/hooks/        # Shared React hooks
 docs/             # PRD, scoring spec, editorial data (xlsx)
 public/           # Static assets
+components.json   # shadcn/ui configuration
 ```
+
+## shadcn/ui
+
+Components are installed as source files — they are ours to customize. When adding or updating:
+
+```bash
+pnpm dlx shadcn@latest add <component>       # Add a new component
+pnpm dlx shadcn@latest add <component> --diff # Preview changes before overwriting
+```
+
+- **Docs:** https://ui.shadcn.com/docs
+- **Theming:** Colors use OKLCH format in `globals.css`. shadcn semantic tokens (primary, secondary, muted, etc.) are mapped to our Sonoma palette.
+- **Tailwind v4 guide:** https://ui.shadcn.com/docs/tailwind-v4
+- Use `cn()` from `@/lib/utils` to merge class names.
+- Use shadcn components before building custom ones.
 
 ## Workflow Rules
 

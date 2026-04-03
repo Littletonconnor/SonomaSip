@@ -6,13 +6,19 @@
 
 ## References
 
-| Artifact | Path |
-|----------|------|
+| Artifact | Path / URL |
+|----------|------------|
 | Product requirements (non-technical) | `docs/PRD.md` |
 | Scoring / filters (technical) | `docs/SCORING.md` |
 | Seed / editorial data (Excel) | `docs/sonoma-winery-database-complete.xlsx` |
 | Original PRD (archive) | `docs/sonoma-winery-prd.docx` |
 | Planning workbook (archive) | `docs/sonoma-winery-website-architecture.xlsx` |
+| **shadcn/ui docs** | https://ui.shadcn.com/docs |
+| shadcn — component list | https://ui.shadcn.com/docs/components |
+| shadcn — theming (OKLCH tokens) | https://ui.shadcn.com/docs/theming |
+| shadcn — Tailwind v4 guide | https://ui.shadcn.com/docs/tailwind-v4 |
+| shadcn — CLI reference | https://ui.shadcn.com/docs/cli |
+| Next.js agent docs (in node_modules) | `node_modules/next/dist/docs/` |
 
 ---
 
@@ -87,11 +93,14 @@ Phase 0 (spec, ERD, design, SCORING draft)
 
 ### 0.5b shadcn/ui integration
 
-- [ ] Install shadcn/ui (`pnpm dlx shadcn@latest init`)
-- [ ] Configure shadcn theme with Sonoma tokens (wine, gold, sage, bark, cream, etc.)
-- [ ] Replace hand-rolled Button, Card, Badge with shadcn versions
-- [ ] Add additional primitives: Slider, Stepper, Modal/Dialog, Toast, Skeleton, Chip/Toggle
-- [ ] Verify all components render with Sonoma palette
+- [x] Install shadcn/ui (`pnpm dlx shadcn@latest init --defaults --base radix`)
+- [x] Install all components (`pnpm dlx shadcn@latest add --all`)
+- [x] Configure shadcn theme with Sonoma tokens in OKLCH (wine, gold, sage, bark, cream, etc.)
+- [x] Map shadcn semantic tokens (primary → wine, background → cream, card → linen, muted → fog, etc.)
+- [x] Replace hand-rolled Button, Card, Badge with shadcn versions
+- [x] All primitives installed: Slider, Dialog, Toast (Sonner), Skeleton, Toggle, and 50+ more
+- [x] Add shadcn documentation references to TODO.md
+- [ ] Verify components render correctly with Sonoma palette (visual check)
 
 ### 0.6 Data model
 
