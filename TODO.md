@@ -39,9 +39,9 @@
 
 ---
 
-## Approach: UI-first with mock data
+## Approach: UI-first, then data pipeline, then wire up
 
-Build the full user experience with mock data first. Validate that every screen feels right. Then wire up the real backend (Supabase, import, matching engine).
+Build the full user experience with mock data first. Validate that every screen feels right. Then build the data pipeline — this is the backbone of the product. Not a one-time import, but a multi-source pipeline that feeds deterministic matching AND LLM content curation.
 
 ```
 Track A — UI Prototype (current focus)
@@ -50,21 +50,37 @@ Track A — UI Prototype (current focus)
     → Phase 3.5 (all screens with mock data) ← YOU ARE HERE
     → Validate & iterate
 
-Track B — Backend (after UI is validated)
-  Phase 0.6 (data model / ERD)
-    → Phase 0.7 (SCORING.md spec)
-    → Phase 1 (Supabase schema + RLS + types)
-    → Phase 2 (import from Excel)
-    → Phase 4 (matching engine + tests)
+Track B — Data Pipeline (the backbone — after UI is validated)
+  Can run in parallel:
+    Phase D1 (schema design) + Phase D2 (data quality) + Phase D3 (SCORING.md)
+  Then sequentially:
+    → Phase D4 (Supabase migrations)
+    → Phase D5 (import pipeline)
+    → Phase D6 (matching engine)
+    → Phase D7 (wire up)
 
-Wire Up: Replace mock data with real Supabase queries + matching engine
+Track C — Content Pipeline & Monetization (foundational — before launch)
+  Phase D8 (content pipeline: scrape → LLM → review)
+    + Phase D9 (admin pages: review UI, health dashboard, click dashboard)
+    + Phase D10 (click attribution: tracking + reporting)
 
-Track C — Polish & Launch
+Track D — Polish & Launch
   Phase 6 (SEO / perf)
     → Phase 7 (ops)
     → Phase 8 (a11y, QA, launch)
     → Phase 9 (post-MVP)
 ```
+
+### Data Source Authority Hierarchy
+
+| Source                                | Provides                                                             | Trust                                    | Refresh                        |
+| ------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------- | ------------------------------ |
+| Curated Excel (68 wineries, 8 sheets) | Editorial stories, style scores, flights, experience flags, pairings | Highest — editorial voice                | Manual, quarterly              |
+| Google Places API                     | business_status, live ratings, hours (comparison only)               | High for facts, low for domain data      | Weekly                         |
+| URL Health Checks                     | Booking URL liveness                                                 | Binary signal                            | Weekly                         |
+| User Reports (future)                 | "This is wrong" flags                                                | Lowest — signal only, never auto-applied | Real-time submit, async review |
+
+**Conflict resolution:** Editorial always wins. Google can auto-update `rating_google` but only _flags_ hours drift for human review. URL checks flag broken links. User reports create a review queue, never touch the canonical record.
 
 ---
 
@@ -153,7 +169,7 @@ Track C — Polish & Launch
 
 ### 3.2 Config
 
-- [ ] `env.ts` with Zod validation; separate public vs server secrets
+- [x] `env.ts` with Zod validation; separate public vs server secrets — `src/lib/env.ts` with `publicSchema` (MAPBOX_TOKEN, SITE_URL) and `serverSchema` (extensible for Supabase, Resend)
 
 ### 3.3 CI
 
@@ -321,34 +337,349 @@ _Custom-styled Mapbox map that matches the Sonoma palette. Used on results page 
 
 ---
 
-## Phase 0.6 — Data model _(after UI is validated)_
+> **NEXT SESSION:** Before starting implementation, discuss the data pipeline (D1–D10) in more detail. Open questions: exact LLM prompts and editorial voice definition, content freshness cadence, admin review UX workflow, how click attribution data feeds into winery partnership outreach, and whether the scrape → enrich pipeline should run on Vercel cron or a separate worker.
 
-- [ ] ERD: `wineries`, `flights`, normalization vs JSONB decision
-- [ ] Column mapping from **`docs/sonoma-winery-database-complete.xlsx`** (every sheet)
-- [ ] Stable slug = Excel `id`; enums for reservation, noise, walk-in, flight_type, etc.
-- [ ] Derived fields: `min_flight_price` (budget uses flights **≤ $200** only), `max_flight_price`, `has_food_pairing_any`, `is_members_only`, etc.
-- [ ] Tables: `import_runs`, `shared_itineraries` (`payload` jsonb + `payload_version`)
-- [ ] RLS plan documented before migration
+## Phase D1 — Schema Design _(can start now, parallel with D2 + D3)_
 
-### 0.7 `docs/SCORING.md`
+Design decisions documented here — these drive everything downstream.
 
-- [ ] Persona inference table (answers → weights)
-- [ ] Filter rules (varietals, must-haves, budget, optional walk-in-only)
-- [ ] Scoring formula + normalization + tie-breakers
-- [ ] Explanation templates
-- [ ] ≥3 worked examples (input → top 5 + reasons)
+**JSONB vs Normalized:**
 
-### 0.8 Data quality (pre-import)
+| Data                     | Decision           | Why                                        |
+| ------------------------ | ------------------ | ------------------------------------------ |
+| Hours                    | JSONB              | Read as unit, never filtered by day        |
+| Varietals                | Normalized table   | Filtered during matching, needs indexes    |
+| Flights                  | Normalized table   | Multiple per winery, aggregated for budget |
+| Style scores             | 6 columns          | Queried individually in scoring formula    |
+| Experience flags         | 16 boolean columns | Each independently filterable as must-have |
+| Import errors            | JSONB              | Variable structure, write-once             |
+| Shared itinerary results | JSONB              | Snapshot, versioned, retrieved by ID only  |
 
-- [ ] Remove closed Jackson Family venues from seed workbook (Arrowood, Fieldstone, Murphy-Goode)
-- [ ] Fix logistics slugs referencing removed / invalid wineries
-- [ ] Dedupe Bella / Cline (and similar) → canonical slug
-- [ ] Scribe: `members-only` flag + copy per PRD
-- [ ] Validate lat/long; fix Carneros / county display per PRD
-- [ ] Spot-check reservation URLs (HTTPS, live)
-- [ ] Sample verify dog/kid/wheelchair flags (time-boxed)
+### D1.1 Column mapping from Excel
 
-### 0.9 Analytics instrumentation
+- [ ] Map every column from all 8 Excel sheets to database columns
+- [ ] Document column name → DB field → TypeScript type for each
+- [ ] Identify columns that are editorial-only (description, tagline) vs filterable vs scoreable
+- [ ] Flag columns with data quality issues (see D2)
+
+### D1.2 Enum design
+
+- [ ] `reservation_type`: appointment_only, walk_ins_welcome, reservations_recommended
+- [ ] `noise_level`: quiet, moderate, lively
+- [ ] `flight_format`: seated, standing, tour, outdoor, picnic, bar _(expanded from current types to match actual Excel data)_
+- [ ] `ava_region`: russian_river_valley, dry_creek_valley, alexander_valley, sonoma_valley, sonoma_coast
+- [ ] `setting`: vineyard, estate, downtown, hilltop, cave
+- [ ] Validate each enum against actual Excel values — no mismatches
+
+### D1.3 ERD & table design
+
+- [ ] `wineries` table: all columns defined with types and constraints
+- [ ] `winery_varietals` join table: `(winery_id, varietal, is_present, is_signature)`
+- [ ] `flights` table: `(id, winery_id, name, price, format, includes_food, description)`
+- [ ] `import_runs` table: `(id, started_at, finished_at, source_file_hash, wineries_upserted, flights_upserted, errors_json, warnings_json)`
+- [ ] `shared_itineraries` table: `(id, created_at, quiz_answers jsonb, results jsonb, payload_version)`
+- [ ] `data_health_checks` table: `(id, winery_id, check_type, status, details, checked_at, resolved_at, resolved_by)`
+- [ ] `field_overrides` table: `(id, winery_id, field_name, override_value, reason, created_at)` — audit trail for editorial overrides
+- [ ] Provenance fields on `wineries`: `last_verified_at`, `last_places_sync_at`, `data_source`, `verification_notes`, `is_active`
+- [ ] Document the ERD (can be a markdown table or mermaid diagram)
+
+### D1.4 RLS plan
+
+- [ ] Document RLS rules before writing migrations
+- [ ] `wineries`, `flights`, `winery_varietals`: public `SELECT` (read-only)
+- [ ] `shared_itineraries`: server-only `INSERT`, public `SELECT` by id
+- [ ] `import_runs`, `data_health_checks`, `field_overrides`: admin-only (service role key)
+- [ ] No public `UPDATE`/`DELETE` on any content table
+
+### D1.5 TypeScript type reconciliation
+
+- [ ] Reconcile `src/lib/types.ts` (current mock types) with new schema
+- [ ] Plan the `WineryForMatching` flat type (pre-joined, all scoring fields, no DB queries in scoring loop)
+- [ ] Plan the `WineryForDisplay` type (what the UI needs)
+- [ ] Decide: generate types from Supabase (`supabase gen types`) or hand-maintain
+
+---
+
+## Phase D2 — Data Quality _(can start now, parallel with D1 + D3)_
+
+Clean the source data BEFORE importing. Garbage in, garbage out.
+
+### D2.1 Identify closures & exclusions
+
+- [ ] Confirm closed wineries: Arrowood, Fieldstone, Murphy-Goode (Jackson Family)
+- [ ] Create `scripts/import-config.yml` with `excluded_slugs` list and reasons
+- [ ] Check for any other closures since Excel was compiled
+
+### D2.2 Resolve duplicates
+
+- [ ] Audit for duplicate/near-duplicate entries (Bella, Cline, etc.)
+- [ ] Define canonical slug for each
+- [ ] Document merge decisions
+
+### D2.3 Validate coordinates
+
+- [ ] All lat/long within Sonoma County bounding box (lat 38.0–39.0, lon -123.5 to -122.0)
+- [ ] Fix Carneros / county display per PRD
+- [ ] Spot-check 10 random wineries on a map
+
+### D2.4 Validate URLs
+
+- [ ] HTTP HEAD check on every `booking_url` and `website_url` in Excel
+- [ ] Fix or flag broken links
+- [ ] Ensure all URLs are HTTPS
+
+### D2.5 Validate experience flags
+
+- [ ] Spot-check dog/kid/wheelchair/food-pairing flags against winery websites (time-boxed, 15 wineries)
+- [ ] Scribe: confirm `members-only` nuance (weekends only → V1 treats as binary)
+- [ ] Document any overrides in `import-config.yml`
+
+### D2.6 Validate enums & ranges
+
+- [ ] Every `reservation_type` value in Excel maps to a defined enum
+- [ ] Every `noise_level` value maps to a defined enum
+- [ ] Flight prices are numeric and reasonable ($0–$500 range)
+- [ ] Flight formats match expanded enum (seated, standing, tour, outdoor, picnic, bar)
+- [ ] Document any Excel values that need mapping/coercion
+
+---
+
+## Phase D3 — SCORING.md Spec _(can start now, parallel with D1 + D2)_
+
+### D3.1 Persona inference
+
+- [ ] Define the quiz answer → persona weight mapping table
+- [ ] Cover all quiz dimensions: occasion, group size, budget, wine knowledge, vibe preference, must-haves
+
+### D3.2 Hard filters
+
+- [ ] Document all must-have filters (eliminates wineries entirely)
+- [ ] Varietals: "must have Pinot Noir" → winery must have it
+- [ ] Budget: only consider flights ≤ budget cap (≤$200 per PRD)
+- [ ] Walk-in-only: filter by `reservation_type`
+- [ ] Members-only: exclude by default unless explicitly chosen
+- [ ] Accessibility: dog-friendly, kid-friendly, wheelchair-accessible
+
+### D3.3 Soft scoring
+
+- [ ] Define the weighted scoring formula
+- [ ] Style dimension scoring: quiz vibe → style\_\* column weights
+- [ ] Experience bonus: quiz must-haves that are nice-to-haves (not hard filters)
+- [ ] Budget proximity: closer to target = higher score
+- [ ] Rating blend: how to combine `quality_score`, `popularity_score`, `rating_google`
+- [ ] Normalize scores to 0–100 range
+
+### D3.4 Tie-breakers & diversity
+
+- [ ] Tie-breaking rule (alphabetical? random seed?)
+- [ ] Geographic diversity: don't return 5 wineries on the same road
+- [ ] AVA diversity: try to spread across regions
+
+### D3.5 Explanation templates
+
+- [ ] Define the "why we picked this" template per winery
+- [ ] Map each scoring dimension to a human-readable reason
+- [ ] Examples: "Great for your group because it's family-friendly with outdoor seating"
+
+### D3.6 Worked examples
+
+- [ ] ≥5 complete examples: quiz input → filter results → scoring → top 5 + reasons
+- [ ] Cover edge cases: very restrictive filters (few results), very broad (many ties)
+- [ ] These become golden test files for Phase D6
+
+---
+
+## Phase D4 — Supabase Migrations _(after D1 schema design)_
+
+### D4.1 Project setup
+
+- [ ] `supabase init`; link remote project
+- [ ] Server + browser Supabase clients (cookie pattern for Next.js App Router)
+- [ ] Environment variables: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+
+### D4.2 Migrations
+
+- [ ] Migration 001: create enums (`reservation_type`, `noise_level`, `flight_format`, `ava_region`, `setting`, `check_type`, `check_status`)
+- [ ] Migration 002: create `wineries` table (all columns from D1.3)
+- [ ] Migration 003: create `winery_varietals` table + indexes
+- [ ] Migration 004: create `flights` table + FK + indexes
+- [ ] Migration 005: create `import_runs` table
+- [ ] Migration 006: create `shared_itineraries` table
+- [ ] Migration 007: create `data_health_checks` + `field_overrides` tables
+- [ ] Indexes: unique `wineries.slug`, `flights.winery_id`, `winery_varietals.winery_id`, filters as needed
+- [ ] Apply to local first, then staging
+
+### D4.3 RLS policies
+
+- [ ] Enable RLS on all tables
+- [ ] Implement policies per D1.4 plan
+- [ ] Test: anonymous user can SELECT wineries/flights, cannot INSERT/UPDATE/DELETE
+- [ ] Test: service role can do everything
+
+### D4.4 Type generation
+
+- [ ] `supabase gen types typescript` → `src/types/database.ts`
+- [ ] Add `db:types` script to package.json
+- [ ] Create mapper layer: Supabase row types → app types (`WineryForDisplay`, `WineryForMatching`)
+
+---
+
+## Phase D5 — Import Pipeline _(after D4 migrations)_
+
+### D5.1 Parser setup
+
+- [ ] Add `exceljs` dependency
+- [ ] Create `scripts/import-wineries.ts` entrypoint
+- [ ] Read `scripts/import-config.yml` for exclusions and overrides
+
+### D5.2 Sheet parsers
+
+- [ ] Parser for "Core Info" sheet → basic winery fields
+- [ ] Parser for "Experiences" sheet → experience flags + accessibility
+- [ ] Parser for "Styles" sheet → style\_\* scores (1-5)
+- [ ] Parser for "Flights" sheet → flight records
+- [ ] Parser for "Varietals" sheet → varietal arrays + signatures
+- [ ] Parser for "Logistics" sheet → hours, pairings, practical info
+- [ ] Parser for "Ratings" sheet → editorial scores + platform ratings
+- [ ] Parser for "Descriptions" sheet → tagline, description, editorial content
+- [ ] Each parser validates headers match expected schema
+
+### D5.3 Join & transform
+
+- [ ] Join all sheets by slug into single `WineryImportRecord` per winery
+- [ ] Apply exclusions from config
+- [ ] Apply overrides from config
+- [ ] Compute derived fields: `min_flight_price` (flights ≤$200 only), `max_flight_price`, `has_food_pairing`, varietal arrays, vibe tags
+
+### D5.4 Validation gate
+
+- [ ] Required fields: slug, name, lat, lon
+- [ ] Enum validation against defined enums
+- [ ] Coordinate range check (Sonoma County bounding box)
+- [ ] URL format validation (HTTPS)
+- [ ] No duplicate slugs after exclusion/merge
+- [ ] Log warnings for non-fatal issues, errors for fatal ones
+
+### D5.5 Database upsert
+
+- [ ] Single Supabase transaction per import run
+- [ ] UPSERT `wineries` (on conflict slug)
+- [ ] DELETE + INSERT `winery_varietals` for each winery
+- [ ] DELETE + INSERT `flights` for each winery
+- [ ] Record run in `import_runs` with source file SHA-256 hash
+
+### D5.6 Dry-run mode
+
+- [ ] `--dry-run` flag: parse, validate, compute — but don't write to DB
+- [ ] Print summary: X wineries, Y flights, Z warnings, N errors
+- [ ] Always run dry-run before real import
+
+### D5.7 Post-import verification
+
+- [ ] Automated assertions: winery count = 65-68, flights ≥ 100, zero orphan flights
+- [ ] All 5 AVA regions represented
+- [ ] No null required fields
+- [ ] Print health report to console
+
+### D5.8 npm scripts
+
+- [ ] `db:import` — run import against configured Supabase
+- [ ] `db:import:dry` — dry-run mode
+- [ ] `db:reset` — reset local DB + re-import
+- [ ] `db:types` — regenerate TypeScript types from schema
+
+---
+
+## Phase D6 — Matching Engine _(after D5 import + D3 scoring spec)_
+
+### D6.1 Types
+
+- [ ] `lib/matching/types.ts` — `WineryForMatching`, `MatchResult`, `MatchExplanation`, `QuizAnswers` (refined from current mock version)
+
+### D6.2 Filters
+
+- [ ] `lib/matching/filters.ts` — hard filters per D3.2
+- [ ] Each filter is a pure function: `(winery: WineryForMatching, answers: QuizAnswers) => boolean`
+- [ ] Compose filters: winery must pass ALL active hard filters
+
+### D6.3 Scoring
+
+- [ ] `lib/matching/score.ts` — weighted scoring per D3.3
+- [ ] Pure function: `(winery: WineryForMatching, answers: QuizAnswers) => number`
+- [ ] Score normalized to 0-100
+
+### D6.4 Explanations
+
+- [ ] `lib/matching/explain.ts` — per D3.5 templates
+- [ ] Generate human-readable "why this winery" for each match
+- [ ] Reference specific quiz answers in explanations
+
+### D6.5 Orchestrator
+
+- [ ] `lib/matching/index.ts` — `recommend(wineries: WineryForMatching[], answers: QuizAnswers): MatchResult[]`
+- [ ] Flow: fetch all active wineries → filter → score → sort → diversify → take top N → explain
+- [ ] Deterministic: same input always produces same output
+
+### D6.6 Unit tests
+
+- [ ] Test each filter independently with edge cases
+- [ ] Test scoring with known inputs → expected scores
+- [ ] Test explanation generation
+
+### D6.7 Golden file tests
+
+- [ ] ≥5 quiz profiles from D3.6 worked examples
+- [ ] Snapshot tests: input → expected top 5 ordering
+- [ ] Run against real imported data (not mocks)
+
+---
+
+## Phase D7 — Wire Up: Replace Mock Data _(after D6 matching engine)_
+
+### D7.1 Data layer
+
+- [ ] Create `lib/data/wineries.ts` — Supabase queries for fetching wineries
+- [ ] `getWineriesForMatching()` — flat, pre-joined, all scoring fields
+- [ ] `getWineryBySlug(slug)` — full detail for display
+- [ ] `getAllWinerySlugs()` — for `generateStaticParams`
+- [ ] Cache strategy: ISR with revalidate (hourly or on-demand)
+
+### D7.2 Server actions
+
+- [ ] Quiz submit → server action → fetch wineries → matching engine → results
+- [ ] Server authority: recommendations computed server-side for persistence
+
+### D7.3 Results page
+
+- [ ] Replace mock data with real `MatchResult[]` from server action
+- [ ] Wire up "why this winery" explanations
+
+### D7.4 Winery detail pages
+
+- [ ] `generateStaticParams` from `getAllWinerySlugs()`
+- [ ] Revalidate policy (ISR, hourly)
+- [ ] Replace mock winery data with `getWineryBySlug()`
+
+### D7.5 Browse page
+
+- [ ] Replace mock winery list with Supabase query
+- [ ] Wire up filters to real data
+
+### D7.6 Share flow
+
+- [ ] Insert `shared_itineraries` → Supabase on share create
+- [ ] Load shared itinerary by ID on share page
+- [ ] Rate limit share creation by IP
+
+### D7.7 Plan page
+
+- [ ] Wire up plan/itinerary page to real data
+- [ ] PDF: text-first print route / CSS; v2: Mapbox Static image
+- [ ] Email: send via Resend/Postmark with share URL + summary
+
+---
+
+## Phase 0.9 — Analytics instrumentation
 
 - [ ] Plausible snippet / proxy per their Next.js guidance
 - [ ] Events: `quiz_started`, `quiz_step_completed`, `quiz_completed`, `itinerary_computed` (count ≥ 1), optional `results_rendered`, `winery_detail_opened`, `share_created`, `pdf_downloaded`, `email_sent`
@@ -356,93 +687,161 @@ _Custom-styled Mapbox map that matches the Sonoma palette. Used on results page 
 
 ---
 
-## Phase 1 — Supabase: schema, RLS, types _(after UI + data model)_
+## Phase D8 — Content Pipeline _(foundational — before launch)_
 
-### 1.1 CLI & clients
+_The detail pages need rich, original content to drive click-throughs. This pipeline scrapes winery websites, feeds them to LLMs, and produces original editorial content for human review._
 
-- [ ] `supabase init`; link remote
-- [ ] Server + browser Supabase clients (cookie pattern for Next)
+**Architecture:**
 
-### 1.2 Migrations
+```
+Registry (winery URLs from Excel)
+  → Cloudflare /crawl API (scrape websites as markdown)
+  → Raw scrape storage (winery_scrapes table)
+  → LLM extraction (structured data: hours, flights, prices, varietals)
+  → LLM enrichment (original stories, descriptions, seasonal notes)
+  → Content drafts (content_drafts table, status: draft)
+  → Admin review UI (you + girlfriend approve/edit/reject)
+  → Published to wineries table (status: approved)
+```
 
-- [ ] Extensions (PostGIS optional, defer if unused)
-- [ ] `wineries` + related tables / enums
-- [ ] `flights` (FK `winery_id`)
-- [ ] `import_runs`, `shared_itineraries`
-- [ ] Indexes: unique `wineries.slug`, `flights.winery_id`, filters as needed
-- [ ] Apply to staging first
+### D8.1 Cloudflare Browser Rendering setup
 
-### 1.3 RLS
+- [ ] Cloudflare account + API token with "Browser Rendering - Edit" permission
+- [ ] Environment variables: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
+- [ ] Wrapper utility: `lib/pipeline/cloudflare-crawl.ts` — initiates crawl, polls for completion, returns markdown
+- [ ] Configuration: `limit: 10` pages per winery, `formats: ["markdown"]`, `rejectResourceTypes: ["image", "media", "font", "stylesheet"]`
+- [ ] Respect robots.txt (Cloudflare does this by default)
+- [ ] Test with 3 winery websites to validate output quality
 
-- [ ] RLS enabled on all user-facing tables
-- [ ] `SELECT` public read: `wineries`, `flights`
-- [ ] `shared_itineraries`: controlled `INSERT` (server-only or rate-limited path); `SELECT` by id
-- [ ] No public `UPDATE`/`DELETE` on core content
+### D8.2 Scrape pipeline
 
-### 1.4 Types
+- [ ] `scripts/scrape-wineries.ts` — iterates registry, crawls each winery website
+- [ ] `winery_scrapes` table: `(id, winery_id, url, raw_markdown, pages_crawled, scraped_at, cloudflare_job_id)`
+- [ ] Store raw markdown per crawl — never throw away source material
+- [ ] Rate limiting: space crawls to avoid hitting Cloudflare limits (68 wineries × 10 pages = ~680 renders)
+- [ ] `--dry-run` mode: crawl 1 winery, print output, don't store
+- [ ] npm script: `pipeline:scrape`
 
-- [ ] `supabase gen types typescript` → commit under e.g. `types/database.ts`
-- [ ] Optional CI: regen on migration change
+### D8.3 LLM extraction (structured data)
+
+- [ ] `lib/pipeline/llm-extract.ts` — takes raw markdown, returns structured JSON
+- [ ] Extraction prompt: "Given this winery website content, extract: hours of operation, tasting flight names/prices/descriptions, varietals offered, winemaker name, reservation policy, group size limits, accessibility info, events. Return as JSON matching this schema: {...}"
+- [ ] `winery_llm_extractions` table: `(id, winery_id, scrape_id, extracted_data jsonb, model_used, tokens_used, extracted_at)`
+- [ ] Diff extraction against current DB values — flag changes
+- [ ] Auto-apply high-confidence factual changes (e.g., new flight added) to drafts
+- [ ] Flag low-confidence changes for review (e.g., hours changed, price changed significantly)
+
+### D8.4 LLM enrichment (original content generation)
+
+- [ ] `lib/pipeline/llm-enrich.ts` — generates original editorial content
+- [ ] Content types to generate:
+  - `story` — 2-3 paragraph winery narrative (your editorial voice + fresh details from scrape)
+  - `tagline` — one-line hook for cards/listings
+  - `flight_descriptions` — enriched tasting experience descriptions
+  - `visitor_tip` — "What to know before you go" (parking, dress code, best time to visit)
+  - `seasonal_note` — current seasonal info if detected (harvest events, holiday hours)
+- [ ] System prompt establishing SonomaSip editorial voice: warm, knowledgeable, opinionated, like a friend who knows wine country
+- [ ] Never fabricate facts — only synthesize from scraped source material + existing editorial
+- [ ] Include source citations in draft metadata (which scrape pages informed this content)
+- [ ] `content_drafts` table: `(id, winery_id, field_name, current_value, draft_value, source_scrape_id, model_used, status, reviewed_by, reviewed_at, created_at)`
+- [ ] Status enum: `draft`, `approved`, `rejected`, `published`
+- [ ] npm script: `pipeline:enrich`
+
+### D8.5 Full pipeline orchestrator
+
+- [ ] `scripts/run-pipeline.ts` — runs scrape → extract → enrich in sequence
+- [ ] Per-winery error handling: if one winery fails, continue with the rest
+- [ ] Summary report: X wineries scraped, Y extractions completed, Z drafts generated, N errors
+- [ ] npm scripts: `pipeline:run` (full), `pipeline:run --winery=slug` (single winery)
+- [ ] Cron-ready: designed to run monthly via scheduled job or manual trigger
+
+### D8.6 Schema additions
+
+- [ ] Migration: `winery_scrapes` table
+- [ ] Migration: `winery_llm_extractions` table
+- [ ] Migration: `content_drafts` table
+- [ ] Add `content_status` field to `wineries` for each enrichable field (editorial / llm_draft / llm_approved)
+- [ ] Add `last_scraped_at` timestamp to `wineries`
+
+### D8.7 Cost management
+
+- [ ] Estimate monthly LLM costs: ~68 wineries × ~2K tokens input + ~1K tokens output per enrichment = ~200K tokens/month (~$1-3/month with Claude Haiku or GPT-4o-mini)
+- [ ] Cloudflare Browser Rendering: ~680 page renders/month (free tier or very cheap)
+- [ ] Log token usage per run in `winery_llm_extractions`
+- [ ] Alert if monthly token usage exceeds budget threshold
 
 ---
 
-## Phase 2 — Data ingestion _(after Supabase schema)_
+## Phase D9 — Admin Pages _(before launch)_
 
-### 2.1 Importer
+_Two people reviewing content. Needs to be fast — reviewing 68 wineries should take ~30 minutes, not 3 hours._
 
-- [ ] Add `xlsx` or `exceljs`
-- [ ] Entrypoint: `scripts/import-wineries.ts` (or package)
-- [ ] Parsers per sheet; join on `id`
-- [ ] Validation: required fields, enums, ranges, boolean coercion
-- [ ] Transactional upsert; on failure log to `import_runs.errors_json`
-- [ ] Derived fields computed pre-write
-- [ ] `--dry-run` mode
+### D9.1 Admin auth
 
-### 2.2 Ops
+- [ ] Simple password-protected route group: `/admin/*`
+- [ ] Environment variable: `ADMIN_PASSWORD` (or Supabase auth if you want accounts later)
+- [ ] Middleware to check auth on all `/admin` routes
+- [ ] No public access to admin pages
 
-- [ ] Default input path: **`docs/sonoma-winery-database-complete.xlsx`**
-- [ ] `package.json` scripts: `db:import`, `db:reset` (local), `db:types`
-- [ ] Optional: CI import to staging on workbook change
+### D9.2 Content review page (`/admin/review`)
 
-### 2.3 Verification
+- [ ] List all pending content drafts, grouped by winery
+- [ ] For each draft: side-by-side view of current published content vs LLM draft
+- [ ] Diff highlighting (show what changed)
+- [ ] Actions per draft: Approve (publish immediately), Edit (inline editor, then approve), Reject (with optional note)
+- [ ] Bulk actions: "Approve all for this winery", "Skip to next winery"
+- [ ] Filter: by status (pending, approved, rejected), by winery, by field type
+- [ ] Progress indicator: "23 of 68 wineries reviewed"
+- [ ] Keyboard shortcuts: A = approve, E = edit, R = reject, N = next (speed matters for 68 wineries)
 
-- [ ] Post-import: winery count = 68 (post-dedupe), flights ~118+, zero orphan flights
-- [ ] Manual spot-check 5 random wineries vs Excel
+### D9.3 Data health dashboard (`/admin/health`)
+
+- [ ] Overview: active winery count, last import date, last scrape date, last enrichment run
+- [ ] Broken URLs list (from D2.4 / D7.4 health checks)
+- [ ] Stale data warnings (not verified in >90 days)
+- [ ] Google Places drift flags (hours/rating mismatches)
+- [ ] Pipeline run history with success/error counts
+
+### D9.4 Click attribution dashboard (`/admin/clicks`)
+
+- [ ] Track "Book a Tasting" clicks per winery: `click_events` table `(id, winery_id, source_page, clicked_at, session_id)`
+- [ ] Dashboard: clicks per winery (7d / 30d / all-time), click-through rate, top performing wineries
+- [ ] UTM parameter support: append `?ref=sonomasip` to booking URLs
+- [ ] Export: CSV download of click data (for pitching affiliate relationships to wineries)
+- [ ] Future: conversion tracking if wineries provide affiliate links
+
+### D9.5 Pipeline trigger page (`/admin/pipeline`)
+
+- [ ] Manual trigger buttons: "Run full pipeline", "Scrape single winery", "Re-enrich single winery"
+- [ ] Pipeline run status: in-progress indicator, last run summary
+- [ ] Winery registry management: add/remove/edit winery URLs
+- [ ] View raw scrape output for any winery (for debugging)
 
 ---
 
-## Phase 4 — Matching engine (TypeScript) _(after data import)_
+## Phase D10 — Click Attribution _(wire into existing UI)_
 
-### 4.1 Modules
+_Track every "Book a Tasting" click. This is how you prove value to wineries and eventually monetize._
 
-- [ ] `lib/matching/types.ts`
-- [ ] `lib/matching/filters.ts`
-- [ ] `lib/matching/score.ts`
-- [ ] `lib/matching/explain.ts`
-- [ ] `lib/matching/index.ts` — `recommend(...)`
+### D10.1 Click tracking infrastructure
 
-### 4.2 Tests
+- [ ] `click_events` table: `(id, winery_id, source_page, booking_url, clicked_at, session_id, user_agent)`
+- [ ] Server action: `trackBookingClick(wineryId, sourcePage)` — fires on "Book a Tasting" click
+- [ ] Client-side: intercept booking link clicks, fire server action, then redirect to booking URL
+- [ ] Append `?ref=sonomasip` (or UTM params) to all outbound booking URLs
 
-- [ ] Unit tests: each filter edge case
-- [ ] Golden files: ≥5 profiles → ordering snapshot
-- [ ] Optional: deterministic sort stability test
+### D10.2 Wire into existing pages
 
-### 4.3 Server authority
+- [ ] Winery detail page: wrap "Book a Tasting" CTA with click tracker
+- [ ] Results page: wrap any booking links with click tracker
+- [ ] Plan page: wrap booking links with click tracker
+- [ ] Browse page: if any direct booking links, wrap them too
 
-- [ ] Recommendations computed server-side for persistence (share/PDF/email)
-- [ ] No client-only source of truth for ranked results
+### D10.3 Attribution reporting
 
----
-
-## Phase 5 — Wire up: replace mock data with real backend
-
-- [ ] Replace mock data imports with Supabase queries
-- [ ] Quiz submit → server action → matching engine → results
-- [ ] Winery detail pages: `generateStaticParams` + revalidate policy
-- [ ] Share: insert `shared_itineraries` → Supabase
-- [ ] PDF: text-first print route / CSS; v2: Mapbox Static image
-- [ ] Email: send via Resend/Postmark with share URL + summary
-- [ ] Rate limit share create + email by IP _(see Phase 7.5 for comprehensive rate limiting plan)_
+- [ ] Monthly summary: total clicks, clicks per winery, top 10 wineries by traffic sent
+- [ ] Exportable report (CSV) for sharing with potential winery partners
+- [ ] Simple email report (optional): monthly stats sent to you
 
 ---
 
@@ -458,10 +857,12 @@ _Custom-styled Mapbox map that matches the Sonoma palette. Used on results page 
 
 ## Phase 7 — Integrations & operations
 
-### 7.1 Optional Google Places
+### 7.1 Google Places Sync (Track C — D8)
 
-- [ ] `google_place_id` column if used
-- [ ] Scheduled job: rating, review count, business status; `last_places_sync_at`
+- [ ] Map `google_place_id` for each winery (manual or via Places API text search)
+- [ ] Sync script: auto-update `rating_google`, `review_count_total`; flag hours drift for review
+- [ ] Never auto-update: hours, booking_url, experience flags, style scores
+- [ ] Cron route or scheduled job (weekly)
 - [ ] ToS compliance for cache/display
 
 ### 7.2 Reliability
@@ -475,7 +876,7 @@ _Custom-styled Mapbox map that matches the Sonoma palette. Used on results page 
 - [ ] Doc: import from `docs/*.xlsx`, rollback via backup
 - [ ] Optional: protected admin import trigger
 
-### 7.4 Data freshness & automated verification
+### 7.4 Data Freshness & Automated Verification (Track C — D9)
 
 _Winery info changes: hours shift seasonally, flights get repriced, wineries close or go members-only, reservation URLs break. We need automated + manual processes to keep data trustworthy._
 
@@ -526,14 +927,14 @@ _Every third-party service has usage-based pricing. Every server action has comp
 
 ### 7.5.3 Per-endpoint rate limits
 
-| Endpoint / Action | Limit | Window | Reason |
-|---|---|---|---|
-| Quiz submit (server action) | 10 | 1 hour | Prevents matching engine abuse (compute cost) |
-| Share/itinerary create | 5 | 1 hour | Prevents DB write spam (Supabase row count) |
-| Email send (share via email) | 3 | 1 hour | Resend free tier = 100/day total. Strictest limit |
-| PDF generate | 5 | 1 hour | Server-side rendering cost |
-| Page views (results/plan) | 60 | 1 hour | General abuse prevention |
-| API health check | 30 | 1 minute | Prevent monitoring abuse |
+| Endpoint / Action            | Limit | Window   | Reason                                            |
+| ---------------------------- | ----- | -------- | ------------------------------------------------- |
+| Quiz submit (server action)  | 10    | 1 hour   | Prevents matching engine abuse (compute cost)     |
+| Share/itinerary create       | 5     | 1 hour   | Prevents DB write spam (Supabase row count)       |
+| Email send (share via email) | 3     | 1 hour   | Resend free tier = 100/day total. Strictest limit |
+| PDF generate                 | 5     | 1 hour   | Server-side rendering cost                        |
+| Page views (results/plan)    | 60    | 1 hour   | General abuse prevention                          |
+| API health check             | 30    | 1 minute | Prevent monitoring abuse                          |
 
 - [ ] Apply rate limits to quiz submit server action
 - [ ] Apply rate limits to share/itinerary create server action
@@ -699,11 +1100,13 @@ Then your PostHog sink and Axiom sink both get the sampled stream — errors alw
 
 ## Changelog (this file)
 
-| Date       | Change                                                                                   |
-| ---------- | ---------------------------------------------------------------------------------------- |
-| 2026-04-02 | First engineering backlog                                                                |
-| 2026-04-02 | Locked Q1–Q14 implementation targets                                                     |
-| 2026-04-02 | Split product doc to `docs/PRD.md`; moved data to `docs/`; TODO is technical-only        |
-| 2026-04-02 | Phase 9.2 AI roadmap; PRD §14 + README deterministic-first note                          |
-| 2026-04-02 | Restructured to UI-first approach: Phase 3.5 (mock data prototype) before backend phases |
-| 2026-04-02 | Added shadcn/ui docs references                                                          |
+| Date       | Change                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------ |
+| 2026-04-02 | First engineering backlog                                                                  |
+| 2026-04-02 | Locked Q1–Q14 implementation targets                                                       |
+| 2026-04-02 | Split product doc to `docs/PRD.md`; moved data to `docs/`; TODO is technical-only          |
+| 2026-04-02 | Phase 9.2 AI roadmap; PRD §14 + README deterministic-first note                            |
+| 2026-04-02 | Restructured to UI-first approach: Phase 3.5 (mock data prototype) before backend phases   |
+| 2026-04-02 | Added shadcn/ui docs references                                                            |
+| 2026-04-03 | Replaced vague data phases (0.6-5) with granular D1-D7 pipeline plan + authority hierarchy |
+| 2026-04-03 | Added D8 (content pipeline: Cloudflare scrape → LLM enrichment), D9 (admin pages), D10 (click attribution) |
