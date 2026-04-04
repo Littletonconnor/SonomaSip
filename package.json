@@ -12,7 +12,9 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:gen-types": "npx supabase gen types typescript --project-id rxihebhphpbhzanijfuv > src/lib/database.types.ts"
+    "db:gen-types": "npx supabase gen types typescript --project-id rxihebhphpbhzanijfuv > src/lib/database.types.ts",
+    "db:import": "npx tsx scripts/import-wineries.ts",
+    "db:import:dry": "npx tsx scripts/import-wineries.ts --dry-run"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
