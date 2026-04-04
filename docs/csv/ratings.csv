@@ -1,0 +1,69 @@
+id,rating_google,rating_yelp,rating_tripadvisor,review_count_total,quality_score,popularity_score,hidden_gem,must_visit,local_favorite,unique_selling_point,awards,good_for_mix_intimate,good_for_mix_grand
+jordan-winery,4.8,4.5,5,2500,9,9,FALSE,TRUE,FALSE,French-inspired estate with all food-paired experiences and stunning hilltop views,Wine & Spirits #1 Restaurant List multiple years,FALSE,TRUE
+dry-creek-vineyard,4.7,4.5,4.5,1800,8,8,FALSE,TRUE,FALSE,First Dry Creek winery post-Prohibition with iconic sailboat label and bocce courts,USA Today Top 10 Tasting Room,FALSE,TRUE
+gloria-ferrer,4.5999999999999996,4,4.5,3000,8,9,FALSE,TRUE,FALSE,First sparkling wine house in Carneros with stunning terrace views,Multiple sparkling wine awards,FALSE,TRUE
+scribe-winery,4.7,4.5,4.5,1500,9,8,FALSE,TRUE,TRUE,Instagram-famous hacienda with natural wines and farm-to-glass philosophy,James Beard nominated,TRUE,FALSE
+nalle-winery,4.9000000000000004,4.5,4.5,400,9,5,TRUE,FALSE,TRUE,Hidden gem with elegant Zin often poured by the family,Wine Spectator Top 100,TRUE,FALSE
+iron-horse-vineyards,4.7,4.5,4.5,1200,9,7,FALSE,TRUE,TRUE,"Served at White House state dinners, outdoor-only with Oyster Girls weekends",White House official sparkling,TRUE,FALSE
+martinelli-winery,4.7,4.5,4.5,900,9,7,FALSE,TRUE,TRUE,Six generations farming including impossibly steep Jackass Hill,Multiple 90+ scores,TRUE,FALSE
+deloach-vineyards,4.5999999999999996,4,4.5,1500,8,7,FALSE,FALSE,FALSE,Pioneering biodynamic farming with gardens and chickens,Wine & Spirits Winery of Year 10x,FALSE,TRUE
+unti-vineyards,4.9000000000000004,4.5,4.5,600,9,5,TRUE,FALSE,TRUE,Beloved for Italian/Rhône wines with casual Airstream tasting bar,Critics' darling for Rhône varieties,TRUE,FALSE
+benziger-family-winery,4.5999999999999996,4,4.5,2000,8,8,FALSE,TRUE,FALSE,Only biodynamic tram tour in Sonoma - great for families,Certified Biodynamic,FALSE,TRUE
+flowers-winery,4.8,4.5,4.5,800,9,7,FALSE,FALSE,FALSE,Stunning modern architecture with exceptional coastal Pinot Noir,Multiple 95+ scores,FALSE,TRUE
+seghesio-family-vineyards,4.7,4,4.5,1600,8,8,FALSE,TRUE,FALSE,Five generations of Italian heritage with downtown bocce courts,Old Vine Zin icon,FALSE,TRUE
+halleck-vineyard,4.9000000000000004,5,5,300,10,4,TRUE,FALSE,TRUE,"Best Pinot in America three years running, 16-guest max intimate experience",Best Pinot in America 3x,TRUE,FALSE
+pedroncelli-winery,4.7,4,4.5,800,7,6,FALSE,FALSE,TRUE,"Best values in Dry Creek, family-owned since 1927",Survived Prohibition,TRUE,FALSE
+arista-winery,4.8,4.5,4.5,700,9,6,TRUE,FALSE,FALSE,Stunning Japanese garden setting with meticulous attention to detail,Consistently 90+ Pinots,TRUE,FALSE
+landmark-hop-kiln,4.5999999999999996,4,4.5,1200,7,7,FALSE,FALSE,FALSE,California Historical Landmark in a photogenic hop kiln building,Historic landmark status,FALSE,TRUE
+wilson-winery,4.8,4.5,4.5,500,8,5,TRUE,FALSE,TRUE,Century-old tin barn with valley views and big Zinfandels,Multiple 90+ Zinfandels,TRUE,FALSE
+buena-vista-winery,4.5,4,4.5,2500,7,8,FALSE,TRUE,FALSE,California's first premium winery with theatrical Count tours,California Historic Landmark,FALSE,TRUE
+ridge-lytton-springs,4.7,4.5,4.5,1000,9,7,FALSE,TRUE,FALSE,Legendary Zinfandel producer with eco-friendly straw bale tasting room,Wine legend status,TRUE,FALSE
+gary-farrell-winery,4.8,4.5,4.5,600,9,6,FALSE,FALSE,FALSE,Stunning hilltop Russian River views with exceptional Pinot,Multiple 95+ scores,FALSE,TRUE
+ferrari-carano,4.7,4,4.5,2500,8,8,FALSE,TRUE,FALSE,Stunning Italian gardens and underground barrel cellars with exceptional hospitality,Multiple 90+ scores,FALSE,TRUE
+chalk-hill-estate,4.8,4.5,4.5,600,9,6,FALSE,FALSE,FALSE,Own AVA estate with exceptional Chardonnay and exclusive culinary experiences,Consistently rated 90+,FALSE,TRUE
+sebastiani,4.5,4,4.5,1500,7,7,FALSE,FALSE,TRUE,Historic downtown Sonoma winery since 1904 with easy walkability,Historic landmark,TRUE,FALSE
+chateau-st-jean,4.5999999999999996,4,4.5,2000,8,8,FALSE,TRUE,FALSE,"Beautiful 1920s chateau with rose gardens, bocce, and best views in Sonoma Valley",Best of Appellation winner,FALSE,TRUE
+roth-estate,4.5,4,4,800,7,6,FALSE,FALSE,FALSE,Full-flavored Bordeaux varietals from Alexander Valley,Good value wines,TRUE,FALSE
+banshee-wines,4.5999999999999996,4.5,4.5,400,8,7,FALSE,FALSE,TRUE,Hip downtown Healdsburg tasting with cool-climate Pinot specialist,Urban wine bar vibe,TRUE,FALSE
+lancaster-estate,4.8,4.5,4.5,200,9,4,TRUE,FALSE,FALSE,Ultra-premium Bordeaux-style wines in exclusive setting,Collectors' choice,TRUE,FALSE
+kendall-jackson,4.5999999999999996,4,4.5,5000,7,10,FALSE,TRUE,FALSE,Ultimate wine-food-garden destination with America's #1 Chardonnay,Wine & Spirits multiple awards,FALSE,TRUE
+la-crema,4.5999999999999996,4,4.5,2000,8,9,FALSE,TRUE,FALSE,Cool-climate Pinot specialist beloved nationally,NBA/WNBA partner,FALSE,TRUE
+stonestreet-winery,4.7,4.5,4.5,800,9,6,FALSE,FALSE,FALSE,High-elevation Alexander Mountain estate with exceptional Cabernet,Wine Spectator Top 10,TRUE,FALSE
+matanzas-creek,4.7,4,4.5,1500,8,8,FALSE,TRUE,FALSE,Famous lavender fields (June) and pioneer Sauvignon Blanc,Lavender destination,FALSE,TRUE
+hartford-family,4.8,4.5,4.5,500,9,5,TRUE,FALSE,TRUE,Old-vine specialist with small-lot single-vineyard wines,Wine Spectator 90+ regularly,TRUE,FALSE
+copain-wines,4.7,4.5,4.5,400,8,5,TRUE,FALSE,TRUE,Elegant Rhône and Burgundian wines with relaxed atmosphere,Coolest spot in Healdsburg - critics,TRUE,FALSE
+siduri-wines,4.7,4.5,4.5,600,9,5,TRUE,FALSE,TRUE,Pinot Noir obsessives sourcing from 20+ top vineyards,Wine Spectator favorite,TRUE,FALSE
+fort-ross-vineyard,4.8,4.5,4.5,400,9,4,TRUE,TRUE,FALSE,Only estate tasting room in Fort Ross-Seaview with Pacific Ocean views and chef-prepared pairings,Most spectacularly sited in CA,TRUE,FALSE
+red-car-wine,4.7,4.5,4.5,300,8,5,TRUE,FALSE,TRUE,Site-driven Sonoma Coast wines with passionate knowledgeable staff,Critics' darling,TRUE,FALSE
+gundlach-bundschu,4.5999999999999996,4,4.5,2000,8,8,FALSE,TRUE,TRUE,California's oldest family-owned winery (1858) with live music and great value,Historic landmark,TRUE,TRUE
+domaine-carneros,4.5999999999999996,4,4.5,3500,8,9,FALSE,TRUE,FALSE,Stunning French château owned by Taittinger with exceptional traditional method sparkling,Taittinger family connection,FALSE,TRUE
+cline-cellars,4.5,4,4.5,2500,7,8,FALSE,FALSE,TRUE,"Historic estate with free tastings, California Missions museum, and farm animals",Best free tasting,TRUE,TRUE
+schug-carneros,4.5999999999999996,4,4.5,600,8,5,TRUE,FALSE,FALSE,German-style winery with Carneros Pinot pioneer,Pioneer status,TRUE,FALSE
+rams-gate,4.7,4.5,4.5,800,9,7,FALSE,FALSE,FALSE,Luxurious modern estate with farm-to-table restaurant at Carneros gateway,Architecture award winner,FALSE,TRUE
+kunde-family,4.5999999999999996,4,4.5,1500,8,7,FALSE,TRUE,FALSE,"Five-generation 1,850-acre estate with caves, hiking, and Mountain Top tasting",Best cave tour,FALSE,TRUE
+st-francis,4.7,4.5,4.5,2000,8,8,FALSE,TRUE,FALSE,Famous multi-course food and wine pairings with chef-prepared cuisine,Best food pairing in Sonoma,FALSE,TRUE
+ledson-winery,4.5,4,4.5,2500,7,8,FALSE,TRUE,FALSE,"16,000 sq ft Gothic castle known as 'The Castle Winery'",Most photographed,FALSE,TRUE
+imagery-estate,4.5999999999999996,4,4.5,800,8,6,FALSE,FALSE,TRUE,Artist series labels with 180+ original artworks and unusual varietals,Art collector destination,TRUE,FALSE
+keller-estate,4.7,4.5,4.5,400,9,5,TRUE,FALSE,TRUE,One of few Petaluma Gap tasting rooms with cave tours and stellar views,Petaluma Gap pioneer,TRUE,FALSE
+mcevoy-ranch,4.7,4.5,4.5,500,8,5,TRUE,FALSE,FALSE,550-acre olive oil and wine estate in hidden valley with Italian varietals,Olive oil destination,TRUE,FALSE
+merry-edwards,4.8,4.5,4.5,1000,9,7,FALSE,TRUE,FALSE,Legendary winemaker's acclaimed Russian River Pinot and Sauvignon Blanc,Winemaker legend,FALSE,TRUE
+korbel,4.4000000000000004,3.5,4,5000,6,10,FALSE,TRUE,FALSE,America's best-known sparkling wine with historic 1882 redwood setting and free tastings,Most recognized brand,FALSE,TRUE
+lynmar-estate,4.8,4.5,5,700,9,6,FALSE,FALSE,FALSE,Ultra-premium estate with stunning architecture and farm-to-table food,TripAdvisor Excellence,FALSE,TRUE
+twomey-cellars,4.7,4.5,4.5,600,9,6,FALSE,FALSE,FALSE,Silver Oak family's terroir-driven Pinot Noir specialist,Silver Oak connection,TRUE,FALSE
+balletto-vineyards,4.7,4.5,4.5,800,8,6,FALSE,FALSE,TRUE,100% estate-grown wines with relaxed patio and excellent value,Best estate value,TRUE,FALSE
+porter-creek,4.8,4.5,4.5,300,9,4,TRUE,FALSE,TRUE,Organic biodynamic pioneer often poured by winemaker,Biodynamic pioneer,TRUE,FALSE
+a-rafanelli,4.9000000000000004,5,5,300,10,4,TRUE,TRUE,TRUE,Legendary cult Zinfandel producer - consistently exceptional for 50 years,Cult status,TRUE,FALSE
+preston-farm,4.8,4.5,4.5,700,9,6,TRUE,FALSE,TRUE,"Organic farm with bread from wood-fired oven, olive oil, and wines",Best picnic destination,TRUE,FALSE
+mauritson-wines,4.7,4.5,4.5,600,8,6,FALSE,FALSE,TRUE,Six-generation family with powerful Rockpile Zinfandels,Rockpile specialist,TRUE,FALSE
+lambert-bridge,4.7,4.5,4.5,700,8,6,FALSE,FALSE,FALSE,Charming covered bridge entrance with excellent picnic grounds,Most romantic entrance,TRUE,FALSE
+bella-vineyards,4.8,4.5,4.5,500,8,5,TRUE,FALSE,TRUE,Cave tasting room with old-vine Zinfandel specialist,Best cave tasting,TRUE,FALSE
+alexander-valley-vineyards,4.5999999999999996,4,4.5,1500,7,8,FALSE,FALSE,TRUE,Historic 1840s homestead site with cave tours and Sin Zin,Historic homestead,TRUE,FALSE
+silver-oak-alexander,4.7,4.5,4.5,2000,9,9,FALSE,TRUE,FALSE,Iconic Cabernet producer with LEED Platinum certified estate,Life is a Cabernet,FALSE,TRUE
+francis-ford-coppola,4.4000000000000004,3.5,4,5000,6,10,FALSE,TRUE,FALSE,"Filmmaker's wine country resort with pools, movie memorabilia, and family fun",Movie memorabilia destination,FALSE,TRUE
+rodney-strong,4.5,4,4.5,2000,7,8,FALSE,TRUE,FALSE,Sonoma pioneer with concerts and wines from multiple AVAs,Concert venue,FALSE,TRUE
+macrostie-winery,4.7,4.5,4.5,500,9,5,TRUE,FALSE,FALSE,Cool-climate Chardonnay and Pinot specialist with beautiful views,Chardonnay excellence,TRUE,FALSE
+j-vineyards,4.7,4.5,4.5,1500,9,8,FALSE,TRUE,FALSE,Bubble Room for sparkling flights with multi-course Legacy Bar pairings,Wine Spectator 90+,TRUE,TRUE
+cline-family-cellars,4.5,4.5,4.5,2000,7,8,FALSE,FALSE,TRUE,Historic 1850s farmstead with California mission museum and free tastings,,TRUE,FALSE
+bella-winery,4.8,4.5,4.5,400,9,5,TRUE,FALSE,TRUE,Cave tasting experience with old-vine Zinfandel focus,Wine Spectator 92+,TRUE,FALSE
+medlock-ames,4.7,4.5,4.5,400,9,5,TRUE,FALSE,FALSE,Organic Bell Mountain estate with historic farm buildings,Wine Spectator 92+,TRUE,FALSE
+verite-winery,5,5,5,150,10,5,TRUE,TRUE,FALSE,17 perfect 100-point scores - collaboration between Jackson Family and French vigneron Pierre Seillan,"Wine Advocate 100pts (17x), Wine Spectator 98+",FALSE,TRUE

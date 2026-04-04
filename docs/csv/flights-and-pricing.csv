@@ -1,0 +1,119 @@
+id,flight_name,flight_price,flight_wines_count,flight_duration,flight_type,flight_food_included,flight_reservation_required,flight_description
+jordan-winery,Library Tasting,60,4,60,seated,TRUE,TRUE,Current releases with seasonal hors d'oeuvres
+jordan-winery,Winery Tour & Tasting,80,5,90,tour,TRUE,TRUE,Walking tour of chateau plus seated food pairing
+jordan-winery,Estate Tour,185,6,180,tour,TRUE,TRUE,Full estate journey with hilltop lunch
+dry-creek-vineyard,Classic Tasting,30,5,45,bar,FALSE,FALSE,Current releases at the bar
+dry-creek-vineyard,Elevated Tasting,55,5,60,seated,TRUE,TRUE,Reserve wines with cheese pairing
+gloria-ferrer,Vista Terrace Tasting,45,4,60,seated,FALSE,FALSE,Sparkling flight with terrace views
+gloria-ferrer,Reserve Tour,75,5,90,tour,TRUE,TRUE,Cave tour plus reserve sparklings
+gloria-ferrer,Culinary Journey,125,5,120,seated,TRUE,TRUE,Five-course food and wine pairing
+scribe-winery,Hacienda Tasting,70,4,90,seated,TRUE,TRUE,Wine and garden snacks on the terrace
+nalle-winery,Classic Tasting,25,5,45,bar,FALSE,FALSE,"Intimate tasting, often with family"
+iron-horse-vineyards,Sparkling Tasting,45,5,60,seated,FALSE,TRUE,Outdoor vineyard views with sparklings
+martinelli-winery,Standard Tasting,35,5,45,bar,FALSE,FALSE,Historic hop barn setting
+deloach-vineyards,Estate Tasting,35,5,45,seated,FALSE,FALSE,Sustainably farmed wines
+deloach-vineyards,Franco-American Tasting,65,6,75,seated,TRUE,TRUE,Compare Sonoma and French wines with cheese
+unti-vineyards,Patio Tasting,30,5,45,bar,FALSE,FALSE,Casual Airstream bar experience
+benziger-family-winery,Estate Tasting,40,5,45,seated,FALSE,FALSE,Standard tasting with garden views
+benziger-family-winery,Biodynamic Tram Tour,75,5,90,tour,FALSE,TRUE,45-min tram through vineyards plus tasting
+flowers-winery,Estate Tasting,65,4,60,seated,FALSE,TRUE,Elegant Pinot and Chardonnay experience
+seghesio-family-vineyards,Classic Tasting,35,5,45,bar,FALSE,FALSE,Italian heritage wines
+seghesio-family-vineyards,Bocce & Wine,60,4,90,bar,TRUE,TRUE,Bocce court reservation with wine and snacks
+halleck-vineyard,Estate Experience,65,8,90,seated,TRUE,TRUE,Vineyard tour plus wines with local bites
+pedroncelli-winery,Classic Tasting,15,5,30,bar,FALSE,FALSE,Best value in Dry Creek Valley
+arista-winery,Garden Tasting,55,5,60,seated,FALSE,TRUE,Japanese garden setting
+landmark-hop-kiln,Estate Tasting,35,5,45,bar,FALSE,FALSE,Historic hop kiln setting
+wilson-winery,Deck Tasting,30,5,45,bar,FALSE,FALSE,Valley views from the deck
+buena-vista-winery,Historic Tasting,35,5,45,bar,FALSE,FALSE,California's oldest winery
+buena-vista-winery,Bubble Lounge,55,4,60,seated,TRUE,FALSE,Champagne-style lounge experience
+ridge-lytton-springs,Standard Tasting,40,5,45,bar,FALSE,FALSE,Legendary Zinfandels
+gary-farrell-winery,Terrace Tasting,60,4,60,seated,FALSE,TRUE,Stunning Russian River views
+ferrari-carano,Estate Tasting,40,5,45,bar,FALSE,FALSE,Award-winning wines at the bar
+ferrari-carano,Enoteca Tasting,60,5,60,seated,TRUE,TRUE,Reserve wines with cheese pairing
+chalk-hill-estate,Estate Tasting,75,5,75,seated,TRUE,TRUE,Exceptional Chardonnay and estate wines
+sebastiani,Classic Tasting,25,5,30,bar,FALSE,FALSE,Downtown Sonoma historic tasting
+chateau-st-jean,Reserve Tasting,55,5,60,seated,FALSE,TRUE,Estate wines in historic chateau
+banshee-wines,Flight,30,4,45,bar,FALSE,FALSE,Cool-climate Pinot and Chardonnay
+lancaster-estate,Estate Experience,100,5,90,seated,TRUE,TRUE,Ultra-premium Bordeaux-style wines
+kendall-jackson,Sensory Tasting,45,5,60,seated,TRUE,TRUE,Garden-inspired wine and food journey
+kendall-jackson,Culinary Tasting,90,5,90,seated,TRUE,TRUE,Multi-course food and wine pairing
+la-crema,Classic Tasting,35,5,45,bar,FALSE,FALSE,Cool-climate favorites
+stonestreet-winery,Mountain Estate,65,5,75,seated,TRUE,TRUE,High-elevation terroir wines
+matanzas-creek,Estate Tasting,45,5,60,seated,FALSE,TRUE,Lavender views and Sauvignon Blanc
+hartford-family,Single Vineyard,50,5,60,seated,FALSE,TRUE,Old-vine single vineyard wines
+copain-wines,Tasting Flight,40,5,60,seated,FALSE,TRUE,Rhône and Burgundian varieties
+siduri-wines,Pinot Flight,35,5,45,bar,FALSE,FALSE,Compare Pinots from different regions
+fort-ross-vineyard,Redwood Walk & Taste,95,4,150,tour,TRUE,TRUE,Guided walk through redwoods with food pairing
+fort-ross-vineyard,Coastal Tasting,55,4,75,seated,TRUE,TRUE,Estate wines with seasonal menu
+gundlach-bundschu,Classic Tasting,30,5,45,bar,FALSE,FALSE,Historic estate wines
+domaine-carneros,Le Rêve Tasting,65,4,60,seated,FALSE,TRUE,Sparkling wines on terrace
+cline-cellars,Classic Tasting,0,5,30,bar,FALSE,FALSE,Free tasting - Rhône varieties
+rams-gate,Terrace Tasting,75,5,75,seated,TRUE,TRUE,Luxury experience with small bites
+kunde-family,Mountain Top Tasting,75,5,90,tour,TRUE,TRUE,Drive to summit with panoramic views
+st-francis,Wine & Food Pairing,85,5,120,seated,TRUE,TRUE,Famous multi-course pairing
+ledson-winery,Castle Tasting,40,5,45,bar,FALSE,FALSE,Tasting in the Gothic castle
+keller-estate,Cave Tour & Tasting,65,5,75,tour,TRUE,TRUE,Cave tour with Petaluma Gap wines
+mcevoy-ranch,Estate Experience,65,5,90,seated,TRUE,TRUE,Wine and olive oil tasting
+merry-edwards,Seated Tasting,55,5,60,seated,FALSE,TRUE,Legendary Pinot experience
+korbel,Marketplace Tasting,0,3,15,bar,FALSE,FALSE,Free sparkling samples
+korbel,Premium Tasting,15,5,30,bar,FALSE,FALSE,Extended sparkling selection
+lynmar-estate,Estate Experience,95,5,90,seated,TRUE,TRUE,Farm-to-table pairing
+twomey-cellars,Seated Tasting,50,4,60,seated,FALSE,TRUE,Single-vineyard Pinot focus
+balletto-vineyards,Estate Tasting,25,5,45,bar,FALSE,FALSE,Relaxed patio tasting
+porter-creek,Organic Tasting,25,5,45,bar,FALSE,FALSE,Biodynamic wines with winemaker
+a-rafanelli,Appointment Tasting,40,5,60,bar,FALSE,TRUE,Cult Zinfandel experience
+preston-farm,Farm Tasting,25,5,45,bar,FALSE,FALSE,Organic wines with fresh bread
+mauritson-wines,Estate Tasting,35,5,45,bar,FALSE,FALSE,Rockpile and Dry Creek Zins
+lambert-bridge,Estate Tasting,35,5,45,bar,FALSE,FALSE,Bordeaux varieties with picnic option
+bella-vineyards,Cave Tasting,40,5,60,bar,FALSE,TRUE,Underground Zinfandel experience
+alexander-valley-vineyards,Classic Tasting,25,5,45,bar,FALSE,FALSE,Historic estate with cave option
+silver-oak-alexander,Current Release,50,3,45,bar,FALSE,TRUE,Iconic Cabernet experience
+silver-oak-alexander,Library Tasting,100,5,75,seated,TRUE,TRUE,Aged Cabernet selection
+francis-ford-coppola,Classic Tasting,30,5,45,bar,FALSE,FALSE,Director's Cut and Sofia wines
+rodney-strong,Estate Tasting,30,5,45,bar,FALSE,FALSE,Multi-AVA wine selection
+macrostie-winery,Estate Tasting,50,5,60,seated,FALSE,TRUE,Cool-climate specialists
+ferrari-carano,Classic Tasting,40,4,45,bar,FALSE,FALSE,Four wines overlooking gardens
+ferrari-carano,Reserve Tasting (Enoteca),60,5,60,seated,FALSE,TRUE,Underground cellar experience
+ferrari-carano,Fontana Pergola Tasting,75,5,75,seated,FALSE,TRUE,Outdoor among olive trees
+ferrari-carano,Aperitivo Pergola,95,5,90,seated,TRUE,TRUE,Food pairing under private pergola
+ferrari-carano,Sunday Brunch,95,4,120,seated,TRUE,TRUE,Italian-inspired brunch menu
+chateau-st-jean,Estate Tasting,45,5,45,bar,FALSE,FALSE,Classic wines with garden views
+chalk-hill-estate,Estate Experience,85,5,75,seated,TRUE,TRUE,Food paired estate tour
+chalk-hill-estate,Helicopter Tour,450,6,180,tour,TRUE,TRUE,Aerial vineyard experience
+roth-estate,Classic Tasting,40,5,45,bar,FALSE,FALSE,Alexander Valley focus
+roth-estate,Adults at Play,55,5,90,seated,TRUE,FALSE,First Friday music and BBQ
+banshee-wines,Flight Tasting,30,4,30,bar,FALSE,FALSE,Downtown casual vibes
+banshee-wines,Private Tasting,50,5,45,seated,FALSE,TRUE,Guided experience
+kendall-jackson,Signature Tasting,40,3,45,bar,FALSE,FALSE,Three signature wines
+kendall-jackson,Jackson Estate Tasting,60,4,60,seated,FALSE,TRUE,Estate collection with cheese add-on
+kendall-jackson,Chef's Small Plates,95,5,75,seated,TRUE,TRUE,Seasonal bites from culinary garden
+kendall-jackson,Five Course Pairing,145,5,120,seated,TRUE,TRUE,Farm-to-table excellence
+matanzas-creek,Journey Tasting,75,5,75,seated,FALSE,TRUE,Pinnacle wines with library
+la-crema,Saralee's Tasting,45,5,60,seated,FALSE,FALSE,Estate vineyard wines
+la-crema,Reserve Experience,65,5,75,seated,FALSE,TRUE,Single-vineyard deep dive
+hartford-family,Hartford Court,65,5,75,seated,FALSE,TRUE,Single-vineyard Pinot focus
+copain-wines,Copain Tasting,60,5,60,seated,FALSE,TRUE,Cool climate wines
+francis-ford-coppola,Director's Cut Experience,65,5,75,seated,TRUE,TRUE,Premium wines with food
+gundlach-bundschu,Bundschu Signature,40,5,45,bar,FALSE,FALSE,California's oldest family winery
+gundlach-bundschu,Cave Tour,65,5,75,tour,FALSE,TRUE,Historic cave experience
+rodney-strong,Classic Tasting,35,5,45,bar,FALSE,FALSE,Carbon neutral winery
+rodney-strong,Reserve Experience,55,5,60,seated,FALSE,TRUE,Single-vineyard wines
+j-vineyards,Bubble Room,45,4,45,bar,FALSE,FALSE,Sparkling wine focus
+j-vineyards,Multi-Course Pairing,135,5,120,seated,TRUE,TRUE,Food-focused journey
+cline-family-cellars,Classic Tasting,0,6,30,bar,FALSE,FALSE,"Free tasting, historic setting"
+cline-family-cellars,Premium Tasting,25,6,45,bar,FALSE,FALSE,Reserve wines
+imagery-estate,Art & Wine,35,5,45,bar,FALSE,FALSE,Unique varietals with art
+kunde-family,Estate Tasting,40,5,45,bar,FALSE,FALSE,Five generations
+kunde-family,Mountain Top,75,5,90,tour,FALSE,TRUE,Panoramic view tasting
+merry-edwards,Estate Experience,75,5,75,seated,FALSE,TRUE,Legendary Pinot Noir
+twomey-cellars,Pinot Experience,55,5,60,seated,FALSE,FALSE,Single-vineyard focus
+lynmar-estate,Passport Tasting,65,5,60,seated,FALSE,TRUE,Estate wines with garden stroll
+lynmar-estate,Chef's Pairing,125,5,90,seated,TRUE,TRUE,Culinary excellence
+alexander-valley-vineyards,Cave Tour,35,5,60,tour,FALSE,FALSE,Historic cave experience
+porter-creek,Creek-side Tasting,25,5,30,bar,FALSE,FALSE,Organic/biodynamic
+bella-winery,Cave Tasting,40,5,60,seated,FALSE,TRUE,Zinfandel in caves
+macrostie-winery,Hilltop Tasting,50,5,60,seated,FALSE,TRUE,Panoramic views
+medlock-ames,Bell Mountain,55,5,60,seated,FALSE,TRUE,Organic estate
+verite-winery,Estate Tasting,250,4,120,seated,TRUE,TRUE,Three current vintage wines plus one library vintage
+verite-winery,Library Comparison Tasting,350,6,150,seated,TRUE,TRUE,Three current plus three library vintages
+verite-winery,Library Wine & Food Pairing,450,6,180,seated,TRUE,TRUE,Six wines with seasonal chef dishes

@@ -1,0 +1,69 @@
+id,pinot_noir,chardonnay,cabernet_sauvignon,zinfandel,sauvignon_blanc,merlot,sparkling,rose,syrah,other_varietals,signature_wines,production_size
+jordan-winery,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,"Cabernet Sauvignon, Chardonnay",medium
+dry-creek-vineyard,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,Chenin Blanc,"Heritage Vines Zinfandel, Fumé Blanc",medium
+gloria-ferrer,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,Pinot Blanc,"Blanc de Blancs, Royal Cuvée",large
+scribe-winery,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,"Riesling, Sylvaner","Pinot Noir, Chardonnay, Skin-contact whites",small
+nalle-winery,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,Petite Sirah,Dry Creek Zinfandel,boutique
+iron-horse-vineyards,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,"Ocean Reserve Sparkling, Wedding Cuvée",small
+martinelli-winery,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,Gewürztraminer,"Jackass Hill Zinfandel, Pinot Noir",small
+deloach-vineyards,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,,"Estate Pinot Noir, Chardonnay",medium
+unti-vineyards,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,"Grenache, Vermentino, Fiano, Sangiovese","Grenache, Syrah, Sangiovese",boutique
+benziger-family-winery,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,Tribute blend,"Tribute, Signaterra Pinot",medium
+flowers-winery,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,"Sea View Ridge Pinot, Camp Meeting Ridge",small
+seghesio-family-vineyards,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,"Sangiovese, Barbera","Old Vine Zinfandel, Home Ranch Zin",medium
+halleck-vineyard,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,Gewürztraminer,"Estate Pinot Noir, Sauvignon Blanc",boutique
+pedroncelli-winery,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,Petite Sirah,"Bushnell Zinfandel, Mother Clone Zin",medium
+arista-winery,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Gewürztraminer,Single-vineyard Pinot Noirs,small
+landmark-hop-kiln,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,"Overlook Chardonnay, Grand Detour Pinot",medium
+wilson-winery,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,Petite Sirah,"Sawyer Zinfandel, Rockpile Zin",small
+buena-vista-winery,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,FALSE,FALSE,,"Private Reserve wines, Count's Selection",medium
+ridge-lytton-springs,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,"Petite Sirah, Carignan","Lytton Springs, Geyserville",medium
+gary-farrell-winery,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,"Hallberg Pinot, Russian River Chardonnay",small
+ferrari-carano,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,"Pinot Grigio, Sangiovese","Fumé Blanc, Trésor, Siena",large
+chalk-hill-estate,FALSE,TRUE,TRUE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,"Malbec, Petit Verdot","Estate Chardonnay, Cabernet",medium
+sebastiani,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,FALSE,Barbera,"Cherryblock Cabernet, Sonoma Zin",large
+chateau-st-jean,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,"Gewürztraminer, Malbec","Cinq Cépages, Reserve Chardonnay",large
+roth-estate,FALSE,TRUE,TRUE,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,Malbec,"Heritage Cabernet, Sauvignon Blanc",medium
+banshee-wines,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,,"Sonoma Coast Pinot Noir, Chardonnay",small
+lancaster-estate,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"Malbec, Petit Verdot, Cab Franc","Estate Cabernet, Winemaker's Cuvée",boutique
+kendall-jackson,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,Riesling,"Vintner's Reserve Chardonnay, Grand Reserve Cab",commercial
+la-crema,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,Pinot Gris,"Sonoma Coast Pinot Noir, Chardonnay",large
+stonestreet-winery,FALSE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,,"Upper Barn Chardonnay, Estate Cabernet",medium
+matanzas-creek,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,,"Estate Sauvignon Blanc, Bennett Valley Merlot",medium
+hartford-family,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,,"Old Vine Zin, Single Vineyard Pinot",small
+copain-wines,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,TRUE,"Trousseau Gris, Grenache","Tous Ensemble Pinot, Anderson Valley Syrah",small
+siduri-wines,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,Single-vineyard Pinot Noir from 20+ sites,small
+fort-ross-vineyard,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Pinotage,"Sea Slopes Pinot, Fort Ross Chardonnay",boutique
+red-car-wine,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,,"Sonoma Coast Pinot Noir, Syrah",small
+gundlach-bundschu,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,TRUE,FALSE,"Gewürztraminer, Tempranillo","Vintage Reserve Cabernet, Rhinefarm Pinot",medium
+domaine-carneros,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,,"Le Rêve Blanc de Blancs, Brut Cuvée",medium
+cline-cellars,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,"Mourvèdre, Viognier, Carignane","Ancient Vines Zin, Cashmere",large
+schug-carneros,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,,"Carneros Pinot Noir, Estate Chardonnay",small
+rams-gate,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,TRUE,,"Gaps Crown Pinot, Estate Chardonnay",small
+kunde-family,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,Viognier,"Century Vines Zin, Reserve Cab",medium
+st-francis,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,FALSE,,"Old Vines Zin, Sonoma County Cab",large
+ledson-winery,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,Barbera,"Cabernet, Merlot, Chardonnay",medium
+imagery-estate,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,"Lagrein, Teroldego, Barbera, Malbec",Artist Collection wines,small
+keller-estate,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,"Pinot Gris, Viognier","La Cruz Pinot Noir, Estate Chardonnay",small
+mcevoy-ranch,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,TRUE,"Vermentino, Montepulciano, Refosco, Sagrantino","Estate Pinot, Italian varietals",small
+merry-edwards,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,,"Russian River Pinot Noir, Sauvignon Blanc",small
+korbel,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,,"Brut, Extra Dry, Brut Rosé, Natural",commercial
+lynmar-estate,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,"Quail Hill Pinot, Chardonnay",small
+twomey-cellars,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,,"Russian River Pinot, Anderson Valley Pinot",small
+balletto-vineyards,TRUE,TRUE,FALSE,TRUE,TRUE,FALSE,TRUE,TRUE,TRUE,Gewürztraminer,"Estate Pinot Noir, Dry Gewürz",medium
+porter-creek,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"Carignane, Viognier","Old Vine Carignane, Estate Pinot",boutique
+a-rafanelli,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,FALSE,,"Dry Creek Zinfandel, Cabernet Sauvignon",boutique
+preston-farm,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,"Mourvèdre, Viognier, Grenache, Marsanne","Estate Zinfandel, L. Preston Red",small
+mauritson-wines,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,Petite Sirah,"Rockpile Zinfandel, Dry Creek Zin",small
+lambert-bridge,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,"Malbec, Petit Verdot","Crane Creek Cab, Estate Zin",small
+bella-vineyards,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,Petite Sirah,"Big River Ranch Zin, Lily Hill Zin",boutique
+alexander-valley-vineyards,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,TRUE,Gewürztraminer,"Sin Zin, CYRUS Bordeaux blend",medium
+silver-oak-alexander,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,Alexander Valley Cabernet Sauvignon,medium
+francis-ford-coppola,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,,"Director's Cut wines, Sofia sparkling",large
+rodney-strong,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,,"Reserve Pinot, Alexander Cab",large
+macrostie-winery,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,"Wildcat Mountain Chardonnay, Sonoma Coast Pinot",small
+j-vineyards,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,,"Brut, Vintage Brut",Sparkling and still
+cline-family-cellars,TRUE,TRUE,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,"Mourvèdre, Carignane, Marsanne",Ancient Vines Zinfandel,Old-vine Rhône specialist
+bella-winery,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,Petite Sirah,Big River Ranch Zinfandel,Old-vine Zinfandel caves
+medlock-ames,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,"Petit Verdot, Malbec",Bell Mountain Red,Organic Bell Mountain
+verite-winery,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"Cabernet Franc, Petit Verdot, Malbec","La Muse, La Joie, Le Désir",Bordeaux-style blends only

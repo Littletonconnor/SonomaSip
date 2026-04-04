@@ -3,6 +3,8 @@ import { z } from 'zod/v4';
 const publicSchema = z.object({
   NEXT_PUBLIC_MAPBOX_TOKEN: z.string().startsWith('pk.').optional(),
   NEXT_PUBLIC_SITE_URL: z.url().optional().default('http://localhost:3000'),
+  NEXT_PUBLIC_SUPABASE_URL: z.url(),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
 });
 
 const serverSchema = z.object({
