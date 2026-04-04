@@ -416,8 +416,8 @@ _Values below are locked in `src/lib/types.ts` as of 2026-04-04. DB enums must m
 ### D1.5 TypeScript type reconciliation
 
 - [x] Reconcile `src/lib/types.ts` (current mock types) with new schema — done 2026-04-04: added `StyleScores`, `Setting`, `signatureVarietals`, `qualityScore`, `popularityScore`, `ratingGoogle`; updated `ReservationType`, `FlightFormat`, `Region`
-- [ ] Plan the `WineryForMatching` flat type (pre-joined, all scoring fields, no DB queries in scoring loop)
-- [ ] Plan the `WineryForDisplay` type (what the UI needs)
+- [x] Plan the `WineryForMatching` flat type (pre-joined, all scoring fields, no DB queries in scoring loop)
+- [x] Plan the `WineryForDisplay` type (what the UI needs)
 - [ ] Decide: generate types from Supabase (`supabase gen types`) or hand-maintain
 
 ---

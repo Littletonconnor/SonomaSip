@@ -133,3 +133,79 @@ export type MatchResult = {
   score: number;
   matchReasons: string[];
 };
+
+/**
+ * Pre-joined, flat shape consumed by the scoring engine.
+ * All fields needed for hard filters + soft scoring in one object —
+ * no extra DB queries inside the scoring loop.
+ */
+export type WineryForMatching = {
+  id: string;
+  slug: string;
+  region: Region;
+  reservationType: ReservationType;
+  isMembersOnly: boolean;
+  groupSizeMax: number | null;
+
+  // Hard filter: varietals (OR logic)
+  varietals: Varietal[];
+
+  // Hard filter: budget (minFlightPrice ≤ maxBudget)
+  minFlightPrice: number | null;
+
+  // Hard filter: must-haves
+  isDogFriendly: boolean;
+  isKidFriendly: boolean;
+  isWheelchairAccessible: boolean;
+  hasFoodPairing: boolean;
+  hasOutdoorSeating: boolean;
+  hasViews: boolean;
+
+  // Soft scoring: style match (§4.1)
+  styleScores: StyleScores;
+
+  // Soft scoring: rating blend (§4.4)
+  qualityScore: number | null;
+  popularityScore: number | null;
+  ratingGoogle: number | null;
+};
+
+/**
+ * Everything the UI needs to render a winery across all pages
+ * (cards, detail, plan stops, map markers). Excludes scoring-only
+ * fields like styleScores and qualityScore/popularityScore/ratingGoogle.
+ */
+export type WineryForDisplay = {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string;
+  story: string;
+  region: Region;
+  city: string;
+  latitude: number;
+  longitude: number;
+  setting: Setting | null;
+  hours: WeeklyHours;
+  reservationType: ReservationType;
+  bookingUrl: string;
+  groupSizeMax: number | null;
+  parking: string;
+  noiseLevel: NoiseLevel;
+  varietals: Varietal[];
+  signatureVarietals: Varietal[];
+  minFlightPrice: number;
+  maxFlightPrice: number;
+  flights: Flight[];
+  averageRating: number | null;
+  ratingsCount: number | null;
+
+  // Experience flags (displayed as badges/amenities)
+  isDogFriendly: boolean;
+  isKidFriendly: boolean;
+  isWheelchairAccessible: boolean;
+  hasFoodPairing: boolean;
+  hasOutdoorSeating: boolean;
+  hasViews: boolean;
+  isMembersOnly: boolean;
+};
