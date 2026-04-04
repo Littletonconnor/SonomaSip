@@ -51,8 +51,8 @@ function PrivacyContent() {
         <p className="text-stone mt-4 text-pretty">
           We use Plausible Analytics, a privacy-focused analytics service. Plausible does not use
           cookies, does not collect personal data, and does not track you across websites. It gives
-          us aggregate information like page views and referral sources — nothing that identifies you
-          personally.
+          us aggregate information like page views and referral sources — nothing that identifies
+          you personally.
         </p>
         <p className="text-stone mt-3 text-pretty">
           Because Plausible is cookie-free, you won&apos;t see a cookie consent banner on Sonoma
@@ -64,12 +64,12 @@ function PrivacyContent() {
         <SectionHeading number={2}>Email Collection</SectionHeading>
         <p className="text-stone mt-4 text-pretty">
           We only collect your email address if you choose to email yourself a winery plan. Your
-          email is used solely to deliver that plan. We do not add you to a marketing list, and we do
-          not share your email with anyone.
+          email is used solely to deliver that plan. We do not add you to a marketing list, and we
+          do not share your email with anyone.
         </p>
         <p className="text-stone mt-3 text-pretty">
-          If we ever introduce a newsletter or marketing emails in the future, it will be a separate,
-          explicit opt-in — never automatic.
+          If we ever introduce a newsletter or marketing emails in the future, it will be a
+          separate, explicit opt-in — never automatic.
         </p>
       </section>
 
@@ -81,9 +81,9 @@ function PrivacyContent() {
         </p>
         <ul role="list" className="text-stone mt-4 list-disc space-y-2 pl-6">
           <li className="text-pretty">
-            <strong className="text-bark font-medium">What&apos;s stored:</strong> Your quiz
-            answers and the resulting winery matches. No personal information beyond what you entered
-            in the quiz.
+            <strong className="text-bark font-medium">What&apos;s stored:</strong> Your quiz answers
+            and the resulting winery matches. No personal information beyond what you entered in the
+            quiz.
           </li>
           <li className="text-pretty">
             <strong className="text-bark font-medium">Who can access it:</strong> Anyone with the

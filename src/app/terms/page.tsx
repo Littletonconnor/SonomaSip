@@ -4,8 +4,7 @@ import { SidebarNav } from '@/components/legal/sidebar-nav';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description:
-    'Terms of Service for Sonoma Sip, an independent guide to Sonoma County wineries.',
+  description: 'Terms of Service for Sonoma Sip, an independent guide to Sonoma County wineries.',
 };
 
 const LAST_UPDATED = 'April 4, 2026';
@@ -47,10 +46,10 @@ function TermsContent() {
       <section className="scroll-mt-20" id="accuracy">
         <SectionHeading number={2}>No Guarantee of Accuracy</SectionHeading>
         <p className="text-stone mt-4 text-pretty">
-          All winery information on Sonoma Sip — including hours, tasting fees, reservation policies,
-          amenities, accessibility details, and availability — is provided for informational purposes
-          only. We make reasonable efforts to keep our data current, but wineries change their
-          operations frequently and without notice.
+          All winery information on Sonoma Sip — including hours, tasting fees, reservation
+          policies, amenities, accessibility details, and availability — is provided for
+          informational purposes only. We make reasonable efforts to keep our data current, but
+          wineries change their operations frequently and without notice.
         </p>
         <p className="text-stone mt-3 text-pretty">
           <strong className="text-bark font-medium">
@@ -108,10 +107,10 @@ function TermsContent() {
       <section className="scroll-mt-20" id="user-content">
         <SectionHeading number={6}>User-Generated Content</SectionHeading>
         <p className="text-stone mt-4 text-pretty">
-          We may introduce features in the future that allow users to submit reviews, corrections, or
-          reports. If we do, we reserve the right to moderate, edit, or remove user-submitted content
-          at our discretion. We are not responsible for the accuracy or opinions expressed in
-          user-generated content.
+          We may introduce features in the future that allow users to submit reviews, corrections,
+          or reports. If we do, we reserve the right to moderate, edit, or remove user-submitted
+          content at our discretion. We are not responsible for the accuracy or opinions expressed
+          in user-generated content.
         </p>
       </section>
 

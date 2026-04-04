@@ -24,20 +24,11 @@
 // For now, keep them inline so the app compiles without a running DB.
 // ---------------------------------------------------------------------------
 
-export type ReservationType =
-  | 'walk_ins_welcome'
-  | 'reservations_recommended'
-  | 'appointment_only';
+export type ReservationType = 'walk_ins_welcome' | 'reservations_recommended' | 'appointment_only';
 
 export type NoiseLevel = 'quiet' | 'moderate' | 'lively';
 
-export type FlightFormat =
-  | 'seated'
-  | 'standing'
-  | 'tour'
-  | 'outdoor'
-  | 'picnic'
-  | 'bar';
+export type FlightFormat = 'seated' | 'standing' | 'tour' | 'outdoor' | 'picnic' | 'bar';
 
 export type AvaRegion =
   | 'russian_river_valley'
