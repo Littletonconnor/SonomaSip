@@ -152,12 +152,8 @@ describe('submitQuiz server action', () => {
   });
 
   it('returns empty array when no wineries match', async () => {
-    const matchingData = [
-      makeWineryForMatching({ varietals: ['Zinfandel'], minFlightPrice: 200 }),
-    ];
-    const wineryMap = new Map<string, Winery>([
-      ['w-1', makeWinery()],
-    ]);
+    const matchingData = [makeWineryForMatching({ varietals: ['Zinfandel'], minFlightPrice: 200 })];
+    const wineryMap = new Map<string, Winery>([['w-1', makeWinery()]]);
 
     const dataModule = await import('../data/wineries');
     vi.mocked(dataModule.getWineriesForMatching).mockResolvedValue(matchingData);

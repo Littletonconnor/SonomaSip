@@ -276,9 +276,7 @@ describe('wineries data layer', () => {
     });
 
     it('throws on supabase error', async () => {
-      mockFrom.mockReturnValue(
-        createChainableQuery({ data: null, error: { message: 'timeout' } }),
-      );
+      mockFrom.mockReturnValue(createChainableQuery({ data: null, error: { message: 'timeout' } }));
 
       const { getAllWinerySlugs } = await import('./wineries');
       await expect(getAllWinerySlugs()).rejects.toThrow('timeout');

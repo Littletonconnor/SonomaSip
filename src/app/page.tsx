@@ -20,9 +20,9 @@ export default function Home() {
               Plan Your Sonoma Wine Tasting Day in Minutes
             </h1>
             <p className="text-stone mt-6 max-w-[48ch] text-lg text-pretty">
-              Tell us your favorite wines, your vibe, your budget, and where you want to
-              go. Our matching engine scores every winery in our curated collection and builds
-              a personalized itinerary you can share, print, or email.
+              Tell us your favorite wines, your vibe, your budget, and where you want to go. Our
+              matching engine scores every winery in our curated collection and builds a
+              personalized itinerary you can share, print, or email.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <Button size="lg" className="rounded-full px-8 tracking-wide" asChild>
@@ -120,7 +120,8 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-6">
           <AnimatedSection>
             <p className="text-stone text-center font-mono text-xs tracking-widest">
-              Curated wineries &middot; Every Sonoma AVA region &middot; Personalized matching &middot; Always free
+              Curated wineries &middot; Every Sonoma AVA region &middot; Personalized matching
+              &middot; Always free
             </p>
           </AnimatedSection>
         </div>
@@ -202,17 +203,20 @@ export default function Home() {
                 {
                   icon: DollarSign,
                   term: 'Budget-aware',
-                  detail: 'Set a price range for tasting flights. We surface wineries that fit, from $25 walk-ins to $100+ seated experiences.',
+                  detail:
+                    'Set a price range for tasting flights. We surface wineries that fit, from $25 walk-ins to $100+ seated experiences.',
                 },
                 {
                   icon: Users,
                   term: 'Group-friendly',
-                  detail: 'Filters for group size limits, kid and dog policies, and wheelchair accessibility so nobody gets left out.',
+                  detail:
+                    'Filters for group size limits, kid and dog policies, and wheelchair accessibility so nobody gets left out.',
                 },
                 {
                   icon: Map,
                   term: 'Map your day',
-                  detail: 'See your matched wineries plotted across Sonoma County and plan a route that makes geographic sense.',
+                  detail:
+                    'See your matched wineries plotted across Sonoma County and plan a route that makes geographic sense.',
                 },
                 {
                   icon: Info,
@@ -223,7 +227,8 @@ export default function Home() {
                 {
                   icon: Share2,
                   term: 'Share your plan',
-                  detail: 'Send your itinerary as a link, print it for the car, or email it to your group. No account needed.',
+                  detail:
+                    'Send your itinerary as a link, print it for the car, or email it to your group. No account needed.',
                 },
               ].map((item) => (
                 <div key={item.term} className="bg-background p-8 md:p-10">
@@ -245,7 +250,9 @@ export default function Home() {
       <section className="bg-card py-24 md:py-32">
         <div className="mx-auto max-w-5xl px-6">
           <AnimatedSection>
-            <p className="text-wine font-mono text-sm tracking-wide">Explore Sonoma County wineries</p>
+            <p className="text-wine font-mono text-sm tracking-wide">
+              Explore Sonoma County wineries
+            </p>
             <h2 className="text-bark mt-3 max-w-[35ch] text-3xl font-semibold tracking-tight text-balance md:text-4xl">
               A sample from our curated collection.
             </h2>

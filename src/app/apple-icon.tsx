@@ -28,7 +28,15 @@ export default function AppleIcon() {
           fill="rgba(255,255,255,0.95)"
         />
         <line x1="10" y1="14" x2="10" y2="20" stroke="rgba(255,255,255,0.95)" strokeWidth="1.4" />
-        <line x1="6.5" y1="21" x2="13.5" y2="21" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" strokeLinecap="round" />
+        <line
+          x1="6.5"
+          y1="21"
+          x2="13.5"
+          y2="21"
+          stroke="rgba(255,255,255,0.95)"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
       </svg>
     </div>,
     { ...size },

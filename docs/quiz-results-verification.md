@@ -13,6 +13,7 @@ There are two areas of concern. First, the style-dimension mapping from the data
 **Quiz input summary**: Pinot Noir, Relaxed & Scenic vibe, $$ budget, views + outdoor seating required, Russian River Valley, group of 2.
 
 **Results**:
+
 1. landmark-hop-kiln (75) — relaxed: region, mustHaves
 2. sebastiani (72) — relaxed: region, mustHaves
 3. iron-horse-vineyards (70) — relaxed: region, mustHaves
@@ -24,6 +25,7 @@ Landmark Hop Kiln as #1 is reasonable — it is a historic, relaxed Pinot Noir p
 **Grade**: C+
 
 **Issues**:
+
 - Filter relaxation on both region and mustHaves is too aggressive for what seems like a mainstream profile. A couple wanting Pinot + views + outdoors in Russian River Valley is not unusual.
 - The `has_outdoor_seating` field appears to be FALSE for many wineries that clearly have outdoor areas (per descriptions mentioning patios, terraces, gardens). This data quality issue forces unnecessary relaxation.
 - Sebastiani as #2 is a poor fit for a "Relaxed & Scenic" seeking couple — it is a downtown tasting bar, not a scenic vineyard.
@@ -34,6 +36,7 @@ Landmark Hop Kiln as #1 is reasonable — it is a historic, relaxed Pinot Noir p
 **Quiz input summary**: Cabernet Sauvignon + Sparkling, Celebratory + Social & Lively vibes, $$$$ budget, food pairing required, all regions, group of 6, members-only included.
 
 **Results**:
+
 1. iron-horse-vineyards (81)
 2. seghesio-family-vineyards (81)
 3. rodney-strong (81)
@@ -50,6 +53,7 @@ The vibe weights for Celebratory + Social & Lively average to: styleRelaxed=0.05
 **Grade**: B
 
 **Issues**:
+
 - Three-way tie at 81 suggests the scoring doesn't differentiate enough among luxury/social wineries.
 - Jordan Winery missing from results despite being the quintessential luxury Sonoma experience. Its low social score (2) penalizes it too heavily.
 - Domaine Carneros (French chateau, sparkling, celebratory) seems like a natural top pick for this profile but is absent.
@@ -60,6 +64,7 @@ The vibe weights for Celebratory + Social & Lively average to: styleRelaxed=0.05
 **Quiz input summary**: No varietal preference, no vibe preference, $ budget, kid-friendly + dog-friendly required, Sonoma Valley + Carneros, group of 4.
 
 **Results**:
+
 1. gundlach-bundschu (72)
 2. imagery-estate (71)
 
@@ -74,6 +79,7 @@ Only 2 results for a family trip is a bit thin, but given the combination of $ b
 **Grade**: B+
 
 **Issues**:
+
 - Cline Cellars/Cline Family Cellars appears to satisfy all filters (free tasting, kid-friendly, dog-friendly, Carneros) but is missing from results. There are duplicate Cline entries in the data (`cline-cellars` and `cline-family-cellars`) which may cause confusion.
 - Only 2 results is accurate given filters but might feel sparse to a user.
 
@@ -82,6 +88,7 @@ Only 2 results for a family trip is a bit thin, but given the combination of $ b
 **Quiz input summary**: Syrah, Educational vibe, $ budget, wheelchair accessible + views + food pairing required, Alexander Valley, group of 8.
 
 **Results**:
+
 1. rodney-strong (79) — relaxed: region
 2. wilson-winery (76) — relaxed: region
 3. francis-ford-coppola (68) — relaxed: region
@@ -99,6 +106,7 @@ The Educational vibe maps to weights: styleRelaxed=0.2, styleAdventurous=0.2, st
 **Grade**: B+
 
 **Issues**:
+
 - Only region was relaxed (not mustHaves or budget), which is the right call since the non-region filters all pass.
 - The style_sustainable-to-Educational mapping works acceptably here but misses the "winery tour" and "learning about winemaking" aspect that "Educational" implies to most users.
 - Rodney Strong as #1 for an educational experience is acceptable but not ideal — it is more of a large production facility than an intimate learning experience.
@@ -108,6 +116,7 @@ The Educational vibe maps to weights: styleRelaxed=0.2, styleAdventurous=0.2, st
 **Quiz input summary**: No varietals, Adventurous vibe, no budget limit, no must-haves, all regions, 5 stops, no group size.
 
 **Results**:
+
 1. fort-ross-vineyard (60)
 2. bella-winery (57)
 3. kunde-family (55)
@@ -139,6 +148,7 @@ The scores are moderate (54-60 range) because only the adventure dimension has h
 **Quiz input summary**: No preferences at all — no varietals, no vibes, no budget, no must-haves, no regions, 3 stops, no group size.
 
 **Results**:
+
 1. wilson-winery (57)
 2. roth-estate (55)
 3. sebastiani (55)
@@ -160,6 +170,7 @@ Actually, the real differentiator with uniform weights is likely the experience 
 **Grade**: B-
 
 **Issues**:
+
 - The "default" recommendations feel generic rather than representing the best of Sonoma. Wilson Winery, Roth Estate, and Sebastiani are decent wineries but would not be on most people's "top 3 Sonoma wineries" lists.
 - The scoring formula heavily weights style match (40 pts) even when style weights are uniform, which creates a "meh" score across the board. When no vibes are selected, the rating blend (15 pts) and experience bonus (20 pts) become the main differentiators, which is a small signal to work with.
 - Higher-rated wineries like Jordan (quality 9), Halleck (quality 10), or Fort Ross (quality 9) should arguably surface for a default profile. The ratings weight of 15 points is too low relative to the 40-point style match to push genuinely exceptional wineries to the top when style is neutral.
@@ -169,6 +180,7 @@ Actually, the real differentiator with uniform weights is likely the experience 
 **Quiz input summary**: Chardonnay, Relaxed & Scenic vibe, $ budget, no must-haves, Carneros, 3 stops, group of 2.
 
 **Results**:
+
 1. sebastiani (75) — relaxed: region
 2. dry-creek-vineyard (71) — relaxed: region
 3. landmark-hop-kiln (66) — relaxed: region
@@ -188,6 +200,7 @@ Wineries like Balletto Vineyards ($25, Chardonnay, Russian River, relaxed) or Pe
 **Grade**: B
 
 **Issues**:
+
 - Region relaxation is correct but the user gets zero Carneros results, which is a poor UX outcome. The UI should clearly communicate that their region preference was relaxed.
 - The $ budget ceiling of $35 eliminates all Carneros Chardonnay producers since they start at $45+. This is a realistic market constraint, not a scoring bug.
 - Sebastiani as #1 for "Relaxed & Scenic" is debatable — it is a downtown tasting bar, not a scenic vineyard. The `style_classic` = 5 score drives it to the top, but "classic" and "relaxed & scenic" are not synonymous.
