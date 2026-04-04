@@ -627,37 +627,37 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 
 ### D6.1 Types
 
-- [ ] `lib/matching/types.ts` — `WineryForMatching`, `MatchResult`, `MatchExplanation`, `QuizAnswers` (refined from current mock version)
+- [x] `WineryForMatching`, `MatchResult`, `QuizAnswers` — already defined in `src/lib/types.ts`; `ScoreBreakdown` added in `src/lib/matching/score.ts`
 
 ### D6.2 Filters
 
-- [ ] `lib/matching/filters.ts` — hard filters per D3.2
-- [ ] Each filter is a pure function: `(winery: WineryForMatching, answers: QuizAnswers) => boolean`
-- [ ] Compose filters: winery must pass ALL active hard filters
+- [x] `lib/matching/filters.ts` — hard filters per D3.2
+- [x] Each filter is a pure function: `(winery: WineryForMatching, answers: QuizAnswers) => boolean`
+- [x] Compose filters: winery must pass ALL active hard filters
 
 ### D6.3 Scoring
 
-- [ ] `lib/matching/score.ts` — weighted scoring per D3.3
-- [ ] Pure function: `(winery: WineryForMatching, answers: QuizAnswers) => number`
-- [ ] Score normalized to 0-100
+- [x] `lib/matching/score.ts` — weighted scoring per D3.3
+- [x] Pure function: `(winery: WineryForMatching, answers: QuizAnswers) => number`
+- [x] Score normalized to 0-100
 
 ### D6.4 Explanations
 
-- [ ] `lib/matching/explain.ts` — per D3.5 templates
-- [ ] Generate human-readable "why this winery" for each match
-- [ ] Reference specific quiz answers in explanations
+- [x] `lib/matching/explain.ts` — per D3.5 templates
+- [x] Generate human-readable "why this winery" for each match
+- [x] Reference specific quiz answers in explanations
 
 ### D6.5 Orchestrator
 
-- [ ] `lib/matching/index.ts` — `recommend(wineries: WineryForMatching[], answers: QuizAnswers): MatchResult[]`
-- [ ] Flow: fetch all active wineries → filter → score → sort → diversify → take top N → explain
-- [ ] Deterministic: same input always produces same output
+- [x] `lib/matching/index.ts` — `recommend(wineries: WineryForMatching[], answers: QuizAnswers): MatchResult[]`
+- [x] Flow: fetch all active wineries → filter → score → sort → diversify → take top N → explain
+- [x] Deterministic: same input always produces same output
 
 ### D6.6 Unit tests
 
-- [ ] Test each filter independently with edge cases
-- [ ] Test scoring with known inputs → expected scores
-- [ ] Test explanation generation
+- [x] Test each filter independently with edge cases (44 tests across 3 files)
+- [x] Test scoring with known inputs → expected scores
+- [x] Test orchestrator: ranking, diversity, determinism, edge cases
 
 ### D6.7 Golden file tests
 
