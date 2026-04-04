@@ -8,7 +8,6 @@ import type {
   StyleScores,
   Varietal,
   WeeklyHours,
-  DayHours,
   WineryForDisplay,
   WineryForMatching,
 } from './types';
@@ -30,24 +29,19 @@ const VARIETAL_DISPLAY: Record<string, Varietal> = {
   syrah: 'Syrah',
 };
 
-function parseDayHours(raw: string | undefined): DayHours {
-  if (!raw || raw === 'closed') return null;
-  const [open, close] = raw.split('-');
-  if (!open || !close) return null;
-  return { open: open.trim(), close: close.trim() };
-}
+const DEFAULT_HOURS: WeeklyHours = {
+  monday: null,
+  tuesday: null,
+  wednesday: null,
+  thursday: null,
+  friday: null,
+  saturday: null,
+  sunday: null,
+};
 
 function parseHours(raw: unknown): WeeklyHours {
-  const h = (raw ?? {}) as Record<string, string>;
-  return {
-    monday: parseDayHours(h.mon),
-    tuesday: parseDayHours(h.tue),
-    wednesday: parseDayHours(h.wed),
-    thursday: parseDayHours(h.thu),
-    friday: parseDayHours(h.fri),
-    saturday: parseDayHours(h.sat),
-    sunday: parseDayHours(h.sun),
-  };
+  if (!raw || typeof raw !== 'object') return DEFAULT_HOURS;
+  return { ...DEFAULT_HOURS, ...(raw as WeeklyHours) };
 }
 
 function mapStyleScores(row: WineryRow): StyleScores {

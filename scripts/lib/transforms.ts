@@ -105,16 +105,23 @@ export function parseFloatOrNull(value: string): number | null {
   return isNaN(n) ? null : n;
 }
 
-export function buildHoursJson(row: CSVRow): Record<string, string> {
-  const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
-  const hours: Record<string, string> = {};
+export function buildHoursJson(
+  row: CSVRow,
+): Record<string, { open: string; close: string } | null> {
+  const days = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ] as const;
+  const hours: Record<string, { open: string; close: string } | null> = {};
   for (const day of days) {
-    const val = row[`hours_${day}`];
-    if (val && val !== 'closed') {
-      hours[day] = val;
-    } else if (val === 'closed') {
-      hours[day] = 'closed';
-    }
+    const open = row[`${day}_open`];
+    const close = row[`${day}_close`];
+    hours[day] = open && close ? { open, close } : null;
   }
   return hours;
 }
