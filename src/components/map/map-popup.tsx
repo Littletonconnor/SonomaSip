@@ -27,16 +27,16 @@ export function MapPopup({ item, onClose }: MapPopupProps) {
         <div className="min-w-0 flex-1">
           <Link
             href={`/wineries/${item.slug}`}
-            className="font-heading text-sm font-medium tracking-tight text-balance text-bark hover:text-wine"
+            className="font-heading text-bark hover:text-wine text-sm font-medium tracking-tight text-balance"
           >
             {item.label}
           </Link>
-          <p className="mt-0.5 text-xs text-stone">{item.region}</p>
+          <p className="text-stone mt-0.5 text-xs">{item.region}</p>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="flex size-6 shrink-0 items-center justify-center rounded-full text-stone hover:bg-fog hover:text-bark"
+          className="text-stone hover:bg-fog hover:text-bark flex size-6 shrink-0 items-center justify-center rounded-full"
         >
           <X className="size-3.5" />
         </button>

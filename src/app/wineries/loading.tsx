@@ -40,7 +40,7 @@ export default function WineriesLoading() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="rounded-xl bg-card p-5 ring-1 ring-black/5">
+              <div key={i} className="bg-card rounded-xl p-5 ring-1 ring-black/5">
                 <div className="flex items-start justify-between">
                   <Skeleton className="h-6 w-40 rounded-lg" />
                   <Skeleton className="h-5 w-10" />
