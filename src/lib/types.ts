@@ -40,21 +40,18 @@ export type AvaRegion =
   | 'sonoma_mountain'
   | 'green_valley'
   | 'petaluma_gap'
-  | 'rockpile';
+  | 'rockpile'
+  | 'bennett_valley'
+  | 'chalk_hill'
+  | 'fort_ross_seaview';
 
 export type Setting = 'vineyard' | 'estate' | 'downtown' | 'hilltop' | 'cave';
 
 /**
- * @deprecated Use AvaRegion instead. Kept for backward compatibility with
- * existing UI code that references the display-friendly region names.
+ * Display-friendly region name. Derived from AVA_TO_DISPLAY values.
+ * Use AvaRegion for DB/filtering; use Region for UI display.
  */
-export type Region =
-  | 'Russian River Valley'
-  | 'Dry Creek Valley'
-  | 'Sonoma Valley'
-  | 'Alexander Valley'
-  | 'Carneros'
-  | 'Sonoma Coast';
+export type Region = string;
 
 export type BudgetBand = '$' | '$$' | '$$$' | '$$$$';
 
@@ -293,7 +290,7 @@ export type WineryForDisplay = {
 // Region mapping helpers — convert between DB enum and display string.
 // ---------------------------------------------------------------------------
 
-export const AVA_TO_DISPLAY: Record<AvaRegion, Region | string> = {
+export const AVA_TO_DISPLAY: Record<AvaRegion, Region> = {
   russian_river_valley: 'Russian River Valley',
   dry_creek_valley: 'Dry Creek Valley',
   alexander_valley: 'Alexander Valley',
@@ -304,6 +301,9 @@ export const AVA_TO_DISPLAY: Record<AvaRegion, Region | string> = {
   green_valley: 'Green Valley',
   petaluma_gap: 'Petaluma Gap',
   rockpile: 'Rockpile',
+  bennett_valley: 'Bennett Valley',
+  chalk_hill: 'Chalk Hill',
+  fort_ross_seaview: 'Fort Ross-Seaview',
 };
 
 export const DISPLAY_TO_AVA: Record<string, AvaRegion> = Object.fromEntries(

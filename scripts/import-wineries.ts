@@ -123,6 +123,7 @@ function buildWineryRecord(id: string, sheets: ReturnType<typeof loadSheets>) {
     has_picnic_area: parseBool(exp?.has_picnic_area || ''),
     has_restaurant: parseBool(exp?.has_restaurant || ''),
     has_sunset_views: parseBool(exp?.has_sunset_views || ''),
+    has_outdoor_seating: parseBool(exp?.has_outdoor_seating || ''),
     has_live_music: parseBool(exp?.has_live_music || ''),
     live_music_schedule: exp?.live_music_schedule || null,
     is_dog_friendly: parseBool(exp?.dog_friendly || ''),

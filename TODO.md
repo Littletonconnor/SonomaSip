@@ -552,8 +552,8 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 ### D4.4 Type generation
 
 - [x] `supabase gen types typescript` → `src/lib/database.types.ts` (script: `pnpm db:gen-types`)
-- [ ] Add `db:types` script to package.json
-- [ ] Create mapper layer: Supabase row types → app types (`WineryForDisplay`, `WineryForMatching`)
+- [x] ~~Add `db:types` script to package.json~~ — already exists as `db:gen-types`
+- [x] Create mapper layer: Supabase row types → app types (`WineryForDisplay`, `WineryForMatching`) — `src/lib/mappers.ts` with `toFlight`, `toWineryForDisplay`, `toWineryForMatching`
 
 ---
 
