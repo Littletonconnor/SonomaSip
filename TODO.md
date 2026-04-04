@@ -96,7 +96,7 @@ Track D — Polish & Launch
 
 ### 0.2 Service accounts _(manual — do when needed)_
 
-- [ ] Supabase project (note ref, DB password, region)
+- [x] Supabase project — ref: `rxihebhphpbhzanijfuv`, region: us-east-2
 - [ ] Vercel project linked to repo
 - [ ] Mapbox token; restrict HTTP referrers when domain known
 - [ ] Domain DNS
@@ -113,30 +113,30 @@ Track D — Polish & Launch
 
 **Accuracy & liability disclaimer:**
 
-- [ ] Prominent disclaimer on every page with winery data (footer, results, detail, plan, PDF, email): "Sonoma Sip is an independent guide. We are not affiliated with, endorsed by, or sponsored by any winery listed. Information may be outdated or inaccurate — always verify details directly with the winery before visiting."
+- [x] Prominent disclaimer on every page with winery data (footer, results, detail, plan, PDF, email): "Sonoma Sip is an independent guide. We are not affiliated with, endorsed by, or sponsored by any winery listed. Information may be outdated or inaccurate — always verify details directly with the winery before visiting."
 - [ ] Winery detail page: dedicated disclaimer block near the CTA, not just footer
 - [ ] Shared plan / PDF: disclaimer as first or last line of the document
 
 **Terms of Service — key clauses:**
 
-- [ ] **Independent guide / no affiliation:** Sonoma Sip is an independent informational resource. We are not agents, representatives, or affiliates of any winery. Listing does not imply endorsement in either direction.
-- [ ] **No guarantee of accuracy:** All winery information (hours, prices, policies, availability, amenities) is provided for informational purposes only. We make reasonable efforts to keep data current but cannot guarantee accuracy. Users must verify details with wineries before visiting.
-- [ ] **Third-party content:** Winery names, descriptions, and details are sourced from publicly available information. All trademarks belong to their respective owners. If a winery wishes to update or remove their listing, they can contact us.
-- [ ] **Winery opt-out / update process:** Clear contact method (email) for wineries to request corrections, updates, or removal of their listing. Commit to processing requests within a reasonable timeframe (e.g., 7 business days).
-- [ ] **Limitation of liability:** Sonoma Sip is not liable for any damages arising from reliance on information provided, including but not limited to incorrect hours, prices, policies, or closures.
-- [ ] **User-generated content:** If users can submit reviews/reports in the future, include clause reserving right to moderate and disclaiming responsibility for user content.
+- [x] **Independent guide / no affiliation:** Sonoma Sip is an independent informational resource. We are not agents, representatives, or affiliates of any winery. Listing does not imply endorsement in either direction.
+- [x] **No guarantee of accuracy:** All winery information (hours, prices, policies, availability, amenities) is provided for informational purposes only. We make reasonable efforts to keep data current but cannot guarantee accuracy. Users must verify details with wineries before visiting.
+- [x] **Third-party content:** Winery names, descriptions, and details are sourced from publicly available information. All trademarks belong to their respective owners. If a winery wishes to update or remove their listing, they can contact us.
+- [x] **Winery opt-out / update process:** Clear contact method (email) for wineries to request corrections, updates, or removal of their listing. Commit to processing requests within a reasonable timeframe (e.g., 7 business days).
+- [x] **Limitation of liability:** Sonoma Sip is not liable for any damages arising from reliance on information provided, including but not limited to incorrect hours, prices, policies, or closures.
+- [x] **User-generated content:** If users can submit reviews/reports in the future, include clause reserving right to moderate and disclaiming responsibility for user content.
 
 **Privacy policy:**
 
-- [ ] Analytics data collection (Plausible/PostHog — cookie-light)
-- [ ] Email collection (only if user opts into email share)
-- [ ] Share URL data (what's stored, how long, who can access)
-- [ ] No sale of personal data
-- [ ] CCPA compliance (California users)
+- [x] Analytics data collection (Plausible/PostHog — cookie-light)
+- [x] Email collection (only if user opts into email share)
+- [x] Share URL data (what's stored, how long, who can access)
+- [x] No sale of personal data
+- [x] CCPA compliance (California users)
 
 **Footer legal line (all pages):**
 
-- [ ] "Sonoma Sip is an independent guide — not affiliated with any listed winery. Verify details before visiting."
+- [x] "Sonoma Sip is an independent guide — not affiliated with any listed winery. Verify details before visiting."
 
 ### 0.5 Design system
 
@@ -335,6 +335,11 @@ _Custom-styled Mapbox map that matches the Sonoma palette. Used on results page 
 - [x] Accessibility: keyboard navigation works, focus rings visible on all interactive elements, WCAG AA contrast verified on critical text pairs
 - [x] No default browser styles, no unstyled flash, no broken layouts — audited, all clean
 
+### 3.5.10 Content refresh
+
+- [ ] **"How It Works" section rewrite:** Current copy says "Three questions. One perfect day." but the quiz is 4 steps, not 3 questions. Rethink the headline, step titles, and descriptions to accurately reflect the actual quiz flow (varietals → vibe/budget → must-haves/group → regions/stops). The "three questions" framing is misleading.
+- [ ] **Logo redesign:** Current wine glass icon (`src/app/icon.tsx`, `src/app/apple-icon.tsx`, navbar) looks like a goblet. Replace with a more refined, professional wine glass silhouette that feels editorial/luxury. Update favicon, apple icon, navbar logo, and manifest icons.
+
 ---
 
 > **Open questions for future sessions:** exact LLM prompts and editorial voice definition, content freshness cadence, admin review UX workflow, how click attribution data feeds into winery partnership outreach, and whether the scrape → enrich pipeline should run on Vercel cron or a separate worker.
@@ -377,9 +382,9 @@ Design decisions documented here — these drive everything downstream.
 
 ### D1.1 Column mapping from Excel
 
-- [ ] Map every column from all 8 Excel sheets to database columns
-- [ ] Document column name → DB field → TypeScript type for each
-- [ ] Identify columns that are editorial-only (description, tagline) vs filterable vs scoreable
+- [x] Map every column from all 8 Excel sheets to database columns — documented inline in migration SQL comments
+- [x] Document column name → DB field → TypeScript type for each
+- [x] Identify columns that are editorial-only (description, tagline) vs filterable vs scoreable
 - [ ] Flag columns with data quality issues (see D2)
 
 ### D1.2 Enum design
@@ -391,34 +396,34 @@ _Values below are locked in `src/lib/types.ts` as of 2026-04-04. DB enums must m
 - [x] `flight_format`: `seated`, `standing`, `tour`, `outdoor`, `picnic`, `bar` _(expanded to match actual Excel data)_
 - [x] `ava_region`: `russian_river_valley`, `dry_creek_valley`, `alexander_valley`, `sonoma_valley`, `carneros`, `sonoma_coast` _(6 regions, Sonoma Coast added)_
 - [x] `setting`: `vineyard`, `estate`, `downtown`, `hilltop`, `cave` _(display-only for V1)_
-- [ ] Validate each enum against actual Excel values — no mismatches
+- [x] Validate each enum against actual Excel values — mapped in migration 001 comments; added 4 new AVA regions from CSV (sonoma_mountain, green_valley, petaluma_gap, rockpile)
 
 ### D1.3 ERD & table design
 
-- [ ] `wineries` table: all columns defined with types and constraints — must include `styleRelaxed..styleSocial` (5 int), `qualityScore`, `popularityScore`, `ratingGoogle`, `setting`, `signatureVarietals` (or use join table `is_signature`)
-- [ ] `winery_varietals` join table: `(winery_id, varietal, is_present, is_signature)` — maps to `signatureVarietals[]` on the app type
-- [ ] `flights` table: `(id, winery_id, name, price, format, includes_food, description)`
-- [ ] `import_runs` table: `(id, started_at, finished_at, source_file_hash, wineries_upserted, flights_upserted, errors_json, warnings_json)`
-- [ ] `shared_itineraries` table: `(id, created_at, quiz_answers jsonb, results jsonb, payload_version)`
-- [ ] `data_health_checks` table: `(id, winery_id, check_type, status, details, checked_at, resolved_at, resolved_by)`
-- [ ] `field_overrides` table: `(id, winery_id, field_name, override_value, reason, created_at)` — audit trail for editorial overrides
-- [ ] Provenance fields on `wineries`: `last_verified_at`, `last_places_sync_at`, `data_source`, `verification_notes`, `is_active`
+- [x] `wineries` table: 70+ columns from all 8 CSV sheets, style scores use CSV names (style_classic, style_luxury, etc.)
+- [x] `winery_varietals` join table: `(winery_id, varietal, is_signature)`
+- [x] `flights` table: `(winery_id, name, price, wines_count, duration_minutes, format, food_included, reservation_required, description)`
+- [x] `import_runs` table: audit trail for data imports
+- [x] `shared_itineraries` table: UUID PK, JSONB quiz_answers + results snapshot, payload_version
+- [x] `data_health_checks` table: URL health, hours drift, rating drift, missing data, user reports
+- [x] `field_overrides` table: editorial override audit trail
+- [x] Provenance fields on `wineries`: `last_verified_at`, `last_places_sync_at`, `data_source`, `verification_notes`, `is_active`
 - [ ] Document the ERD (can be a markdown table or mermaid diagram)
 
 ### D1.4 RLS plan
 
-- [ ] Document RLS rules before writing migrations
-- [ ] `wineries`, `flights`, `winery_varietals`: public `SELECT` (read-only)
-- [ ] `shared_itineraries`: server-only `INSERT`, public `SELECT` by id
-- [ ] `import_runs`, `data_health_checks`, `field_overrides`: admin-only (service role key)
-- [ ] No public `UPDATE`/`DELETE` on any content table
+- [x] Document RLS rules before writing migrations
+- [x] `wineries`, `flights`, `winery_varietals`: public `SELECT` (read-only)
+- [x] `shared_itineraries`: server-only `INSERT`, public `SELECT` by id
+- [x] `import_runs`, `data_health_checks`, `field_overrides`: admin-only (service role key)
+- [x] No public `UPDATE`/`DELETE` on any content table
 
 ### D1.5 TypeScript type reconciliation
 
 - [x] Reconcile `src/lib/types.ts` (current mock types) with new schema — done 2026-04-04: added `StyleScores`, `Setting`, `signatureVarietals`, `qualityScore`, `popularityScore`, `ratingGoogle`; updated `ReservationType`, `FlightFormat`, `Region`
 - [x] Plan the `WineryForMatching` flat type (pre-joined, all scoring fields, no DB queries in scoring loop)
 - [x] Plan the `WineryForDisplay` type (what the UI needs)
-- [ ] Decide: generate types from Supabase (`supabase gen types`) or hand-maintain
+- [x] Decide: generate types from Supabase — `pnpm db:gen-types` generates `src/lib/database.types.ts`
 
 ---
 
@@ -520,32 +525,32 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 
 ### D4.1 Project setup
 
-- [ ] `supabase init`; link remote project
-- [ ] Server + browser Supabase clients (cookie pattern for Next.js App Router)
-- [ ] Environment variables: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- [x] `supabase init`; link remote project (ref: `rxihebhphpbhzanijfuv`)
+- [x] Browser Supabase client (`src/lib/supabase.ts`) — server client (cookie pattern) deferred to when needed
+- [x] Environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`
 
 ### D4.2 Migrations
 
-- [ ] Migration 001: create enums (`reservation_type`, `noise_level`, `flight_format`, `ava_region`, `setting`, `check_type`, `check_status`)
-- [ ] Migration 002: create `wineries` table (all columns from D1.3)
-- [ ] Migration 003: create `winery_varietals` table + indexes
-- [ ] Migration 004: create `flights` table + FK + indexes
-- [ ] Migration 005: create `import_runs` table
-- [ ] Migration 006: create `shared_itineraries` table
-- [ ] Migration 007: create `data_health_checks` + `field_overrides` tables
-- [ ] Indexes: unique `wineries.slug`, `flights.winery_id`, `winery_varietals.winery_id`, filters as needed
-- [ ] Apply to local first, then staging
+- [x] Migration 001: create enums (7 enums including 10-value `ava_region`)
+- [x] Migration 002: create `wineries` table (70+ columns)
+- [x] Migration 003: create `winery_varietals` table + indexes
+- [x] Migration 004: create `flights` table + FK + indexes
+- [x] Migration 005: create `import_runs` table
+- [x] Migration 006: create `shared_itineraries` table
+- [x] Migration 007: create `data_health_checks` + `field_overrides` tables
+- [x] Indexes: unique `wineries.slug`, `flights.winery_id`, `winery_varietals.winery_id`, ava_primary, reservation_type, is_active
+- [x] Applied to remote Supabase via `supabase db push`
 
 ### D4.3 RLS policies
 
-- [ ] Enable RLS on all tables
-- [ ] Implement policies per D1.4 plan
+- [x] Enable RLS on all tables
+- [x] Implement policies per D1.4 plan (inline in migrations)
 - [ ] Test: anonymous user can SELECT wineries/flights, cannot INSERT/UPDATE/DELETE
 - [ ] Test: service role can do everything
 
 ### D4.4 Type generation
 
-- [ ] `supabase gen types typescript` → `src/types/database.ts`
+- [x] `supabase gen types typescript` → `src/lib/database.types.ts` (script: `pnpm db:gen-types`)
 - [ ] Add `db:types` script to package.json
 - [ ] Create mapper layer: Supabase row types → app types (`WineryForDisplay`, `WineryForMatching`)
 

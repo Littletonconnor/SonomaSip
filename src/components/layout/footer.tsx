@@ -64,7 +64,10 @@ export function Footer() {
 
         <div className="border-gold/20 mt-12 border-t pt-6">
           <div className="text-muted-foreground flex flex-col items-center justify-between gap-3 text-xs tracking-wide md:flex-row">
-            <p>Independent guide. Verify hours and policies before visiting.</p>
+            <p>
+              Sonoma Sip is an independent guide — not affiliated with any listed winery. Verify
+              details before visiting.
+            </p>
             <p className="shrink-0">Made with care in Sonoma County</p>
           </div>
         </div>
