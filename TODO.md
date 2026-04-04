@@ -51,11 +51,12 @@ Track A — UI Prototype (current focus)
     → Validate & iterate
 
 Track B — Data Pipeline (the backbone — after UI is validated)
+  Phase D0 (winery discovery — expand from 68 to comprehensive registry)
   Can run in parallel:
     Phase D1 (schema design) + Phase D2 (data quality) + Phase D3 (SCORING.md)
   Then sequentially:
     → Phase D4 (Supabase migrations)
-    → Phase D5 (import pipeline)
+    → Phase D5 (import pipeline — handles both editorial + discovered wineries)
     → Phase D6 (matching engine)
     → Phase D7 (wire up)
 
@@ -73,14 +74,17 @@ Track D — Polish & Launch
 
 ### Data Source Authority Hierarchy
 
-| Source                                | Provides                                                             | Trust                                    | Refresh                        |
-| ------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------- | ------------------------------ |
-| Curated Excel (68 wineries, 8 sheets) | Editorial stories, style scores, flights, experience flags, pairings | Highest — editorial voice                | Manual, quarterly              |
-| Google Places API                     | business_status, live ratings, hours (comparison only)               | High for facts, low for domain data      | Weekly                         |
-| URL Health Checks                     | Booking URL liveness                                                 | Binary signal                            | Weekly                         |
-| User Reports (future)                 | "This is wrong" flags                                                | Lowest — signal only, never auto-applied | Real-time submit, async review |
+| Source                                | Provides                                                             | Trust                                    | Refresh                        | Cost   |
+| ------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------- | ------------------------------ | ------ |
+| Curated CSV (68 editorial wineries)   | Editorial stories, style scores, flights, experience flags, pairings | Highest — editorial voice                | Manual, quarterly              | Free   |
+| OpenStreetMap / Overpass API          | Winery discovery: name, coordinates, address, website, phone         | High for existence/location              | Quarterly discovery runs       | Free   |
+| Wine association directories          | Member lists (cross-validation, new winery discovery)                | High for "is this a real tasting room?"  | Annual scrape                  | Free   |
+| Wikidata SPARQL                       | Cross-validation, Wikipedia descriptions                             | Medium — incomplete but authoritative    | Quarterly                      | Free   |
+| Google Places API (optional, future)  | business_status, live ratings, hours (comparison only)               | High for facts, low for domain data      | Weekly                         | Paid   |
+| URL Health Checks                     | Booking URL liveness                                                 | Binary signal                            | Weekly                         | Free   |
+| User Reports (future)                 | "This is wrong" flags                                                | Lowest — signal only, never auto-applied | Real-time submit, async review | Free   |
 
-**Conflict resolution:** Editorial always wins. Google can auto-update `rating_google` but only _flags_ hours drift for human review. URL checks flag broken links. User reports create a review queue, never touch the canonical record.
+**Conflict resolution:** Editorial always wins. OSM/Wikidata provide discovery and basic facts but never overwrite editorial fields. Google (if added later) can auto-update `rating_google` but only _flags_ hours drift for human review. URL checks flag broken links. User reports create a review queue, never touch the canonical record.
 
 ---
 
@@ -361,6 +365,91 @@ These decisions were identified during a schema review and are now codified in `
 | **Walk-in filter behavior**                  | "Walk-in friendly" filter passes both `walk_ins_welcome` and `reservations_recommended` (per `SCORING.md` §3.6).                                                                                                                                  |
 | **Shared itinerary flight ID stability**     | `shared_itineraries.results` JSONB stores full winery+flight data (snapshot), not just IDs. Safe against `DELETE + INSERT` on flights during re-import.                                                                                           |
 | **Click tracking client-side**               | Use `navigator.sendBeacon` or fire-and-forget fetch to avoid blocking the redirect to booking URL.                                                                                                                                                |
+
+---
+
+## Phase D0 — Winery Discovery & Registry _(expand beyond 68 editorial wineries)_
+
+**Goal:** Build a comprehensive registry of every winery and tasting room in Sonoma County AND Napa Valley. The 68 editorial wineries become the richest entries in a much larger dataset. Target: 400–600+ wineries total. All discovery sources are free.
+
+**Geographic expansion:** The app covers Sonoma County + Napa Valley (not just Sonoma). This means new AVA regions (Napa-side), expanded coordinate bounds, and updated branding language where needed.
+
+### D0.1 Coverage tiers
+
+Define how wineries at different data richness levels appear in the app:
+
+- [ ] Add `coverage_tier` enum: `editorial` | `verified` | `discovered`
+  - **Editorial** — full curated data (current 68). Rich detail pages, full quiz matching, editorial content, style scores.
+  - **Verified** — basic info confirmed (name, location, website, hours, reservation policy, a few amenities). Shown on map and browse pages. Eligible for basic quiz matching (location, budget if known, reservation type).
+  - **Discovered** — exists in registry but not yet reviewed. Shown on map only (pin + name + "Visit website"). Not eligible for quiz matching.
+- [ ] Add `coverage_tier` column to `wineries` table (default: `discovered`)
+- [ ] Update winery detail page to handle reduced data gracefully (verified/discovered tiers)
+- [ ] Update quiz matching to only include `editorial` + `verified` wineries
+- [ ] Update browse/map to show all tiers with visual differentiation (e.g., muted pins for discovered)
+
+### D0.2 OpenStreetMap / Overpass API discovery (primary source — free)
+
+OSM's Overpass API lets you query for all `amenity=winery` and `craft=winery` nodes in a bounding box. Completely free, no API key, no rate limit for reasonable usage.
+
+- [ ] Write `scripts/discover-osm.ts` — queries Overpass API for wineries in Sonoma + Napa bounding box
+  - Query: `[out:json];(node["amenity"="winery"](38.0,−123.5,39.0,−122.0);node["craft"="winery"](38.0,−123.5,39.0,−122.0);way["amenity"="winery"](38.0,−123.5,39.0,−122.0);way["craft"="winery"](38.0,−123.5,39.0,−122.0););out center;`
+  - Extract: name, latitude, longitude, address, website, phone, opening_hours (OSM format)
+  - Output: `docs/csv/discovered-osm.csv`
+- [ ] Fuzzy-match OSM results against existing 68 editorial wineries (name + proximity threshold ~500m)
+- [ ] Tag matched wineries with `osm_node_id` for future syncs
+- [ ] Tag unmatched results as new `discovered` entries
+- [ ] npm script: `pnpm discover:osm`
+- [ ] Run and review: how many wineries does OSM know about? What's missing?
+
+### D0.3 Wine association directory scraping (cross-validation — free)
+
+Official wine association member directories are the most authoritative "does this tasting room exist and is it open to the public?" source.
+
+- [ ] Scrape Sonoma County Vintners member directory (public web page)
+- [ ] Scrape Napa Valley Vintners member directory (public web page)
+- [ ] Output: `docs/csv/discovered-associations.csv` (name, website, region)
+- [ ] Cross-reference against OSM discoveries and editorial list
+- [ ] Wineries on association lists but not in OSM → flag for manual addition
+- [ ] npm script: `pnpm discover:associations`
+
+### D0.4 Wikidata SPARQL (supplementary — free)
+
+Wikidata can provide structured data (founding year, owner, Wikipedia description) and serve as a third cross-validation source.
+
+- [ ] Write SPARQL query for wineries in Sonoma County + Napa Valley
+- [ ] Extract: name, coordinates, website, founding date, Wikipedia article URL
+- [ ] Cross-reference against existing registry
+- [ ] npm script: `pnpm discover:wikidata`
+
+### D0.5 Registry merge & deduplication
+
+- [ ] `scripts/merge-discoveries.ts` — merges all discovery sources into a single canonical registry
+  - Priority: editorial CSV > OSM > association > Wikidata
+  - Dedup by: fuzzy name match (Levenshtein or similar) + coordinate proximity (<500m)
+  - Output: `docs/csv/winery-registry.csv` — the master list with `coverage_tier` and source columns
+- [ ] Human review step: scan the merged list for obvious junk (non-wineries, duplicates the fuzzy match missed, entries outside target regions)
+- [ ] npm script: `pnpm discover:merge`
+
+### D0.6 Expand geographic scope
+
+- [ ] Add Napa Valley AVA regions to `ava_region` enum: `napa_valley`, `oakville`, `rutherford`, `stags_leap_district`, `yountville`, `st_helena`, `calistoga`, `howell_mountain`, `spring_mountain`, `atlas_peak`, `diamond_mountain`, `mount_veeder`, `wild_horse_valley`, `coombsville`, `chiles_valley`, `los_carneros` (shared with Sonoma)
+- [ ] Expand validation bounds in `scripts/lib/validate.ts` to cover Napa (current bounds already include Napa geographically, but update the warning message from "Sonoma County" to "Sonoma/Napa wine country")
+- [ ] Update any hard-coded "Sonoma" references in app copy that should now say "Sonoma & Napa" (audit needed)
+
+### D0.7 Import pipeline updates
+
+- [ ] Update `scripts/import-wineries.ts` to handle registry CSV alongside editorial CSVs
+  - Editorial wineries: full import (all 8 CSVs) → `coverage_tier: editorial`
+  - Discovered wineries: basic import (registry CSV only) → `coverage_tier: discovered`
+- [ ] Verified wineries: as manual review enriches discovered entries, promote to `coverage_tier: verified`
+- [ ] Dry-run with merged data to validate before live import
+
+### D0.8 Ongoing discovery cadence
+
+- [ ] Run `discover:osm` quarterly to catch new openings
+- [ ] Cross-reference closures: if an OSM entry disappears or gets tagged `disused:amenity=winery`, flag for review
+- [ ] Track discovery runs in `import_runs` table (source: `osm_discovery`, `association_scrape`, etc.)
+- [ ] Promotion workflow: discovered → verified (checklist: confirm website works, confirm open to public, fill reservation_type + basic hours)
 
 ---
 
@@ -924,7 +1013,7 @@ _Winery info changes: hours shift seasonally, flights get repriced, wineries clo
 
 - [ ] **Quarterly audit** (Jan, Apr, Jul, Oct): Spot-check 15-20 wineries across all regions. Verify hours, prices, reservation policy, and amenity flags against winery websites. Update database. Log audit in `import_runs`.
 - [ ] **Seasonal hours update** (Mar + Nov): Many wineries shift to summer/winter hours. Bulk review all hours against winery websites before each season change.
-- [ ] **Annual full audit** (January): Full pass on all 68 wineries. Verify every field. Remove permanently closed wineries. Add new notable wineries.
+- [ ] **Annual full audit** (January): Full pass on all editorial-tier wineries. Verify every field. Remove permanently closed wineries. Run discovery pipeline (D0) to catch new wineries opened since last run. Promote high-quality discovered wineries to verified/editorial.
 
 **Schema support:**
 
@@ -1144,3 +1233,4 @@ Then your PostHog sink and Axiom sink both get the sampled stream — errors alw
 | 2026-04-03 | Replaced vague data phases (0.6-5) with granular D1-D7 pipeline plan + authority hierarchy                                                                                                                                                                                                                                                                 |
 | 2026-04-03 | Added D8 (content pipeline: Cloudflare scrape → LLM enrichment), D9 (admin pages), D10 (click attribution)                                                                                                                                                                                                                                                 |
 | 2026-04-04 | Schema review: resolved 11 design gaps. Updated types.ts (StyleScores, Setting, signatureVarietals, expanded enums, Sonoma Coast). Full SCORING.md spec (budget bands, style weights, filters, scoring formula, tie-breakers, 5 worked examples). Updated mock data + all page references. Marked D1.2 enums + D1.5 type reconciliation + D3 spec as done. |
+| 2026-04-04 | Added Phase D0 (Winery Discovery & Registry): plan to expand from 68 editorial wineries to comprehensive Sonoma + Napa coverage (~400-600 wineries) using free sources (OpenStreetMap Overpass API, wine association directories, Wikidata). Added coverage tiers (editorial/verified/discovered). Updated data source authority hierarchy. Expanded geographic scope to include Napa Valley. |
