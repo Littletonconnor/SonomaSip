@@ -6,6 +6,7 @@
  *   pnpm db:import:dry      # parse + validate only, no writes
  */
 
+import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import { createHash } from 'crypto';
 import { readFileSync } from 'fs';

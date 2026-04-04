@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Grape, BarChart3, MapPin, DollarSign, Users, Map, Info, Share2 } from 'lucide-react';
+import { Grape, MapPin, DollarSign, Users, Map, Info, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import { mockWineries } from '@/lib/mock-data';
@@ -13,25 +13,26 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 pt-12 pb-16 md:pt-16 md:pb-24 lg:grid-cols-[1fr_1.2fr] lg:gap-12 lg:pt-0 lg:pb-0">
           <div className="lg:py-28">
             <span className="bg-wine/10 text-wine ring-wine/20 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium tracking-wide ring-1">
-              Covering 68+ Sonoma County wineries
+              Free & independent wine guide
             </span>
 
             <h1 className="font-heading text-bark mt-5 max-w-[20ch] text-4xl font-medium tracking-tight text-balance sm:text-5xl lg:text-6xl">
-              Your Perfect Sonoma Wine Day, Planned in Minutes
+              Plan Your Sonoma Wine Tasting Day in Minutes
             </h1>
             <p className="text-stone mt-6 max-w-[48ch] text-lg text-pretty">
-              Take a short quiz about the wines you love, your budget, and your group. We&apos;ll
-              rank 68 curated wineries by how well they fit — then hand you a shareable plan.
+              Tell us your favorite wines, your vibe, your budget, and where you want to
+              go. Our matching engine scores every winery in our curated collection and builds
+              a personalized itinerary you can share, print, or email.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <Button size="lg" className="rounded-full px-8 tracking-wide" asChild>
-                <Link href="/quiz">Plan Your Visit</Link>
+                <Link href="/quiz">Start the Quiz</Link>
               </Button>
               <Link
                 href="/wineries"
                 className="text-stone decoration-oak/40 hover:text-bark hover:decoration-oak text-sm font-medium underline underline-offset-4"
               >
-                Browse all 68 wineries
+                Browse all wineries
               </Link>
             </div>
           </div>
@@ -119,7 +120,7 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-6">
           <AnimatedSection>
             <p className="text-stone text-center font-mono text-xs tracking-widest">
-              68 curated wineries &middot; personalized matches &middot; free to use
+              Curated wineries &middot; Every Sonoma AVA region &middot; Personalized matching &middot; Always free
             </p>
           </AnimatedSection>
         </div>
@@ -131,7 +132,7 @@ export default function Home() {
           <AnimatedSection>
             <p className="text-wine font-mono text-sm tracking-wide">How it works</p>
             <h2 className="text-bark mt-3 max-w-[35ch] text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-              Three questions. One perfect day.
+              Four quick steps to your ideal wine tasting itinerary.
             </h2>
           </AnimatedSection>
 
@@ -139,20 +140,26 @@ export default function Home() {
             {[
               {
                 number: '01',
-                title: 'Share your preferences',
-                body: 'A short, thoughtful quiz. We ask about the wines you love, the atmosphere you want, your budget, and anything your group needs.',
+                title: 'Pick your wines',
+                body: 'Choose from nine varietals — Pinot Noir, Chardonnay, Zinfandel, Sparkling, and more. Skip this step to keep things wide open.',
                 icon: Grape,
               },
               {
                 number: '02',
-                title: 'We find your matches',
-                body: 'Every winery in our curated set is scored against what you told us. You get a ranked list with honest reasons why each one fits.',
-                icon: BarChart3,
+                title: 'Set the mood and budget',
+                body: 'Tell us the vibe you want — relaxed, adventurous, celebratory — and how much you want to spend per tasting flight.',
+                icon: DollarSign,
               },
               {
                 number: '03',
-                title: 'Take it with you',
-                body: 'Your plan shows up on a map. Check hours and policies, then share the link or email it to your group. No account required.',
+                title: 'Add your must-haves',
+                body: 'Dog-friendly? Wheelchair accessible? Food pairing? Toggle the features that matter, set your group size, and we filter accordingly.',
+                icon: Users,
+              },
+              {
+                number: '04',
+                title: 'Get your itinerary',
+                body: 'Choose your Sonoma regions and number of stops. Our matching engine scores every winery and builds a ranked plan you can share, print, or email.',
                 icon: MapPin,
               },
             ].map((step) => (
@@ -179,7 +186,7 @@ export default function Home() {
           <AnimatedSection>
             <p className="text-wine font-mono text-sm tracking-wide">Why Sonoma Sip</p>
             <h2 className="text-bark mt-3 max-w-[35ch] text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-              Everything you need to plan the perfect visit.
+              An independent guide built for how you actually plan.
             </h2>
           </AnimatedSection>
 
@@ -188,35 +195,35 @@ export default function Home() {
               {[
                 {
                   icon: Grape,
-                  term: 'Matches your taste',
+                  term: 'Varietal matching',
                   detail:
-                    'Tell us which wines you love and we\u2019ll find wineries that pour them.',
+                    'Select from nine varietals and we score wineries on how well their pours align with your palate.',
                 },
                 {
                   icon: DollarSign,
                   term: 'Budget-aware',
-                  detail: 'Filter by flight price so there are no surprises at the tasting bar.',
+                  detail: 'Set a price range for tasting flights. We surface wineries that fit, from $25 walk-ins to $100+ seated experiences.',
                 },
                 {
                   icon: Users,
                   term: 'Group-friendly',
-                  detail: 'We check group limits, kid policies, and accessibility for your crew.',
+                  detail: 'Filters for group size limits, kid and dog policies, and wheelchair accessibility so nobody gets left out.',
                 },
                 {
                   icon: Map,
                   term: 'Map your day',
-                  detail: 'See your picks on a map and plan a route that makes geographic sense.',
+                  detail: 'See your matched wineries plotted across Sonoma County and plan a route that makes geographic sense.',
                 },
                 {
                   icon: Info,
-                  term: 'Real details',
+                  term: 'Honest details',
                   detail:
-                    'Hours, reservations, parking, noise level — the stuff that actually matters.',
+                    'Hours, reservation type, parking, noise level, and tasting formats — sourced from editorial research, not marketing copy.',
                 },
                 {
                   icon: Share2,
                   term: 'Share your plan',
-                  detail: 'Email or link your itinerary to the group. Print it for the car.',
+                  detail: 'Send your itinerary as a link, print it for the car, or email it to your group. No account needed.',
                 },
               ].map((item) => (
                 <div key={item.term} className="bg-background p-8 md:p-10">
@@ -238,9 +245,9 @@ export default function Home() {
       <section className="bg-card py-24 md:py-32">
         <div className="mx-auto max-w-5xl px-6">
           <AnimatedSection>
-            <p className="text-wine font-mono text-sm tracking-wide">Discover</p>
+            <p className="text-wine font-mono text-sm tracking-wide">Explore Sonoma County wineries</p>
             <h2 className="text-bark mt-3 max-w-[35ch] text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-              A taste of what&rsquo;s waiting.
+              A sample from our curated collection.
             </h2>
           </AnimatedSection>
 
@@ -276,7 +283,7 @@ export default function Home() {
                 href="/wineries"
                 className="text-wine decoration-wine/30 hover:decoration-wine text-sm font-medium underline underline-offset-4"
               >
-                View all 68 wineries &rarr;
+                View all wineries &rarr;
               </Link>
             </div>
           </AnimatedSection>
@@ -290,17 +297,17 @@ export default function Home() {
             <div className="flex flex-col items-start gap-8 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-cream max-w-[24ch] text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                  Ready to plan your day?
+                  Ready to find your Sonoma wineries?
                 </h2>
                 <p className="text-cream/70 mt-3 max-w-[40ch] text-lg text-pretty">
-                  Takes about two minutes. No account, no email required.
+                  Four quick steps. No account, no email, completely free.
                 </p>
               </div>
               <Link
                 href="/quiz"
                 className="bg-cream text-bark inline-flex h-9 shrink-0 items-center justify-center rounded-full px-10 text-sm font-medium tracking-wide shadow-lg hover:bg-white"
               >
-                Start Planning
+                Start the Quiz
               </Link>
             </div>
           </AnimatedSection>

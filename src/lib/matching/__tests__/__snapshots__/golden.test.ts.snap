@@ -1,0 +1,195 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`golden tests — real Supabase data > allDefaults > slug ordering snapshot 1`] = `
+[
+  {
+    "rank": 1,
+    "relaxed": [],
+    "score": 57,
+    "slug": "wilson-winery",
+  },
+  {
+    "rank": 2,
+    "relaxed": [],
+    "score": 55,
+    "slug": "roth-estate",
+  },
+  {
+    "rank": 3,
+    "relaxed": [],
+    "score": 55,
+    "slug": "sebastiani",
+  },
+]
+`;
+
+exports[`golden tests — real Supabase data > casualCouple > slug ordering snapshot 1`] = `
+[
+  {
+    "rank": 1,
+    "relaxed": [
+      "region",
+      "mustHaves",
+    ],
+    "score": 75,
+    "slug": "landmark-hop-kiln",
+  },
+  {
+    "rank": 2,
+    "relaxed": [
+      "region",
+      "mustHaves",
+    ],
+    "score": 72,
+    "slug": "sebastiani",
+  },
+  {
+    "rank": 3,
+    "relaxed": [
+      "region",
+      "mustHaves",
+    ],
+    "score": 70,
+    "slug": "iron-horse-vineyards",
+  },
+]
+`;
+
+exports[`golden tests — real Supabase data > familyTrip > slug ordering snapshot 1`] = `
+[
+  {
+    "rank": 1,
+    "relaxed": [],
+    "score": 72,
+    "slug": "gundlach-bundschu",
+  },
+  {
+    "rank": 2,
+    "relaxed": [],
+    "score": 71,
+    "slug": "imagery-estate",
+  },
+]
+`;
+
+exports[`golden tests — real Supabase data > luxuryGroup > slug ordering snapshot 1`] = `
+[
+  {
+    "rank": 1,
+    "relaxed": [],
+    "score": 81,
+    "slug": "iron-horse-vineyards",
+  },
+  {
+    "rank": 2,
+    "relaxed": [],
+    "score": 81,
+    "slug": "seghesio-family-vineyards",
+  },
+  {
+    "rank": 3,
+    "relaxed": [],
+    "score": 81,
+    "slug": "rodney-strong",
+  },
+  {
+    "rank": 4,
+    "relaxed": [],
+    "score": 80,
+    "slug": "kendall-jackson",
+  },
+]
+`;
+
+exports[`golden tests — real Supabase data > singleRegionBudget > slug ordering snapshot 1`] = `
+[
+  {
+    "rank": 1,
+    "relaxed": [
+      "region",
+    ],
+    "score": 75,
+    "slug": "sebastiani",
+  },
+  {
+    "rank": 2,
+    "relaxed": [
+      "region",
+    ],
+    "score": 71,
+    "slug": "dry-creek-vineyard",
+  },
+  {
+    "rank": 3,
+    "relaxed": [
+      "region",
+    ],
+    "score": 66,
+    "slug": "landmark-hop-kiln",
+  },
+]
+`;
+
+exports[`golden tests — real Supabase data > veryRestrictive > slug ordering snapshot 1`] = `
+[
+  {
+    "rank": 1,
+    "relaxed": [
+      "region",
+    ],
+    "score": 79,
+    "slug": "rodney-strong",
+  },
+  {
+    "rank": 2,
+    "relaxed": [
+      "region",
+    ],
+    "score": 76,
+    "slug": "wilson-winery",
+  },
+  {
+    "rank": 3,
+    "relaxed": [
+      "region",
+    ],
+    "score": 68,
+    "slug": "francis-ford-coppola",
+  },
+]
+`;
+
+exports[`golden tests — real Supabase data > wideOpen > slug ordering snapshot 1`] = `
+[
+  {
+    "rank": 1,
+    "relaxed": [],
+    "score": 60,
+    "slug": "fort-ross-vineyard",
+  },
+  {
+    "rank": 2,
+    "relaxed": [],
+    "score": 57,
+    "slug": "bella-winery",
+  },
+  {
+    "rank": 3,
+    "relaxed": [],
+    "score": 55,
+    "slug": "kunde-family",
+  },
+  {
+    "rank": 4,
+    "relaxed": [],
+    "score": 54,
+    "slug": "gary-farrell-winery",
+  },
+  {
+    "rank": 5,
+    "relaxed": [],
+    "score": 54,
+    "slug": "medlock-ames",
+  },
+]
+`;

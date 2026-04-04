@@ -215,6 +215,7 @@ export type MatchResult = {
   rank: number;
   score: number;
   matchReasons: string[];
+  filtersRelaxed?: string[];
 };
 
 /**

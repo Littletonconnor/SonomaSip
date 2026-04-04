@@ -7,6 +7,7 @@ import type {
   Setting,
   StyleScores,
   Varietal,
+  Winery,
   WeeklyHours,
   WineryForDisplay,
   WineryForMatching,
@@ -129,6 +130,22 @@ export function toWineryForDisplay(
     hasOutdoorSeating: ((row as Record<string, unknown>).has_outdoor_seating as boolean) ?? false,
     hasViews: row.has_sunset_views,
     isMembersOnly: row.is_members_only,
+  };
+}
+
+export function toWinery(
+  row: WineryRow,
+  flightRows: FlightRow[],
+  varietalRows: VarietalRow[],
+): Winery {
+  const display = toWineryForDisplay(row, flightRows, varietalRows);
+  return {
+    ...display,
+    vibes: [],
+    styleScores: mapStyleScores(row),
+    qualityScore: row.quality_score,
+    popularityScore: row.popularity_score,
+    ratingGoogle: row.rating_google,
   };
 }
 

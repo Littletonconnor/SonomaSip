@@ -8,8 +8,7 @@ const publicSchema = z.object({
 });
 
 const serverSchema = z.object({
-  // Future server-only secrets go here:
-  // SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   // RESEND_API_KEY: z.string().startsWith('re_'),
 });
 

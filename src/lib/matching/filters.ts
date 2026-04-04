@@ -51,18 +51,54 @@ function passesGroupSizeFilter(winery: WineryForMatching, answers: QuizAnswers):
   return winery.groupSizeMax >= answers.groupSize;
 }
 
-const ALL_FILTERS = [
-  passesVarietalFilter,
-  passesBudgetFilter,
-  passesRegionFilter,
-  passesMembersOnlyFilter,
-  passesMustHavesFilter,
-  passesGroupSizeFilter,
+export type FilterName = 'region' | 'mustHaves' | 'budget' | 'varietal';
+
+type NamedFilter = {
+  name: FilterName;
+  fn: (winery: WineryForMatching, answers: QuizAnswers) => boolean;
+};
+
+const RELAXABLE_FILTERS: NamedFilter[] = [
+  { name: 'region', fn: passesRegionFilter },
+  { name: 'mustHaves', fn: passesMustHavesFilter },
+  { name: 'budget', fn: passesBudgetFilter },
+  { name: 'varietal', fn: passesVarietalFilter },
 ];
+
+const ALWAYS_APPLIED = [passesMembersOnlyFilter, passesGroupSizeFilter];
 
 export function applyHardFilters(
   wineries: WineryForMatching[],
   answers: QuizAnswers,
 ): WineryForMatching[] {
-  return wineries.filter((w) => ALL_FILTERS.every((f) => f(w, answers)));
+  const allFilters = [...ALWAYS_APPLIED, ...RELAXABLE_FILTERS.map((f) => f.fn)];
+  return wineries.filter((w) => allFilters.every((f) => f(w, answers)));
+}
+
+export function applyFiltersWithRelaxation(
+  wineries: WineryForMatching[],
+  answers: QuizAnswers,
+  minResults: number,
+): { filtered: WineryForMatching[]; relaxed: FilterName[] } {
+  const relaxed: FilterName[] = [];
+
+  let activeFilters = [...RELAXABLE_FILTERS];
+  let filtered = wineries.filter((w) =>
+    [...ALWAYS_APPLIED, ...activeFilters.map((f) => f.fn)].every((f) => f(w, answers)),
+  );
+
+  if (filtered.length >= minResults) return { filtered, relaxed };
+
+  for (const filter of RELAXABLE_FILTERS) {
+    activeFilters = activeFilters.filter((f) => f.name !== filter.name);
+    relaxed.push(filter.name);
+
+    filtered = wineries.filter((w) =>
+      [...ALWAYS_APPLIED, ...activeFilters.map((f) => f.fn)].every((f) => f(w, answers)),
+    );
+
+    if (filtered.length >= minResults) break;
+  }
+
+  return { filtered, relaxed };
 }

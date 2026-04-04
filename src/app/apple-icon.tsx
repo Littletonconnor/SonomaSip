@@ -17,15 +17,18 @@ export default function AppleIcon() {
       }}
     >
       <svg
-        width="110"
-        height="110"
-        viewBox="0 0 24 24"
+        width="100"
+        height="120"
+        viewBox="0 0 20 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M8 2h8l1 7c0 3.5-2.5 6-5 6s-5-2.5-5-6l1-7z" fill="rgba(255,255,255,0.9)" />
-        <path d="M12 15v5" stroke="rgba(255,255,255,0.9)" strokeWidth="2" strokeLinecap="round" />
-        <path d="M8 22h8" stroke="rgba(255,255,255,0.9)" strokeWidth="2" strokeLinecap="round" />
+        <path
+          d="M7 1 C7 1 5.5 5.5 5.5 8 C5.5 11.5 7.5 13.5 10 14 C12.5 13.5 14.5 11.5 14.5 8 C14.5 5.5 13 1 13 1 Z"
+          fill="rgba(255,255,255,0.95)"
+        />
+        <line x1="10" y1="14" x2="10" y2="20" stroke="rgba(255,255,255,0.95)" strokeWidth="1.4" />
+        <line x1="6.5" y1="21" x2="13.5" y2="21" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
     </div>,
     { ...size },

@@ -17,8 +17,8 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-6 py-14">
         <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
-            <Link href="/" aria-label="Homepage" className="flex items-center gap-2.5">
-              <WineGlassLogo className="h-7 w-auto" />
+            <Link href="/" aria-label="Homepage" className="flex items-center gap-1.5">
+              <WineGlassLogo className="h-6 w-auto" />
               <span className="font-heading text-bark text-lg font-medium tracking-wide">
                 Sonoma Sip
               </span>

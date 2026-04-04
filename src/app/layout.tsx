@@ -35,11 +35,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'Sonoma Sip — Your Personalized Sonoma County Winery Guide',
+    default: 'Sonoma Sip — Sonoma County Winery Trip Planner & Personalized Recommendations',
     template: '%s | Sonoma Sip',
   },
   description:
-    'Plan your Sonoma County winery visit. Answer a few questions and get a personalized, ranked list of wineries that fit your taste, budget, and group.',
+    'Plan your Sonoma wine tasting day with personalized winery recommendations. Take a quick quiz and get a ranked itinerary from curated Sonoma County wineries matched to your taste, budget, and group.',
   metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
   manifest: '/manifest.json',
   appleWebApp: {
@@ -48,17 +48,17 @@ export const metadata: Metadata = {
     title: 'Sonoma Sip',
   },
   openGraph: {
-    title: 'Sonoma Sip — Your Personalized Sonoma County Winery Guide',
+    title: 'Sonoma Sip — Sonoma County Winery Trip Planner',
     description:
-      'Answer a few questions and get a personalized, ranked list of Sonoma County wineries that fit your taste, budget, and group.',
+      'Take a quick quiz and get personalized Sonoma winery recommendations. Curated wineries matched to your taste, budget, and group — with a shareable day itinerary.',
     siteName: 'Sonoma Sip',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sonoma Sip — Your Personalized Sonoma County Winery Guide',
+    title: 'Sonoma Sip — Sonoma County Winery Trip Planner',
     description:
-      'Answer a few questions and get a personalized, ranked list of Sonoma County wineries that fit your taste, budget, and group.',
+      'Take a quick quiz and get personalized Sonoma winery recommendations. Curated wineries matched to your taste, budget, and group — with a shareable day itinerary.',
   },
 };
 

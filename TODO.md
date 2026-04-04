@@ -339,6 +339,57 @@ _Custom-styled Mapbox map that matches the Sonoma palette. Used on results page 
 - [x] Accessibility: keyboard navigation works, focus rings visible on all interactive elements, WCAG AA contrast verified on critical text pairs
 - [x] No default browser styles, no unstyled flash, no broken layouts — audited, all clean
 
+### 3.5.11 Results page polish
+
+_The empty state, error state, loading skeleton, and overall results UI need a quality pass to feel premium and editorial — not like default framework output._
+
+#### Empty state (`EmptyState` component)
+
+- [ ] Richer illustration: replace the plain Search icon with a wine-themed empty state (e.g., empty wine glass, vineyard silhouette, or custom SVG) — should feel warm, not sterile
+- [ ] Better copy hierarchy: larger, more empathetic headline ("We couldn't find a perfect match — yet"), supportive sub-copy explaining what they can do
+- [ ] Actionable suggestions: show 2–3 specific tips for broadening their search (e.g., "Try adding more regions", "Relax your budget filter", "Remove some must-haves") based on which filters were most restrictive
+- [ ] Secondary CTA: add "Browse All Wineries" link alongside "Retake the Quiz" so users have options
+- [ ] Subtle animation: gentle fade-in or illustration animation to soften the disappointment
+
+#### Error state (`ErrorState` component)
+
+- [ ] Friendlier tone: softer headline ("Something didn't go as planned"), reassuring sub-copy
+- [ ] Retry action: add a "Try Again" button that re-runs the quiz submission without navigating away
+- [ ] Contact fallback: small "If this keeps happening, let us know" link or text
+
+#### Loading skeleton (`ResultsSkeleton`)
+
+- [ ] Polish shimmer effect: use a warm-toned shimmer (cream/linen gradient) instead of default gray pulse
+- [ ] Add skeleton for preference badges section
+- [ ] Skeleton map placeholder on desktop side
+
+#### Result cards (`ResultCard`)
+
+- [ ] Score ring animation: animate the SVG stroke on mount (draw-in effect)
+- [ ] Hover state: more pronounced card lift/shadow on hover for better affordance
+- [ ] Winery image: placeholder for future winery photo (gradient or pattern placeholder that looks intentional)
+- [ ] "Book a Tasting" inline CTA: small secondary action on each card so users don't have to click through to detail page
+- [ ] Truncate long match reason lists: show top 3, expandable "Show more" if >3
+
+#### Header & actions
+
+- [ ] Functional Share button: copy share URL to clipboard with toast confirmation
+- [ ] Functional Print button: trigger `window.print()` with a print-optimized stylesheet
+- [ ] Functional Email button: open mailto with pre-filled subject and share URL
+- [ ] Results count copy: make it warmer (e.g., "We found 12 wineries you'll love" instead of "12 wineries matched your preferences")
+
+#### Map integration
+
+- [ ] Highlight card ↔ map pin interaction: hovering a result card highlights the corresponding map pin (and vice versa)
+- [ ] Fly-to on card click: clicking a card briefly highlights the pin on the map before navigating to detail
+- [ ] Mobile map: full-screen expandable overlay instead of inline collapse
+
+#### Responsive & polish
+
+- [ ] Mobile card layout: optimize spacing and typography for small screens (375px)
+- [ ] Print stylesheet: hide map, nav, footer; clean card layout for printing
+- [ ] Page transition: smooth entrance animation when navigating from quiz to results
+
 ### 3.5.10 Content refresh
 
 - [ ] **"How It Works" section rewrite:** Current copy says "Three questions. One perfect day." but the quiz is 4 steps, not 3 questions. Rethink the headline, step titles, and descriptions to accurately reflect the actual quiz flow (varietals → vibe/budget → must-haves/group → regions/stops). The "three questions" framing is misleading.
@@ -750,9 +801,28 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 
 ### D6.7 Golden file tests
 
-- [ ] ≥5 quiz profiles from D3.6 worked examples
-- [ ] Snapshot tests: input → expected top 5 ordering
-- [ ] Run against real imported data (not mocks)
+- [x] 7 quiz profiles (5 from SCORING.md + 2 edge cases) in `src/lib/matching/__fixtures__/quiz-profiles.ts`
+- [x] Snapshot tests: input → expected top N ordering (`src/lib/matching/__tests__/golden.test.ts`)
+- [x] Run against real Supabase data (not mocks) — 55 assertions, all passing
+- [x] Invariant tests: no empty results, scores descending, scores 0–100, reasons populated, determinism
+- [x] `pnpm test:golden` script for running golden tests independently
+
+### D6.8 Filter relaxation
+
+- [x] Progressive filter relaxation when hard filters return fewer results than `numStops`
+- [x] Relaxation order: region → must-haves → budget → varietal (least to most important)
+- [x] Members-only and group-size filters never relaxed (safety/logistics)
+- [x] `filtersRelaxed` field on `MatchResult` so UI can inform users which filters were dropped
+
+### D6.9 Scoring & data quality refinements _(from LLM verification report — `docs/quiz-results-verification.md`)_
+
+- [ ] **Fix `style_classic` → `styleRelaxed` mapping:** "Classic" (traditional, downtown tasting rooms) is not "Relaxed & Scenic" (calm, views, pastoral). Sebastiani scores as top "relaxed" pick when it shouldn't. Consider splitting or re-weighting the relaxed dimension to incorporate view/setting signals.
+- [ ] **Add `ava_secondary` to region matching:** Iron Horse (primary: Green Valley, secondary: Russian River Valley) fails the RRV region filter despite being geographically within the appellation. Match on `ava_secondary` as a fallback before triggering region relaxation.
+- [ ] **Audit `has_outdoor_seating` data:** Many wineries with described outdoor areas (patios, terraces, gardens) have `has_outdoor_seating = FALSE`. Cross-reference descriptions with the flag and fix inaccuracies. This causes unnecessary filter relaxation for the `casualCouple` profile.
+- [ ] **Increase rating weight for no-vibe profiles:** When no vibes are selected, the 40-point style match produces uniform scores, making the 15-point rating blend an insufficient tiebreaker. Consider boosting rating to 25 and style to 30 when weights are uniform, or add a quality-tier bonus for top-rated wineries.
+- [ ] **Deduplicate Cline entries:** `cline-cellars` and `cline-family-cellars` appear in the data with the same address. Merge into one canonical entry. This may cause a qualified family-friendly option to be missed in the `familyTrip` profile.
+- [ ] **Review `style_sustainable` → `styleEducational` mapping:** Overlaps for biodynamic/organic wineries but misses educational tour-focused wineries. Benziger's tram tour is valued for sustainability score, which happens to be correct but for the wrong reason.
+- [ ] Re-run `pnpm test:golden -- --update` after scoring changes and review updated snapshots
 
 ---
 
