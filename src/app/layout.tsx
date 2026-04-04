@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter, Geist_Mono } from 'next/font/google';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
+import { env } from '@/lib/env';
 import './globals.css';
 
 const cormorant = Cormorant_Garamond({
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
   },
   description:
     'Plan your Sonoma County winery visit. Answer a few questions and get a personalized, ranked list of wineries that fit your taste, budget, and group.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
