@@ -538,6 +538,7 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 - [x] Migration 005: create `import_runs` table
 - [x] Migration 006: create `shared_itineraries` table
 - [x] Migration 007: create `data_health_checks` + `field_overrides` tables
+- [x] Migration 008: add missing AVA regions (`bennett_valley`, `chalk_hill`, `fort_ross_seaview`) found in CSV data
 - [x] Indexes: unique `wineries.slug`, `flights.winery_id`, `winery_varietals.winery_id`, ava_primary, reservation_type, is_active
 - [x] Applied to remote Supabase via `supabase db push`
 
@@ -560,65 +561,65 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 
 ### D5.1 Parser setup
 
-- [ ] Add `exceljs` dependency
-- [ ] Create `scripts/import-wineries.ts` entrypoint
+- [x] ~~Add `exceljs` dependency~~ — not needed; CSVs already exported to `docs/csv/`
+- [x] Create `scripts/import-wineries.ts` entrypoint
 - [ ] Read `scripts/import-config.yml` for exclusions and overrides
 
 ### D5.2 Sheet parsers
 
-- [ ] Parser for "Core Info" sheet → basic winery fields
-- [ ] Parser for "Experiences" sheet → experience flags + accessibility
-- [ ] Parser for "Styles" sheet → style\_\* scores (1-5)
-- [ ] Parser for "Flights" sheet → flight records
-- [ ] Parser for "Varietals" sheet → varietal arrays + signatures
-- [ ] Parser for "Logistics" sheet → hours, pairings, practical info
-- [ ] Parser for "Ratings" sheet → editorial scores + platform ratings
-- [ ] Parser for "Descriptions" sheet → tagline, description, editorial content
-- [ ] Each parser validates headers match expected schema
+- [x] Parser for "Core Info" sheet → basic winery fields
+- [x] Parser for "Experiences" sheet → experience flags + accessibility
+- [x] Parser for "Styles" sheet → style\_\* scores (1-5)
+- [x] Parser for "Flights" sheet → flight records
+- [x] Parser for "Varietals" sheet → varietal arrays + signatures
+- [x] Parser for "Logistics" sheet → hours, pairings, practical info
+- [x] Parser for "Ratings" sheet → editorial scores + platform ratings
+- [x] Parser for "Descriptions" sheet → tagline, description, editorial content _(descriptions are in core-info.csv)_
+- [x] Each parser validates headers match expected schema _(via `scripts/lib/parse-csv.ts` CSV parser + `scripts/lib/validate.ts`)_
 
 ### D5.3 Join & transform
 
-- [ ] Join all sheets by slug into single `WineryImportRecord` per winery
+- [x] Join all sheets by slug into single `WineryImportRecord` per winery
 - [ ] Apply exclusions from config
 - [ ] Apply overrides from config
-- [ ] Compute derived fields: `min_flight_price` (flights ≤$200 only), `max_flight_price`, `has_food_pairing`, varietal arrays, vibe tags
+- [x] Compute derived fields: `min_flight_price` (flights ≤$200 only), `max_flight_price`, `has_food_pairing`, varietal arrays, vibe tags
 
 ### D5.4 Validation gate
 
-- [ ] Required fields: slug, name, lat, lon
-- [ ] Enum validation against defined enums
-- [ ] Coordinate range check (Sonoma County bounding box)
-- [ ] URL format validation (HTTPS)
-- [ ] No duplicate slugs after exclusion/merge
-- [ ] Log warnings for non-fatal issues, errors for fatal ones
+- [x] Required fields: slug, name, lat, lon
+- [x] Enum validation against defined enums _(via `scripts/lib/transforms.ts` mapping functions)_
+- [x] Coordinate range check (Sonoma County bounding box)
+- [x] URL format validation (HTTPS)
+- [x] No duplicate slugs after exclusion/merge
+- [x] Log warnings for non-fatal issues, errors for fatal ones
 
 ### D5.5 Database upsert
 
-- [ ] Single Supabase transaction per import run
-- [ ] UPSERT `wineries` (on conflict slug)
-- [ ] DELETE + INSERT `winery_varietals` for each winery
-- [ ] DELETE + INSERT `flights` for each winery _(safe: `shared_itineraries` stores full snapshot, not flight IDs)_
-- [ ] Record run in `import_runs` with source file SHA-256 hash
+- [x] ~~Single Supabase transaction per import run~~ — sequential upserts with import_runs audit trail
+- [x] UPSERT `wineries` (on conflict slug)
+- [x] DELETE + INSERT `winery_varietals` for each winery
+- [x] DELETE + INSERT `flights` for each winery _(safe: `shared_itineraries` stores full snapshot, not flight IDs)_
+- [x] Record run in `import_runs` with source file SHA-256 hash
 
 ### D5.6 Dry-run mode
 
-- [ ] `--dry-run` flag: parse, validate, compute — but don't write to DB
-- [ ] Print summary: X wineries, Y flights, Z warnings, N errors
-- [ ] Always run dry-run before real import
+- [x] `--dry-run` flag: parse, validate, compute — but don't write to DB
+- [x] Print summary: X wineries, Y flights, Z warnings, N errors
+- [x] Always run dry-run before real import — **verified: 68 wineries, 118 flights, 344 varietals, 0 errors, 0 warnings**
 
 ### D5.7 Post-import verification
 
-- [ ] Automated assertions: winery count = 65-68, flights ≥ 100, zero orphan flights
-- [ ] All 5 AVA regions represented
-- [ ] No null required fields
-- [ ] Print health report to console
+- [x] Automated assertions: winery count = 65-68, flights ≥ 100, zero orphan flights
+- [x] All ~~5~~ 13 AVA regions represented
+- [x] No null required fields
+- [x] Print health report to console
 
 ### D5.8 npm scripts
 
-- [ ] `db:import` — run import against configured Supabase
-- [ ] `db:import:dry` — dry-run mode
+- [x] `db:import` — run import against configured Supabase
+- [x] `db:import:dry` — dry-run mode
 - [ ] `db:reset` — reset local DB + re-import
-- [ ] `db:types` — regenerate TypeScript types from schema
+- [x] ~~`db:types`~~ — already exists as `db:gen-types`
 
 ---
 
