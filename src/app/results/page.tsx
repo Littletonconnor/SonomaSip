@@ -116,12 +116,16 @@ export default function ResultsPage() {
   const isMobile = useIsMobile();
   const [showMap, setShowMap] = useState(false);
 
-  if (!hydrated || isPending || results === null) {
+  if (!hydrated || isPending) {
     return <ResultsSkeleton />;
   }
 
   if (error) {
     return <ErrorState message={error} />;
+  }
+
+  if (results === null) {
+    return <ResultsSkeleton />;
   }
 
   if (results.length === 0) {
@@ -314,7 +318,10 @@ function ResultCard({ result, showBorder }: { result: MatchResult; showBorder: b
         {featureBadges.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {featureBadges.map((badge) => (
-              <span key={badge} className="bg-linen text-oak rounded-full px-3 py-1 text-sm font-medium ring-1 ring-black/5">
+              <span
+                key={badge}
+                className="bg-linen text-oak rounded-full px-3 py-1 text-sm font-medium ring-1 ring-black/5"
+              >
                 {badge}
               </span>
             ))}

@@ -29,10 +29,7 @@ function validateQuizAnswers(answers: unknown): asserts answers is QuizAnswers {
 export async function submitQuiz(answers: QuizAnswers): Promise<MatchResult[]> {
   validateQuizAnswers(answers);
 
-  const [wineries, wineryLookup] = await Promise.all([
-    getWineriesForMatching(),
-    getWineryLookup(),
-  ]);
+  const [wineries, wineryLookup] = await Promise.all([getWineriesForMatching(), getWineryLookup()]);
 
   return recommend(wineries, answers, wineryLookup);
 }
