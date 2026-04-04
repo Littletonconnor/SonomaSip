@@ -92,7 +92,12 @@ export default function WineriesPage() {
     if (filters.features.kidFriendly) results = results.filter((w) => w.isKidFriendly);
     if (filters.features.foodPairing) results = results.filter((w) => w.hasFoodPairing);
     if (filters.features.views) results = results.filter((w) => w.hasViews);
-    if (filters.features.walkIn) results = results.filter((w) => w.reservationType === 'walk-in');
+    if (filters.features.walkIn)
+      results = results.filter(
+        (w) =>
+          w.reservationType === 'walk_ins_welcome' ||
+          w.reservationType === 'reservations_recommended',
+      );
 
     switch (sort) {
       case 'name':
@@ -252,7 +257,7 @@ function FilterPanel({
                 key={r}
                 type="button"
                 onClick={() => toggleRegion(r)}
-                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all focus-visible:outline-2 focus-visible:outline-wine ${
+                className={`focus-visible:outline-wine flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all focus-visible:outline-2 ${
                   active
                     ? 'bg-wine/10 text-wine font-medium'
                     : 'text-stone hover:bg-fog hover:text-bark'
@@ -274,7 +279,7 @@ function FilterPanel({
                 key={f.key}
                 type="button"
                 onClick={() => toggleFeature(f.key)}
-                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all focus-visible:outline-2 focus-visible:outline-wine ${
+                className={`focus-visible:outline-wine flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-all focus-visible:outline-2 ${
                   active
                     ? 'bg-wine/10 text-wine font-medium'
                     : 'text-stone hover:bg-fog hover:text-bark'
@@ -303,8 +308,10 @@ function FilterPanel({
 
 function WineryCard({ winery }: { winery: Winery }) {
   const badges: string[] = [];
-  if (winery.reservationType === 'walk-in') badges.push('Walk-in');
-  if (winery.reservationType === 'appointment') badges.push('Reservation');
+  if (winery.reservationType === 'walk_ins_welcome') badges.push('Walk-in');
+  if (winery.reservationType === 'reservations_recommended')
+    badges.push('Reservations Recommended');
+  if (winery.reservationType === 'appointment_only') badges.push('Appointment');
   if (winery.isMembersOnly) badges.push('Members Only');
   if (winery.isDogFriendly) badges.push('Dog Friendly');
   if (winery.hasFoodPairing) badges.push('Food Pairing');

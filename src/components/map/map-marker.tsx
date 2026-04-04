@@ -25,9 +25,9 @@ export function MapMarker({ item, isSelected, onClick }: MapMarkerProps) {
         type="button"
         aria-label={`${item.label}, #${item.rank ?? ''} match`}
         className={cn(
-          'flex size-7 items-center justify-center rounded-full text-[0.6875rem] font-semibold tabular-nums ring-2 ring-white shadow-warm transition-transform',
+          'shadow-warm flex size-7 items-center justify-center rounded-full text-[0.6875rem] font-semibold tabular-nums ring-2 ring-white transition-transform',
           isSelected
-            ? 'scale-115 bg-wine-dark text-white shadow-warm-lg'
+            ? 'bg-wine-dark shadow-warm-lg scale-115 text-white'
             : 'bg-wine text-white hover:scale-105',
         )}
       >

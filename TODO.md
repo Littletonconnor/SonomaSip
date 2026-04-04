@@ -337,7 +337,27 @@ _Custom-styled Mapbox map that matches the Sonoma palette. Used on results page 
 
 ---
 
-> **NEXT SESSION:** Before starting implementation, discuss the data pipeline (D1–D10) in more detail. Open questions: exact LLM prompts and editorial voice definition, content freshness cadence, admin review UX workflow, how click attribution data feeds into winery partnership outreach, and whether the scrape → enrich pipeline should run on Vercel cron or a separate worker.
+> **Open questions for future sessions:** exact LLM prompts and editorial voice definition, content freshness cadence, admin review UX workflow, how click attribution data feeds into winery partnership outreach, and whether the scrape → enrich pipeline should run on Vercel cron or a separate worker.
+
+### Design decisions resolved (2026-04-04)
+
+These decisions were identified during a schema review and are now codified in `src/lib/types.ts` and `docs/SCORING.md`:
+
+| Decision                                     | Resolution                                                                                                                                                                                                                                        |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Budget band → dollar mapping**             | `$` ≤ $35, `$$` ≤ $65, `$$$` ≤ $100, `$$$$`= no cap. Defined in`SCORING.md` §1.                                                                                                                                                                   |
+| **Style dimension scores**                   | 5 numeric columns (1–5): `styleRelaxed`, `styleAdventurous`, `styleEducational`, `styleCelebratory`, `styleSocial`. Added to `Winery` type as `StyleScores` object. Required for soft scoring.                                                    |
+| **Editorial quality/popularity scores**      | `qualityScore` (1–5, editorial), `popularityScore` (1–5, editorial), `ratingGoogle` (1–5, from Google Places). All nullable. Added to `Winery` type.                                                                                              |
+| **`ReservationType` values**                 | Changed from `walk-in / appointment / members-only` to `walk_ins_welcome / reservations_recommended / appointment_only`. Members-only is a separate boolean (`isMembersOnly`). `reservations_recommended` = walk-ins possible but not guaranteed. |
+| **`FlightFormat` expanded**                  | Added `tour` and `bar` to match actual Excel data. Full set: `seated, standing, picnic, outdoor, tour, bar`.                                                                                                                                      |
+| **Sonoma Coast region**                      | Added as 6th region. If Excel contains Sonoma Coast wineries, they get their own bucket. Quiz and types updated.                                                                                                                                  |
+| **`Setting` field**                          | New enum: `vineyard, estate, downtown, hilltop, cave`. Display-only for V1 (not a scoring dimension). Nullable.                                                                                                                                   |
+| **`primaryVarietal` → `signatureVarietals`** | Changed from single value to array. Allows multiple signature varietals per winery. The normalized `winery_varietals` table uses `is_signature` boolean.                                                                                          |
+| **Walk-in filter behavior**                  | "Walk-in friendly" filter passes both `walk_ins_welcome` and `reservations_recommended` (per `SCORING.md` §3.6).                                                                                                                                  |
+| **Shared itinerary flight ID stability**     | `shared_itineraries.results` JSONB stores full winery+flight data (snapshot), not just IDs. Safe against `DELETE + INSERT` on flights during re-import.                                                                                           |
+| **Click tracking client-side**               | Use `navigator.sendBeacon` or fire-and-forget fetch to avoid blocking the redirect to booking URL.                                                                                                                                                |
+
+---
 
 ## Phase D1 — Schema Design _(can start now, parallel with D2 + D3)_
 
@@ -345,15 +365,15 @@ Design decisions documented here — these drive everything downstream.
 
 **JSONB vs Normalized:**
 
-| Data                     | Decision           | Why                                        |
-| ------------------------ | ------------------ | ------------------------------------------ |
-| Hours                    | JSONB              | Read as unit, never filtered by day        |
-| Varietals                | Normalized table   | Filtered during matching, needs indexes    |
-| Flights                  | Normalized table   | Multiple per winery, aggregated for budget |
-| Style scores             | 6 columns          | Queried individually in scoring formula    |
-| Experience flags         | 16 boolean columns | Each independently filterable as must-have |
-| Import errors            | JSONB              | Variable structure, write-once             |
-| Shared itinerary results | JSONB              | Snapshot, versioned, retrieved by ID only  |
+| Data                     | Decision          | Why                                                                                                           |
+| ------------------------ | ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| Hours                    | JSONB             | Read as unit, never filtered by day                                                                           |
+| Varietals                | Normalized table  | Filtered during matching, needs indexes                                                                       |
+| Flights                  | Normalized table  | Multiple per winery, aggregated for budget                                                                    |
+| Style scores             | 5 columns         | `styleRelaxed`, `styleAdventurous`, `styleEducational`, `styleCelebratory`, `styleSocial` (1–5 each)          |
+| Experience flags         | 6 boolean columns | `isDogFriendly`, `isKidFriendly`, `isWheelchairAccessible`, `hasFoodPairing`, `hasOutdoorSeating`, `hasViews` |
+| Import errors            | JSONB             | Variable structure, write-once                                                                                |
+| Shared itinerary results | JSONB             | Snapshot, versioned, retrieved by ID only                                                                     |
 
 ### D1.1 Column mapping from Excel
 
@@ -364,17 +384,19 @@ Design decisions documented here — these drive everything downstream.
 
 ### D1.2 Enum design
 
-- [ ] `reservation_type`: appointment_only, walk_ins_welcome, reservations_recommended
-- [ ] `noise_level`: quiet, moderate, lively
-- [ ] `flight_format`: seated, standing, tour, outdoor, picnic, bar _(expanded from current types to match actual Excel data)_
-- [ ] `ava_region`: russian_river_valley, dry_creek_valley, alexander_valley, sonoma_valley, sonoma_coast
-- [ ] `setting`: vineyard, estate, downtown, hilltop, cave
+_Values below are locked in `src/lib/types.ts` as of 2026-04-04. DB enums must match._
+
+- [x] `reservation_type`: `walk_ins_welcome`, `reservations_recommended`, `appointment_only` _(updated from old `walk-in / appointment / members-only` — members-only is now a separate boolean)_
+- [x] `noise_level`: `quiet`, `moderate`, `lively`
+- [x] `flight_format`: `seated`, `standing`, `tour`, `outdoor`, `picnic`, `bar` _(expanded to match actual Excel data)_
+- [x] `ava_region`: `russian_river_valley`, `dry_creek_valley`, `alexander_valley`, `sonoma_valley`, `carneros`, `sonoma_coast` _(6 regions, Sonoma Coast added)_
+- [x] `setting`: `vineyard`, `estate`, `downtown`, `hilltop`, `cave` _(display-only for V1)_
 - [ ] Validate each enum against actual Excel values — no mismatches
 
 ### D1.3 ERD & table design
 
-- [ ] `wineries` table: all columns defined with types and constraints
-- [ ] `winery_varietals` join table: `(winery_id, varietal, is_present, is_signature)`
+- [ ] `wineries` table: all columns defined with types and constraints — must include `styleRelaxed..styleSocial` (5 int), `qualityScore`, `popularityScore`, `ratingGoogle`, `setting`, `signatureVarietals` (or use join table `is_signature`)
+- [ ] `winery_varietals` join table: `(winery_id, varietal, is_present, is_signature)` — maps to `signatureVarietals[]` on the app type
 - [ ] `flights` table: `(id, winery_id, name, price, format, includes_food, description)`
 - [ ] `import_runs` table: `(id, started_at, finished_at, source_file_hash, wineries_upserted, flights_upserted, errors_json, warnings_json)`
 - [ ] `shared_itineraries` table: `(id, created_at, quiz_answers jsonb, results jsonb, payload_version)`
@@ -393,7 +415,7 @@ Design decisions documented here — these drive everything downstream.
 
 ### D1.5 TypeScript type reconciliation
 
-- [ ] Reconcile `src/lib/types.ts` (current mock types) with new schema
+- [x] Reconcile `src/lib/types.ts` (current mock types) with new schema — done 2026-04-04: added `StyleScores`, `Setting`, `signatureVarietals`, `qualityScore`, `popularityScore`, `ratingGoogle`; updated `ReservationType`, `FlightFormat`, `Region`
 - [ ] Plan the `WineryForMatching` flat type (pre-joined, all scoring fields, no DB queries in scoring loop)
 - [ ] Plan the `WineryForDisplay` type (what the UI needs)
 - [ ] Decide: generate types from Supabase (`supabase gen types`) or hand-maintain
@@ -446,45 +468,50 @@ Clean the source data BEFORE importing. Garbage in, garbage out.
 
 ## Phase D3 — SCORING.md Spec _(can start now, parallel with D1 + D2)_
 
+_Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style weights, hard filters, soft scoring formula, tie-breakers, explanation templates, and 5 worked example skeletons are defined. Needs validation against real imported data._
+
 ### D3.1 Persona inference
 
-- [ ] Define the quiz answer → persona weight mapping table
-- [ ] Cover all quiz dimensions: occasion, group size, budget, wine knowledge, vibe preference, must-haves
+- [x] Define the quiz answer → persona weight mapping table — see `SCORING.md` §2
+- [x] Cover all quiz dimensions: vibes → style weights, group size → implicit weights, budget → hard filter + soft score
 
 ### D3.2 Hard filters
 
-- [ ] Document all must-have filters (eliminates wineries entirely)
-- [ ] Varietals: "must have Pinot Noir" → winery must have it
-- [ ] Budget: only consider flights ≤ budget cap (≤$200 per PRD)
-- [ ] Walk-in-only: filter by `reservation_type`
-- [ ] Members-only: exclude by default unless explicitly chosen
-- [ ] Accessibility: dog-friendly, kid-friendly, wheelchair-accessible
+- [x] Document all must-have filters — see `SCORING.md` §3
+- [x] Varietals: OR logic (winery must have at least one selected varietal)
+- [x] Budget: `minFlightPrice ≤ maxBudget` (flights ≤$200 only for min price calc)
+- [x] Walk-in-only: passes `walk_ins_welcome` OR `reservations_recommended`
+- [x] Members-only: exclude by default; -10 point penalty if included via override
+- [x] Accessibility: dog-friendly, kid-friendly, wheelchair-accessible
+- [x] Region filter: OR logic on selected regions
+- [x] Group size: hard filter when groupSize ≥ 8
 
 ### D3.3 Soft scoring
 
-- [ ] Define the weighted scoring formula
-- [ ] Style dimension scoring: quiz vibe → style\_\* column weights
-- [ ] Experience bonus: quiz must-haves that are nice-to-haves (not hard filters)
-- [ ] Budget proximity: closer to target = higher score
-- [ ] Rating blend: how to combine `quality_score`, `popularity_score`, `rating_google`
-- [ ] Normalize scores to 0–100 range
+- [x] Define the weighted scoring formula — see `SCORING.md` §4
+- [x] Style dimension scoring: quiz vibe → style\_\* column weights (40 pts)
+- [x] Experience bonus: matched must-haves + amenity count (20 pts)
+- [x] Budget proximity: sweet spot at 70% of budget ceiling (20 pts)
+- [x] Rating blend: 0.4 × qualityScore + 0.3 × popularityScore + 0.3 × ratingGoogle (15 pts)
+- [x] Normalize scores to 0–100 range
 
 ### D3.4 Tie-breakers & diversity
 
-- [ ] Tie-breaking rule (alphabetical? random seed?)
-- [ ] Geographic diversity: don't return 5 wineries on the same road
-- [ ] AVA diversity: try to spread across regions
+- [x] Tie-breaking rule: qualityScore → ratingGoogle → alphabetical (deterministic)
+- [x] Geographic diversity: demote 3rd+ winery from same region in top 5
+- [x] AVA diversity: top 5 should represent ≥3 different regions when possible
 
 ### D3.5 Explanation templates
 
-- [ ] Define the "why we picked this" template per winery
-- [ ] Map each scoring dimension to a human-readable reason
-- [ ] Examples: "Great for your group because it's family-friendly with outdoor seating"
+- [x] Define the "why we picked this" template per winery — see `SCORING.md` §6
+- [x] Map each scoring dimension to a human-readable reason (16 templates)
+- [x] Selection rule: top 3–5 by relevance, prioritize must-have matches
 
 ### D3.6 Worked examples
 
-- [ ] ≥5 complete examples: quiz input → filter results → scoring → top 5 + reasons
-- [ ] Cover edge cases: very restrictive filters (few results), very broad (many ties)
+- [x] ≥5 complete examples: quiz input → expected filter behavior → scoring notes — see `SCORING.md` §7
+- [x] Cover edge cases: very restrictive (example 4), very broad (example 5)
+- [ ] Fill in expected top-5 slugs after real data import (TBD in D6.7)
 - [ ] These become golden test files for Phase D6
 
 ---
@@ -565,7 +592,7 @@ Clean the source data BEFORE importing. Garbage in, garbage out.
 - [ ] Single Supabase transaction per import run
 - [ ] UPSERT `wineries` (on conflict slug)
 - [ ] DELETE + INSERT `winery_varietals` for each winery
-- [ ] DELETE + INSERT `flights` for each winery
+- [ ] DELETE + INSERT `flights` for each winery _(safe: `shared_itineraries` stores full snapshot, not flight IDs)_
 - [ ] Record run in `import_runs` with source file SHA-256 hash
 
 ### D5.6 Dry-run mode
@@ -827,7 +854,7 @@ _Track every "Book a Tasting" click. This is how you prove value to wineries and
 
 - [ ] `click_events` table: `(id, winery_id, source_page, booking_url, clicked_at, session_id, user_agent)`
 - [ ] Server action: `trackBookingClick(wineryId, sourcePage)` — fires on "Book a Tasting" click
-- [ ] Client-side: intercept booking link clicks, fire server action, then redirect to booking URL
+- [ ] Client-side: intercept booking link clicks, fire `navigator.sendBeacon` (non-blocking), then redirect to booking URL
 - [ ] Append `?ref=sonomasip` (or UTM params) to all outbound booking URLs
 
 ### D10.2 Wire into existing pages
@@ -1100,13 +1127,14 @@ Then your PostHog sink and Axiom sink both get the sampled stream — errors alw
 
 ## Changelog (this file)
 
-| Date       | Change                                                                                     |
-| ---------- | ------------------------------------------------------------------------------------------ |
-| 2026-04-02 | First engineering backlog                                                                  |
-| 2026-04-02 | Locked Q1–Q14 implementation targets                                                       |
-| 2026-04-02 | Split product doc to `docs/PRD.md`; moved data to `docs/`; TODO is technical-only          |
-| 2026-04-02 | Phase 9.2 AI roadmap; PRD §14 + README deterministic-first note                            |
-| 2026-04-02 | Restructured to UI-first approach: Phase 3.5 (mock data prototype) before backend phases   |
-| 2026-04-02 | Added shadcn/ui docs references                                                            |
-| 2026-04-03 | Replaced vague data phases (0.6-5) with granular D1-D7 pipeline plan + authority hierarchy |
-| 2026-04-03 | Added D8 (content pipeline: Cloudflare scrape → LLM enrichment), D9 (admin pages), D10 (click attribution) |
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                     |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-04-02 | First engineering backlog                                                                                                                                                                                                                                                                                                                                  |
+| 2026-04-02 | Locked Q1–Q14 implementation targets                                                                                                                                                                                                                                                                                                                       |
+| 2026-04-02 | Split product doc to `docs/PRD.md`; moved data to `docs/`; TODO is technical-only                                                                                                                                                                                                                                                                          |
+| 2026-04-02 | Phase 9.2 AI roadmap; PRD §14 + README deterministic-first note                                                                                                                                                                                                                                                                                            |
+| 2026-04-02 | Restructured to UI-first approach: Phase 3.5 (mock data prototype) before backend phases                                                                                                                                                                                                                                                                   |
+| 2026-04-02 | Added shadcn/ui docs references                                                                                                                                                                                                                                                                                                                            |
+| 2026-04-03 | Replaced vague data phases (0.6-5) with granular D1-D7 pipeline plan + authority hierarchy                                                                                                                                                                                                                                                                 |
+| 2026-04-03 | Added D8 (content pipeline: Cloudflare scrape → LLM enrichment), D9 (admin pages), D10 (click attribution)                                                                                                                                                                                                                                                 |
+| 2026-04-04 | Schema review: resolved 11 design gaps. Updated types.ts (StyleScores, Setting, signatureVarietals, expanded enums, Sonoma Coast). Full SCORING.md spec (budget bands, style weights, filters, scoring formula, tie-breakers, 5 worked examples). Updated mock data + all page references. Marked D1.2 enums + D1.5 type reconciliation + D3 spec as done. |

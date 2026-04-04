@@ -144,13 +144,17 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
 function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: boolean }) {
   const { winery, rank, score, matchReasons } = result;
   const badges: string[] = [];
-  if (winery.reservationType === 'walk-in') badges.push('Walk-in');
-  if (winery.reservationType === 'appointment') badges.push('Reservation required');
+  if (winery.reservationType === 'walk_ins_welcome') badges.push('Walk-in');
+  if (winery.reservationType === 'reservations_recommended')
+    badges.push('Reservations Recommended');
+  if (winery.reservationType === 'appointment_only') badges.push('Appointment required');
   if (winery.isDogFriendly) badges.push('Dog Friendly');
   if (winery.hasFoodPairing) badges.push('Food Pairing');
 
   return (
-    <div className={`rounded-xl py-6 transition-colors hover:bg-linen/50 sm:py-8 ${showBorder ? 'border-t border-black/5' : ''}`}>
+    <div
+      className={`hover:bg-linen/50 rounded-xl py-6 transition-colors sm:py-8 ${showBorder ? 'border-t border-black/5' : ''}`}
+    >
       <div className="flex items-start gap-5 px-2">
         <div className="bg-gold/20 font-heading text-bark flex size-10 shrink-0 items-center justify-center rounded-full text-lg font-medium tabular-nums">
           {rank}

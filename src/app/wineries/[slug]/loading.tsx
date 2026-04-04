@@ -54,7 +54,7 @@ export default function WineryDetailLoading() {
               <Skeleton className="h-6 w-24 rounded" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="rounded-xl bg-card p-5 ring-1 ring-black/5">
+                  <div key={i} className="bg-card rounded-xl p-5 ring-1 ring-black/5">
                     <Skeleton className="h-5 w-32 rounded" />
                     <Skeleton className="mt-2 h-4 w-full" />
                     <Skeleton className="mt-1 h-4 w-2/3" />

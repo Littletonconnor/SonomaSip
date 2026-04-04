@@ -21,11 +21,7 @@ type SonomaMapProps = {
   showLegend?: boolean;
 };
 
-export default function SonomaMap({
-  items,
-  className,
-  showLegend = false,
-}: SonomaMapProps) {
+export default function SonomaMap({ items, className, showLegend = false }: SonomaMapProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -113,9 +109,7 @@ export default function SonomaMap({
                 onClick={handleMarkerClick}
               />
             ))}
-            {selectedItem && (
-              <MapPopup item={selectedItem} onClose={() => setSelectedId(null)} />
-            )}
+            {selectedItem && <MapPopup item={selectedItem} onClose={() => setSelectedId(null)} />}
           </Map>
         ) : (
           <MapSkeleton />
@@ -131,10 +125,10 @@ export default function SonomaMap({
 
 function MapSkeleton({ message }: { message?: string }) {
   return (
-    <div className="flex aspect-[4/3] items-center justify-center bg-linear-to-br from-sage/10 via-linen to-gold/10">
+    <div className="from-sage/10 via-linen to-gold/10 flex aspect-[4/3] items-center justify-center bg-linear-to-br">
       <div className="text-center">
-        <MapPin className="mx-auto size-8 animate-pulse text-stone/20" />
-        <p className="mt-2 text-sm font-medium text-stone/40">{message ?? 'Loading map…'}</p>
+        <MapPin className="text-stone/20 mx-auto size-8 animate-pulse" />
+        <p className="text-stone/40 mt-2 text-sm font-medium">{message ?? 'Loading map…'}</p>
       </div>
     </div>
   );
@@ -164,15 +158,13 @@ function MapLegend({
           <span
             className={cn(
               'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums',
-              selectedId === item.id
-                ? 'bg-wine text-primary-foreground'
-                : 'bg-wine/10 text-wine',
+              selectedId === item.id ? 'bg-wine text-primary-foreground' : 'bg-wine/10 text-wine',
             )}
           >
             {item.rank ?? '·'}
           </span>
           <span className="truncate font-medium">{item.label}</span>
-          <span className="ml-auto shrink-0 text-xs text-stone">{item.region}</span>
+          <span className="text-stone ml-auto shrink-0 text-xs">{item.region}</span>
         </button>
       ))}
     </div>
