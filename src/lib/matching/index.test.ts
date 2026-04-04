@@ -123,18 +123,11 @@ describe('recommend', () => {
     expect(results[2].rank).toBe(3);
   });
 
-  it('returns fewer results if not enough pass filters', () => {
-    const wineries = [
-      makeWinery('a', { varietals: ['Pinot Noir'] }),
-      makeWinery('b', { varietals: ['Zinfandel'] }),
-    ];
+  it('returns fewer results if not enough wineries exist', () => {
+    const wineries = [makeWinery('a'), makeWinery('b')];
     const lookup = buildLookup(wineries);
-    const results = recommend(
-      wineries,
-      makeAnswers({ selectedVarietals: ['Pinot Noir'], numStops: 5 }),
-      lookup,
-    );
-    expect(results).toHaveLength(1);
+    const results = recommend(wineries, makeAnswers({ numStops: 5 }), lookup);
+    expect(results).toHaveLength(2);
   });
 
   it('produces deterministic results for same input', () => {
@@ -220,10 +213,11 @@ describe('recommend', () => {
     expect(results).toHaveLength(2);
   });
 
-  it('returns empty array when all wineries filtered out', () => {
+  it('relaxes filters when strict filtering returns no results', () => {
     const wineries = [makeWinery('a', { varietals: ['Syrah'] })];
     const lookup = buildLookup(wineries);
     const results = recommend(wineries, makeAnswers({ selectedVarietals: ['Pinot Noir'] }), lookup);
-    expect(results).toEqual([]);
+    expect(results).toHaveLength(1);
+    expect(results[0].filtersRelaxed).toContain('varietal');
   });
 });

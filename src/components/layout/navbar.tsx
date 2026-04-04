@@ -13,32 +13,36 @@ const navLinks = [
 
 export function WineGlassLogo({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 32" fill="none" className={className} aria-hidden="true">
+    <svg viewBox="0 0 20 28" fill="none" className={className} aria-hidden="true">
       <path
-        d="M5.5 1h13l-1.5 12c-.3 2.5-2.2 4.5-5 5-2.8-.5-4.7-2.5-5-5L5.5 1z"
+        d="M7 1.5 C7 1.5 5.2 6.5 5.2 9.5 C5.2 13.5 7.5 16 10 16.5 C12.5 16 14.8 13.5 14.8 9.5 C14.8 6.5 13 1.5 13 1.5"
         className="stroke-wine"
         strokeWidth="1.2"
+        strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M8 5.5c2 1.2 5.5 1.2 8 0"
+        d="M7.2 6C8.5 7 11.5 7 12.8 6"
         className="stroke-gold"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+      <line
+        x1="10"
+        y1="16.5"
+        x2="10"
+        y2="23.5"
+        className="stroke-wine"
         strokeWidth="1.2"
         strokeLinecap="round"
       />
       <line
-        x1="12"
-        y1="18"
-        x2="12"
-        y2="26"
+        x1="6.5"
+        y1="25"
+        x2="13.5"
+        y2="25"
         className="stroke-wine"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M7.5 26c0 0 2-1 4.5-1s4.5 1 4.5 1"
-        className="stroke-wine"
-        strokeWidth="1.2"
+        strokeWidth="1.3"
         strokeLinecap="round"
       />
     </svg>
@@ -64,8 +68,8 @@ export function Navbar() {
         )}
       >
         <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-          <Link href="/" aria-label="Homepage" className="flex items-center gap-2.5">
-            <WineGlassLogo className="h-7 w-auto" />
+          <Link href="/" aria-label="Homepage" className="flex items-center gap-1.5">
+            <WineGlassLogo className="h-6 w-auto" />
             <span className="font-heading text-bark text-lg font-medium tracking-wide">
               Sonoma Sip
             </span>

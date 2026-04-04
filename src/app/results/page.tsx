@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import {
@@ -19,7 +19,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import { useSessionStorage } from '@/hooks/use-session-storage';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { mockResultsCasualCouple } from '@/lib/mock-data';
+import { submitQuiz } from '@/lib/actions/quiz';
 import type { MapItem } from '@/components/map/types';
 import type { QuizAnswers, MatchResult, MustHaves } from '@/lib/types';
 
@@ -54,7 +54,22 @@ const MUST_HAVE_LABELS: Record<keyof MustHaves, string> = {
 
 export default function ResultsPage() {
   const [answers, , { hydrated }] = useSessionStorage<QuizAnswers>('quiz-answers', defaultAnswers);
-  const results = mockResultsCasualCouple;
+  const [results, setResults] = useState<MatchResult[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    startTransition(async () => {
+      try {
+        const data = await submitQuiz(answers);
+        setResults(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Something went wrong');
+      }
+    });
+  }, [hydrated, answers]);
 
   const hasAnswers = useMemo(() => {
     if (!hydrated) return false;
@@ -83,7 +98,7 @@ export default function ResultsPage() {
 
   const mapItems: MapItem[] = useMemo(
     () =>
-      results.map((r) => ({
+      (results ?? []).map((r) => ({
         id: r.winery.id,
         latitude: r.winery.latitude,
         longitude: r.winery.longitude,
@@ -101,8 +116,12 @@ export default function ResultsPage() {
   const isMobile = useIsMobile();
   const [showMap, setShowMap] = useState(false);
 
-  if (!hydrated) {
-    return <div className="min-h-[calc(100dvh-3.5rem)]" />;
+  if (!hydrated || isPending || results === null) {
+    return <ResultsSkeleton />;
+  }
+
+  if (error) {
+    return <ErrorState message={error} />;
   }
 
   if (results.length === 0) {
@@ -286,7 +305,7 @@ function ResultCard({ result, showBorder }: { result: MatchResult; showBorder: b
         <ul className="mt-3 flex flex-col gap-1" role="list">
           {matchReasons.map((reason) => (
             <li key={reason} className="text-stone flex items-start gap-2 text-sm text-pretty">
-              <Check className="text-sage mt-0.5 size-3.5 shrink-0" />
+              <Check className="text-wine mt-0.5 size-3.5 shrink-0" />
               {reason}
             </li>
           ))}
@@ -295,7 +314,7 @@ function ResultCard({ result, showBorder }: { result: MatchResult; showBorder: b
         {featureBadges.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {featureBadges.map((badge) => (
-              <span key={badge} className="bg-fog/80 text-stone rounded-full px-2 py-0.5 text-xs">
+              <span key={badge} className="bg-linen text-oak rounded-full px-3 py-1 text-sm font-medium ring-1 ring-black/5">
                 {badge}
               </span>
             ))}
@@ -303,6 +322,59 @@ function ResultCard({ result, showBorder }: { result: MatchResult; showBorder: b
         )}
       </div>
     </Link>
+  );
+}
+
+function ResultsSkeleton() {
+  return (
+    <div className="min-h-[calc(100dvh-3.5rem)]">
+      <div className="border-b border-black/5">
+        <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
+          <div className="bg-fog/60 h-9 w-72 animate-pulse rounded-lg" />
+          <div className="bg-fog/40 mt-3 h-5 w-56 animate-pulse rounded-lg" />
+        </div>
+      </div>
+      <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
+        <div className="gap-12 lg:grid lg:grid-cols-[3fr_2fr]">
+          <div className="flex flex-col gap-7">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className={`flex gap-5 py-7 ${i > 0 ? 'border-t border-black/5' : ''}`}>
+                <div className="bg-fog/40 size-16 animate-pulse rounded-full sm:size-20" />
+                <div className="flex-1 space-y-3">
+                  <div className="bg-fog/40 h-4 w-20 animate-pulse rounded" />
+                  <div className="bg-fog/60 h-7 w-48 animate-pulse rounded" />
+                  <div className="bg-fog/40 h-4 w-64 animate-pulse rounded" />
+                  <div className="space-y-2 pt-1">
+                    <div className="bg-fog/30 h-4 w-56 animate-pulse rounded" />
+                    <div className="bg-fog/30 h-4 w-48 animate-pulse rounded" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="max-lg:hidden">
+            <div className="bg-fog/30 h-80 animate-pulse rounded-xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ErrorState({ message }: { message: string }) {
+  return (
+    <div className="flex min-h-[calc(100dvh-3.5rem)] flex-col items-center justify-center px-6 py-24">
+      <div className="bg-fog flex size-16 items-center justify-center rounded-full">
+        <Search className="text-stone size-7" />
+      </div>
+      <h1 className="font-heading text-bark mt-6 text-2xl font-medium tracking-tight">
+        Something went wrong
+      </h1>
+      <p className="text-stone mt-2 max-w-sm text-center text-sm text-pretty">{message}</p>
+      <Button className="mt-8 rounded-full px-8" asChild>
+        <Link href="/quiz">Retake the Quiz</Link>
+      </Button>
+    </div>
   );
 }
 

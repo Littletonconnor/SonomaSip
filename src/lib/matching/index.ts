@@ -1,5 +1,5 @@
 import type { MatchResult, QuizAnswers, Winery, WineryForMatching } from '../types';
-import { applyHardFilters } from './filters';
+import { applyFiltersWithRelaxation } from './filters';
 import { generateReasons } from './explain';
 import { computeUserWeights, scoreWinery } from './score';
 
@@ -71,7 +71,7 @@ export function recommend(
 ): MatchResult[] {
   const topN = options.topN ?? answers.numStops;
 
-  const filtered = applyHardFilters(wineries, answers);
+  const { filtered, relaxed } = applyFiltersWithRelaxation(wineries, answers, topN);
   const userWeights = computeUserWeights(answers);
 
   const scored: ScoredEntry[] = filtered.map((w) => {
@@ -94,6 +94,7 @@ export function recommend(
       rank: i + 1,
       score: entry.score,
       matchReasons: entry.reasons,
+      ...(relaxed.length > 0 ? { filtersRelaxed: relaxed } : {}),
     });
   }
 

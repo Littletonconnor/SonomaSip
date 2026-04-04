@@ -19,23 +19,23 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedSection } from '@/components/ui/animated-section';
-import { mockWineries } from '@/lib/mock-data';
-import type { Winery, Flight } from '@/lib/types';
+import { getWineryBySlug, getAllWinerySlugs, getAllWineriesForBrowse } from '@/lib/data/wineries';
+import type { WineryForDisplay, Flight } from '@/lib/types';
 
-export function generateStaticParams() {
-  return mockWineries.map((w) => ({ slug: w.slug }));
-}
+export const revalidate = 3600;
 
-async function getWinery(slug: string): Promise<Winery | undefined> {
-  return mockWineries.find((w) => w.slug === slug);
+export async function generateStaticParams() {
+  const slugs = await getAllWinerySlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export default async function WineryDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const winery = await getWinery(slug);
+  const winery = await getWineryBySlug(slug);
   if (!winery) notFound();
 
-  const relatedWineries = mockWineries
+  const allWineries = await getAllWineriesForBrowse();
+  const relatedWineries = allWineries
     .filter((w) => w.id !== winery.id && w.region === winery.region)
     .slice(0, 3);
 
