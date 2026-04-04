@@ -3,13 +3,16 @@ export type Region =
   | 'Dry Creek Valley'
   | 'Sonoma Valley'
   | 'Alexander Valley'
-  | 'Carneros';
+  | 'Carneros'
+  | 'Sonoma Coast';
 
-export type ReservationType = 'walk-in' | 'appointment' | 'members-only';
+export type ReservationType = 'walk_ins_welcome' | 'reservations_recommended' | 'appointment_only';
 
 export type NoiseLevel = 'quiet' | 'moderate' | 'lively';
 
-export type FlightFormat = 'seated' | 'standing' | 'picnic' | 'outdoor';
+export type FlightFormat = 'seated' | 'standing' | 'picnic' | 'outdoor' | 'tour' | 'bar';
+
+export type Setting = 'vineyard' | 'estate' | 'downtown' | 'hilltop' | 'cave';
 
 export type BudgetBand = '$' | '$$' | '$$$' | '$$$$';
 
@@ -58,6 +61,14 @@ export type Flight = {
   description: string;
 };
 
+export type StyleScores = {
+  styleRelaxed: number;
+  styleAdventurous: number;
+  styleEducational: number;
+  styleCelebratory: number;
+  styleSocial: number;
+};
+
 export type Winery = {
   id: string;
   slug: string;
@@ -68,15 +79,17 @@ export type Winery = {
   city: string;
   latitude: number;
   longitude: number;
+  setting: Setting | null;
   hours: WeeklyHours;
   reservationType: ReservationType;
   bookingUrl: string;
   groupSizeMax: number | null;
   parking: string;
   varietals: Varietal[];
-  primaryVarietal: Varietal;
+  signatureVarietals: Varietal[];
   vibes: Vibe[];
   noiseLevel: NoiseLevel;
+  styleScores: StyleScores;
   minFlightPrice: number;
   maxFlightPrice: number;
   flights: Flight[];
@@ -89,6 +102,9 @@ export type Winery = {
   isMembersOnly: boolean;
   averageRating: number | null;
   ratingsCount: number | null;
+  qualityScore: number | null;
+  popularityScore: number | null;
+  ratingGoogle: number | null;
 };
 
 export type MustHaves = {

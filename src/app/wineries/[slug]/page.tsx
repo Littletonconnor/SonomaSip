@@ -65,11 +65,11 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
       icon: Calendar,
       label: 'Reservations',
       value:
-        winery.reservationType === 'walk-in'
-          ? 'Walk-in welcome'
-          : winery.reservationType === 'appointment'
-            ? 'Appointment required'
-            : 'Members only',
+        winery.reservationType === 'walk_ins_welcome'
+          ? 'Walk-ins welcome'
+          : winery.reservationType === 'reservations_recommended'
+            ? 'Reservations recommended'
+            : 'Appointment required',
     },
   ];
 

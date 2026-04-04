@@ -3,7 +3,16 @@
 import { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { Share2, Printer, Mail, ChevronDown, Star, Search, Check, Map as MapIcon } from 'lucide-react';
+import {
+  Share2,
+  Printer,
+  Mail,
+  ChevronDown,
+  Star,
+  Search,
+  Check,
+  Map as MapIcon,
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -222,8 +231,10 @@ function ResultCard({ result, showBorder }: { result: MatchResult; showBorder: b
   const { winery, rank, score, matchReasons } = result;
 
   const featureBadges: string[] = [];
-  if (winery.reservationType === 'walk-in') featureBadges.push('Walk-in');
-  if (winery.reservationType === 'appointment') featureBadges.push('Reservation');
+  if (winery.reservationType === 'walk_ins_welcome') featureBadges.push('Walk-in');
+  if (winery.reservationType === 'reservations_recommended')
+    featureBadges.push('Reservations Recommended');
+  if (winery.reservationType === 'appointment_only') featureBadges.push('Appointment');
   if (winery.isMembersOnly) featureBadges.push('Members Only');
   if (winery.isDogFriendly) featureBadges.push('Dog Friendly');
   if (winery.isKidFriendly) featureBadges.push('Kid Friendly');
