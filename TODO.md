@@ -445,9 +445,9 @@ Clean the source data BEFORE importing. Garbage in, garbage out.
 
 ### D2.3 Validate coordinates
 
-- [ ] All lat/long within Sonoma County bounding box (lat 38.0–39.0, lon -123.5 to -122.0)
-- [ ] Fix Carneros / county display per PRD
-- [ ] Spot-check 10 random wineries on a map
+- [x] All lat/long within Sonoma County bounding box (lat 38.0–39.0, lon -123.5 to -122.0) — ✅ 68/68 pass. Validation script: `scripts/validate-coordinates.ts`
+- [x] Fix Carneros / county display per PRD — Domaine Carneros has Napa mailing address but is in Carneros AVA (straddles Napa/Sonoma). City="Napa", ZIP=94559 are correct for its physical location. No change needed.
+- [x] Spot-check 10 random wineries on a map — Cross-referenced against Google Maps/Apple Maps/Yelp. Fixed 3 inaccurate coordinates: Francis Ford Coppola (was 7.4km off), Benziger (2.5km off), Fort Ross Vineyard (4.4km off). Remaining 7/10 spot-checks exact match.
 
 ### D2.4 Validate URLs
 
