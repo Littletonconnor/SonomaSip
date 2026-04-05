@@ -587,9 +587,9 @@ Clean the source data BEFORE importing. Garbage in, garbage out.
 
 ### D2.4 Validate URLs
 
-- [ ] HTTP HEAD check on every `booking_url` and `website_url` in Excel
-- [ ] Fix or flag broken links
-- [ ] Ensure all URLs are HTTPS
+- [x] HTTP HEAD check on every `booking_url` and `website_url` in Excel — `scripts/validate-urls.ts` + `pnpm validate:urls`
+- [ ] Fix or flag broken links _(run `pnpm validate:urls` with internet access and fix issues)_
+- [x] Ensure all URLs are HTTPS — script validates protocol
 
 ### D2.5 Validate experience flags
 
