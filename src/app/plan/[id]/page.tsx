@@ -1,18 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { Printer, Mail, Link2, Star, ExternalLink, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import { PlanMap } from './plan-map';
-import { mockResultsCasualCouple } from '@/lib/mock-data';
+import { getSharedItinerary } from '@/lib/data/shared-itineraries';
 import type { MapItem } from '@/components/map/types';
-import type { MatchResult } from '@/lib/types';
+import type { MatchResult, MustHaves } from '@/lib/types';
 
-const MOCK_PLAN = {
-  id: 'abc123',
-  createdAt: '2026-04-02',
-  preferences: ['Pinot Noir', 'Zinfandel', 'Relaxed & Scenic', '$$', 'Dog Friendly', 'Views'],
-  results: mockResultsCasualCouple,
+const MUST_HAVE_LABELS: Record<keyof MustHaves, string> = {
+  views: 'Views',
+  foodPairing: 'Food Pairing',
+  outdoorSeating: 'Outdoor Seating',
+  dogFriendly: 'Dog Friendly',
+  kidFriendly: 'Kid Friendly',
+  wheelchairAccessible: 'Accessible',
 };
 
 function formatDate(dateStr: string) {
@@ -24,8 +27,18 @@ function formatDate(dateStr: string) {
   });
 }
 
-function getPlan(_id: string) {
-  return MOCK_PLAN;
+function buildPreferenceBadges(plan: Awaited<ReturnType<typeof getSharedItinerary>>): string[] {
+  if (!plan) return [];
+  const badges: string[] = [];
+  const { quizAnswers } = plan;
+  quizAnswers.selectedVarietals.forEach((v) => badges.push(v));
+  quizAnswers.selectedVibes.forEach((v) => badges.push(v));
+  if (quizAnswers.budgetBand) badges.push(quizAnswers.budgetBand);
+  quizAnswers.preferredRegions.forEach((r) => badges.push(r));
+  Object.entries(quizAnswers.mustHaves).forEach(([key, val]) => {
+    if (val) badges.push(MUST_HAVE_LABELS[key as keyof MustHaves]);
+  });
+  return badges;
 }
 
 export async function generateMetadata({
@@ -34,7 +47,12 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const plan = getPlan(id);
+  const plan = await getSharedItinerary(id);
+
+  if (!plan) {
+    return { title: 'Plan Not Found — Sonoma Sip' };
+  }
+
   const wineryNames = plan.results.map((r) => r.winery.name);
   const description = `A ${plan.results.length}-stop Sonoma County wine day: ${wineryNames.join(', ')}. Curated by Sonoma Sip.`;
 
@@ -57,7 +75,11 @@ export async function generateMetadata({
 
 export default async function SharedPlanPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const plan = MOCK_PLAN;
+  const plan = await getSharedItinerary(id);
+
+  if (!plan) notFound();
+
+  const preferences = buildPreferenceBadges(plan);
 
   const mapItems: MapItem[] = plan.results.map((r) => ({
     id: r.winery.id,
@@ -85,19 +107,21 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
               {plan.results.length} stops &middot; Generated {formatDate(plan.createdAt)}
             </p>
 
-            <div className="mt-6">
-              <p className="text-bark text-sm font-medium">Preferences</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {plan.preferences.map((p) => (
-                  <span
-                    key={p}
-                    className="bg-linen text-oak rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-black/5"
-                  >
-                    {p}
-                  </span>
-                ))}
+            {preferences.length > 0 && (
+              <div className="mt-6">
+                <p className="text-bark text-sm font-medium">Preferences</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {preferences.map((p) => (
+                    <span
+                      key={p}
+                      className="bg-linen text-oak rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-black/5"
+                    >
+                      {p}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="mt-8 flex flex-wrap gap-2">
               <Button variant="outline" size="sm" className="gap-1.5">
@@ -142,7 +166,7 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
 }
 
 function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: boolean }) {
-  const { winery, rank, score, matchReasons } = result;
+  const { winery, rank, matchReasons } = result;
   const badges: string[] = [];
   if (winery.reservationType === 'walk_ins_welcome') badges.push('Walk-in');
   if (winery.reservationType === 'reservations_recommended')

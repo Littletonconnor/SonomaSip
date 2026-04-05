@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import {
@@ -12,14 +12,16 @@ import {
   Search,
   Check,
   Map as MapIcon,
+  Loader2,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import { useSessionStorage } from '@/hooks/use-session-storage';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { submitQuiz } from '@/lib/actions/quiz';
+import { submitQuiz, shareItinerary } from '@/lib/actions/quiz';
 import type { MapItem } from '@/components/map/types';
 import type { QuizAnswers, MatchResult, MustHaves } from '@/lib/types';
 
@@ -113,6 +115,38 @@ export default function ResultsPage() {
     [results],
   );
 
+  const [isSharing, startSharing] = useTransition();
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+
+  const handleShare = useCallback(() => {
+    if (!results || results.length === 0) return;
+    startSharing(async () => {
+      try {
+        const { id } = await shareItinerary(answers, results);
+        const url = `${window.location.origin}/plan/${id}`;
+        setShareUrl(url);
+        await navigator.clipboard.writeText(url);
+        toast.success('Link copied to clipboard');
+      } catch {
+        toast.error('Failed to create share link');
+      }
+    });
+  }, [answers, results]);
+
+  const handlePrint = useCallback(() => {
+    window.print();
+  }, []);
+
+  const handleEmail = useCallback(() => {
+    const subject = encodeURIComponent('My Sonoma Sip Wine Day Itinerary');
+    const body = encodeURIComponent(
+      shareUrl
+        ? `Check out my wine day plan: ${shareUrl}`
+        : `Check out my wine day recommendations on Sonoma Sip!`,
+    );
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }, [shareUrl]);
+
   const isMobile = useIsMobile();
   const [showMap, setShowMap] = useState(false);
 
@@ -147,15 +181,25 @@ export default function ResultsPage() {
                 </p>
               </div>
               <div className="flex shrink-0 gap-2">
-                <Button variant="outline" size="sm" className="gap-1.5">
-                  <Share2 className="size-3.5" />
-                  Share
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={handleShare}
+                  disabled={isSharing}
+                >
+                  {isSharing ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <Share2 className="size-3.5" />
+                  )}
+                  {isSharing ? 'Sharing…' : 'Share'}
                 </Button>
-                <Button variant="outline" size="sm" className="gap-1.5">
+                <Button variant="outline" size="sm" className="gap-1.5" onClick={handlePrint}>
                   <Printer className="size-3.5" />
                   Print
                 </Button>
-                <Button variant="outline" size="sm" className="gap-1.5">
+                <Button variant="outline" size="sm" className="gap-1.5" onClick={handleEmail}>
                   <Mail className="size-3.5" />
                   Email
                 </Button>

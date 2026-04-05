@@ -369,9 +369,9 @@ _The empty state, error state, loading skeleton, and overall results UI need a q
 
 #### Header & actions
 
-- [ ] Functional Share button: copy share URL to clipboard with toast confirmation
-- [ ] Functional Print button: trigger `window.print()` with a print-optimized stylesheet
-- [ ] Functional Email button: open mailto with pre-filled subject and share URL
+- [x] Functional Share button: copy share URL to clipboard with toast confirmation
+- [x] Functional Print button: trigger `window.print()` with a print-optimized stylesheet
+- [x] Functional Email button: open mailto with pre-filled subject and share URL
 - [ ] Results count copy: make it warmer (e.g., "We found 12 wineries you'll love" instead of "12 wineries matched your preferences")
 
 #### Map integration
@@ -855,13 +855,13 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 
 ### D7.6 Share flow
 
-- [ ] Insert `shared_itineraries` → Supabase on share create
-- [ ] Load shared itinerary by ID on share page
+- [x] Insert `shared_itineraries` → Supabase on share create
+- [x] Load shared itinerary by ID on share page
 - [ ] Rate limit share creation by IP
 
 ### D7.7 Plan page
 
-- [ ] Wire up plan/itinerary page to real data
+- [x] Wire up plan/itinerary page to real data
 - [ ] PDF: text-first print route / CSS; v2: Mapbox Static image
 - [ ] Email: send via Resend/Postmark with share URL + summary
 
@@ -1300,7 +1300,7 @@ Then your PostHog sink and Axiom sink both get the sampled stream — errors alw
 | 2026-04-03 | Added D8 (content pipeline: Cloudflare scrape → LLM enrichment), D9 (admin pages), D10 (click attribution)                                                                                                                                                                                                                                                                                    |
 | 2026-04-04 | Schema review: resolved 11 design gaps. Updated types.ts (StyleScores, Setting, signatureVarietals, expanded enums, Sonoma Coast). Full SCORING.md spec (budget bands, style weights, filters, scoring formula, tie-breakers, 5 worked examples). Updated mock data + all page references. Marked D1.2 enums + D1.5 type reconciliation + D3 spec as done.                                    |
 | 2026-04-04 | Added Phase D0 (Winery Discovery & Registry): plan to expand from 68 editorial wineries to comprehensive Sonoma + Napa coverage (~400-600 wineries) using free sources (OpenStreetMap Overpass API, wine association directories, Wikidata). Added coverage tiers (editorial/verified/discovered). Updated data source authority hierarchy. Expanded geographic scope to include Napa Valley. |
-| 2026-04-05 | Cross-referenced TODO with codebase: checked off D7.1–D7.5 (data layer fully wired), key screens (0.5), map optimizations (reuseMaps, IntersectionObserver), schema items (last_verified_at, data_health_checks, verification_notes already in migrations). Moved CI (3.3) to bottom — deferred until app is ready. |
+| 2026-04-05 | Cross-referenced TODO with codebase: checked off D7.1–D7.5 (data layer fully wired), key screens (0.5), map optimizations (reuseMaps, IntersectionObserver), schema items (last_verified_at, data_health_checks, verification_notes already in migrations). Moved CI (3.3) to bottom — deferred until app is ready.                                                                           |
 
 ---
 
