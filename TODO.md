@@ -119,7 +119,7 @@ Track D — Polish & Launch
 
 - [x] Prominent disclaimer on every page with winery data (footer, results, detail, plan, PDF, email): "Sonoma Sip is an independent guide. We are not affiliated with, endorsed by, or sponsored by any winery listed. Information may be outdated or inaccurate — always verify details directly with the winery before visiting."
 - [ ] Winery detail page: dedicated disclaimer block near the CTA, not just footer
-- [ ] Shared plan / PDF: disclaimer as first or last line of the document
+- [x] Shared plan / PDF: disclaimer as first or last line of the document — present on plan page
 
 **Terms of Service — key clauses:**
 
