@@ -45,9 +45,18 @@ function parseHours(raw: unknown): WeeklyHours {
   return { ...DEFAULT_HOURS, ...(raw as WeeklyHours) };
 }
 
+function deriveRelaxedScore(row: WineryRow): number {
+  const base = row.style_classic ?? 3;
+  let score = base;
+  if (row.has_sunset_views) score += 1;
+  if (row.noise_level === 'quiet') score += 0.5;
+  if (row.setting === 'downtown') score -= 1.5;
+  return Math.max(1, Math.min(5, Math.round(score * 2) / 2));
+}
+
 function mapStyleScores(row: WineryRow): StyleScores {
   return {
-    styleRelaxed: row.style_classic ?? 3,
+    styleRelaxed: deriveRelaxedScore(row),
     styleAdventurous: row.style_adventure ?? 3,
     styleEducational: row.style_sustainable ?? 3,
     styleCelebratory: row.style_luxury ?? 3,
@@ -162,6 +171,9 @@ export function toWineryForMatching(
     id: row.id,
     slug: row.slug,
     region: AVA_TO_DISPLAY[row.ava_primary] ?? row.ava_primary,
+    regionSecondary: row.ava_secondary
+      ? (AVA_TO_DISPLAY[row.ava_secondary] ?? row.ava_secondary)
+      : null,
     reservationType: row.reservation_type as ReservationType,
     isMembersOnly: row.is_members_only,
     groupSizeMax: row.max_group_size,

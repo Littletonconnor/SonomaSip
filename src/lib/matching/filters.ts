@@ -25,7 +25,7 @@ function passesBudgetFilter(winery: WineryForMatching, answers: QuizAnswers): bo
 
 function passesRegionFilter(winery: WineryForMatching, answers: QuizAnswers): boolean {
   if (answers.preferredRegions.length === 0) return true;
-  return answers.preferredRegions.includes(winery.region);
+  return answers.preferredRegions.some((r) => winery.region === r || winery.regionSecondary === r);
 }
 
 function passesMembersOnlyFilter(winery: WineryForMatching, answers: QuizAnswers): boolean {

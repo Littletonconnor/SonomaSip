@@ -227,6 +227,7 @@ export type WineryForMatching = {
   id: string;
   slug: string;
   region: Region;
+  regionSecondary: Region | null;
   reservationType: ReservationType;
   isMembersOnly: boolean;
   groupSizeMax: number | null;

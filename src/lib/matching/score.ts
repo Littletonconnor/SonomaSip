@@ -173,7 +173,12 @@ export function scoreWinery(
   const rating = scoreRating(winery);
   const membersOnlyPenalty = winery.isMembersOnly && answers.includeMembersOnly ? -10 : 0;
 
-  const raw = style * 40 + budget * 20 + experience * 20 + rating * 15 + membersOnlyPenalty;
+  const hasVibes = answers.selectedVibes.length > 0;
+  const wStyle = hasVibes ? 40 : 30;
+  const wRating = hasVibes ? 15 : 25;
+
+  const raw =
+    style * wStyle + budget * 20 + experience * 20 + rating * wRating + membersOnlyPenalty;
   const total = Math.max(0, Math.min(100, Math.round(raw)));
 
   return { total, style, budget, experience, rating, membersOnlyPenalty };

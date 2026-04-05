@@ -1,69 +1,68 @@
 id,has_cave_tour,has_vineyard_walk,has_food_pairing,has_barrel_tasting,has_blending_session,has_picnic_area,has_restaurant,has_sunset_views,has_outdoor_seating,has_live_music,live_music_schedule,dog_friendly,dog_notes,kid_friendly,kid_activities,wheelchair_accessible,accessibility_notes
 jordan-winery,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,FALSE,,TRUE,Estate is wheelchair accessible
-dry-creek-vineyard,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,,TRUE,In outdoor areas,TRUE,"Bocce courts, open spaces",TRUE,Main areas accessible
-gloria-ferrer,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,TRUE,FALSE,TRUE,Weekends seasonal,FALSE,,TRUE,Spacious terrace,TRUE,Full accessibility
-scribe-winery,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,,TRUE,Welcome on grounds,TRUE,"Open spaces, garden",TRUE,Hacienda accessible
+dry-creek-vineyard,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,,TRUE,In outdoor areas,TRUE,"Bocce courts, open spaces",TRUE,Main areas accessible
+gloria-ferrer,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,TRUE,TRUE,TRUE,Weekends seasonal,FALSE,,TRUE,Spacious terrace,TRUE,Full accessibility
+scribe-winery,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,,TRUE,Welcome on grounds,TRUE,"Open spaces, garden",TRUE,Hacienda accessible
 nalle-winery,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,TRUE,Casual dog-friendly,TRUE,,TRUE,Small rustic space
-iron-horse-vineyards,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,,TRUE,Outdoor only,TRUE,Open vineyard space,TRUE,Outdoor areas accessible
+iron-horse-vineyards,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,,TRUE,Outdoor only,TRUE,Open vineyard space,TRUE,Outdoor areas accessible
 martinelli-winery,FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,FALSE,,TRUE,Historic setting,TRUE,Most areas accessible
-deloach-vineyards,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,,TRUE,Welcome in gardens,TRUE,"Gardens, chickens",TRUE,Full accessibility
-unti-vineyards,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,,TRUE,Very dog-friendly,TRUE,Casual outdoor space,TRUE,Outdoor accessible
-benziger-family-winery,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,,FALSE,,TRUE,"Tram tour, peacocks, gardens",TRUE,Tram is accessible
+deloach-vineyards,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,,TRUE,Welcome in gardens,TRUE,"Gardens, chickens",TRUE,Full accessibility
+unti-vineyards,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,,TRUE,Very dog-friendly,TRUE,Casual outdoor space,TRUE,Outdoor accessible
+benziger-family-winery,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,,FALSE,,TRUE,"Tram tour, peacocks, gardens",TRUE,Tram is accessible
 flowers-winery,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,FALSE,,TRUE,Modern facility accessible
-seghesio-family-vineyards,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,,TRUE,Outdoor areas,TRUE,"Bocce, open plaza",TRUE,Downtown accessible
+seghesio-family-vineyards,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,,TRUE,Outdoor areas,TRUE,"Bocce, open plaza",TRUE,Downtown accessible
 halleck-vineyard,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,TRUE,"Fully fenced, dog-friendly",TRUE,Vineyard tours,TRUE,Most areas accessible
-pedroncelli-winery,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,,TRUE,Welcome,TRUE,"Casual, open",TRUE,Accessible
+pedroncelli-winery,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,,TRUE,Welcome,TRUE,"Casual, open",TRUE,Accessible
 arista-winery,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,FALSE,,FALSE,,TRUE,Garden paths accessible
-landmark-hop-kiln,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,,TRUE,Outdoor areas,TRUE,Large lawn,TRUE,Historic building limited
-wilson-winery,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,,TRUE,Deck area,TRUE,Casual deck,TRUE,Deck accessible
-buena-vista-winery,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,,TRUE,Courtyard,TRUE,"Tours, theatrical",TRUE,Main areas accessible
-ridge-lytton-springs,FALSE,TRUE,FALSE,TRUE,FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,,FALSE,,FALSE,,TRUE,Modern facility
+landmark-hop-kiln,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,,TRUE,Outdoor areas,TRUE,Large lawn,TRUE,Historic building limited
+wilson-winery,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,,TRUE,Deck area,TRUE,Casual deck,TRUE,Deck accessible
+buena-vista-winery,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,,TRUE,Courtyard,TRUE,"Tours, theatrical",TRUE,Main areas accessible
+ridge-lytton-springs,FALSE,TRUE,FALSE,TRUE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,,FALSE,,FALSE,,TRUE,Modern facility
 gary-farrell-winery,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,FALSE,,TRUE,Full accessibility
 ferrari-carano,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Main areas accessible
-chateau-st-jean,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Gardens only,FALSE,,TRUE,Main areas accessible
+chateau-st-jean,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Gardens only,FALSE,,TRUE,Main areas accessible
 chalk-hill-estate,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Full accessibility
 roth-estate,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,First Friday Apr-Oct,,,FALSE,,TRUE,Accessible
 lancaster-estate,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,By arrangement
 banshee-wines,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,TRUE,TRUE,Dog Friendly,FALSE,,TRUE,Fully accessible
-kendall-jackson,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Very dog-friendly!,TRUE,Garden exploration,TRUE,Full accessibility
-matanzas-creek,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Grounds welcome dogs,TRUE,"Bocce, gardens",TRUE,Accessible paths
-la-crema,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Patio welcome,FALSE,,TRUE,Accessible
+kendall-jackson,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Very dog-friendly!,TRUE,Garden exploration,TRUE,Full accessibility
+matanzas-creek,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Grounds welcome dogs,TRUE,"Bocce, gardens",TRUE,Accessible paths
+la-crema,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Patio welcome,FALSE,,TRUE,Accessible
 hartford-family,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Accessible
-copain-wines,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,FALSE,,TRUE,Accessible
-francis-ford-coppola,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,Summer events,TRUE,Resort friendly,TRUE,"Pools, games, movie gallery",TRUE,Full resort accessibility
-gundlach-bundschu,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,Concert series,TRUE,Welcome,TRUE,Outdoor space,TRUE,Main areas accessible
-rodney-strong,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,Summer concerts,TRUE,Patio welcome,TRUE,Outdoor space,TRUE,Full accessibility
+copain-wines,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,FALSE,,TRUE,Accessible
+francis-ford-coppola,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,Summer events,TRUE,Resort friendly,TRUE,"Pools, games, movie gallery",TRUE,Full resort accessibility
+gundlach-bundschu,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,Concert series,TRUE,Welcome,TRUE,Outdoor space,TRUE,Main areas accessible
+rodney-strong,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,Summer concerts,TRUE,Patio welcome,TRUE,Outdoor space,TRUE,Full accessibility
 j-vineyards,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Accessible
-cline-family-cellars,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Very dog-friendly,TRUE,"Museum, grounds",TRUE,Accessible
-imagery-estate,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Art gallery,TRUE,Accessible
-kunde-family,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Cave tour,TRUE,Main areas accessible
+imagery-estate,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Art gallery,TRUE,Accessible
+kunde-family,TRUE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Cave tour,TRUE,Main areas accessible
 merry-edwards,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Accessible
-twomey-cellars,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,TRUE,TRUE,Patio welcome,FALSE,,TRUE,Accessible
-lynmar-estate,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Very welcome!,FALSE,,TRUE,Garden accessible
-alexander-valley-vineyards,TRUE,TRUE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Cave tour,TRUE,Main areas accessible
-porter-creek,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Creek play,TRUE,Limited
+twomey-cellars,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,,TRUE,TRUE,Patio welcome,FALSE,,TRUE,Accessible
+lynmar-estate,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Very welcome!,FALSE,,TRUE,Garden accessible
+alexander-valley-vineyards,TRUE,TRUE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Cave tour,TRUE,Main areas accessible
+porter-creek,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Creek play,TRUE,Limited
 bella-winery,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Cave accessible
-balletto-vineyards,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Patio space,TRUE,Accessible
-macrostie-winery,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,TRUE,TRUE,Patio welcome,FALSE,,TRUE,Accessible
-medlock-ames,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Farm grounds,TRUE,Farm terrain
-a-rafanelli,FALSE,TRUE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,FALSE,,TRUE,Accessible
+balletto-vineyards,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Patio space,TRUE,Accessible
+macrostie-winery,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,,TRUE,TRUE,Patio welcome,FALSE,,TRUE,Accessible
+medlock-ames,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Farm grounds,TRUE,Farm terrain
+a-rafanelli,FALSE,TRUE,FALSE,TRUE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,FALSE,,TRUE,Accessible
 bella-vineyards,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Cave accessible
-cline-cellars,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Very dog-friendly,TRUE,Museum,TRUE,Accessible
-domaine-carneros,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Accessible
-fort-ross-vineyard,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Hiking,TRUE,Remote terrain
-keller-estate,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Olive grove,TRUE,Accessible
-korbel,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Garden welcome,TRUE,Historic tour,TRUE,Accessible
-lambert-bridge,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Grounds,TRUE,Accessible
-ledson-winery,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,FALSE,,,TRUE,Castle tour,TRUE,Accessible
-mauritson-wines,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Outdoor space,TRUE,Accessible
-mcevoy-ranch,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Ranch tours,TRUE,Ranch terrain
-preston-farm,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Farm welcome,TRUE,Farm animals,TRUE,Farm terrain
+cline-cellars,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Very dog-friendly,TRUE,Museum,TRUE,Accessible
+domaine-carneros,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,FALSE,,,FALSE,,TRUE,Accessible
+fort-ross-vineyard,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Hiking,TRUE,Remote terrain
+keller-estate,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Olive grove,TRUE,Accessible
+korbel,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Garden welcome,TRUE,Historic tour,TRUE,Accessible
+lambert-bridge,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Grounds,TRUE,Accessible
+ledson-winery,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,FALSE,,,TRUE,Castle tour,TRUE,Accessible
+mauritson-wines,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Outdoor space,TRUE,Accessible
+mcevoy-ranch,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Ranch tours,TRUE,Ranch terrain
+preston-farm,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Farm welcome,TRUE,Farm animals,TRUE,Farm terrain
 rams-gate,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Full accessibility
-red-car-wine,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,FALSE,,TRUE,Accessible
-schug-carneros,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Welcome,TRUE,Cave tour,TRUE,Accessible
+red-car-wine,FALSE,TRUE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,FALSE,,TRUE,Accessible
+schug-carneros,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Welcome,TRUE,Cave tour,TRUE,Accessible
 sebastiani,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,Friday Music,,,FALSE,,TRUE,Historic accessible
 siduri-wines,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Accessible
-silver-oak-alexander,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,,TRUE,TRUE,Patio welcome,FALSE,,TRUE,Full accessibility
+silver-oak-alexander,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,TRUE,,TRUE,TRUE,Patio welcome,FALSE,,TRUE,Full accessibility
 st-francis,FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Full accessibility
 stonestreet-winery,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Mountain terrain
 verite-winery,FALSE,TRUE,TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,,FALSE,,,FALSE,,TRUE,Full accessibility

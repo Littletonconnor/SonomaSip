@@ -184,7 +184,7 @@ describe('wineries data layer', () => {
       expect(results[0].slug).toBe('test-winery');
       expect(results[0].region).toBe('Russian River Valley');
       expect(results[0].varietals).toContain('Pinot Noir');
-      expect(results[0].styleScores.styleRelaxed).toBe(4);
+      expect(results[0].styleScores.styleRelaxed).toBe(5);
       expect(results[0].minFlightPrice).toBe(40);
       expect(results[0].isDogFriendly).toBe(true);
     });
