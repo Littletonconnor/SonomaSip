@@ -366,6 +366,8 @@ _The empty state, error state, loading skeleton, and overall results UI need a q
 - [ ] Winery image: placeholder for future winery photo (gradient or pattern placeholder that looks intentional)
 - [ ] "Book a Tasting" inline CTA: small secondary action on each card so users don't have to click through to detail page
 - [ ] Truncate long match reason lists: show top 3, expandable "Show more" if >3
+- [ ] Rank circle number centering: numbers aren't visually centered in the rank circles on both result cards and plan page winery stops — adjust alignment so all digits (1–9, 10+) look properly centered
+- [ ] Plan page map parity: make the plan page map match the results page map — clickable winery pins with popups, fly-to on click, same interactive behavior (currently uses a simpler PlanMap component)
 
 #### Header & actions
 
@@ -1300,7 +1302,7 @@ Then your PostHog sink and Axiom sink both get the sampled stream — errors alw
 | 2026-04-03 | Added D8 (content pipeline: Cloudflare scrape → LLM enrichment), D9 (admin pages), D10 (click attribution)                                                                                                                                                                                                                                                                                    |
 | 2026-04-04 | Schema review: resolved 11 design gaps. Updated types.ts (StyleScores, Setting, signatureVarietals, expanded enums, Sonoma Coast). Full SCORING.md spec (budget bands, style weights, filters, scoring formula, tie-breakers, 5 worked examples). Updated mock data + all page references. Marked D1.2 enums + D1.5 type reconciliation + D3 spec as done.                                    |
 | 2026-04-04 | Added Phase D0 (Winery Discovery & Registry): plan to expand from 68 editorial wineries to comprehensive Sonoma + Napa coverage (~400-600 wineries) using free sources (OpenStreetMap Overpass API, wine association directories, Wikidata). Added coverage tiers (editorial/verified/discovered). Updated data source authority hierarchy. Expanded geographic scope to include Napa Valley. |
-| 2026-04-05 | Cross-referenced TODO with codebase: checked off D7.1–D7.5 (data layer fully wired), key screens (0.5), map optimizations (reuseMaps, IntersectionObserver), schema items (last_verified_at, data_health_checks, verification_notes already in migrations). Moved CI (3.3) to bottom — deferred until app is ready. |
+| 2026-04-05 | Cross-referenced TODO with codebase: checked off D7.1–D7.5 (data layer fully wired), key screens (0.5), map optimizations (reuseMaps, IntersectionObserver), schema items (last_verified_at, data_health_checks, verification_notes already in migrations). Moved CI (3.3) to bottom — deferred until app is ready.                                                                           |
 
 ---
 

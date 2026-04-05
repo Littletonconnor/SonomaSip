@@ -3,15 +3,15 @@
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
-  Share2,
-  Printer,
-  Mail,
   ChevronDown,
   Star,
   Search,
   Check,
   Map as MapIcon,
+  Loader2,
+  ArrowRight,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/a
 import { useSessionStorage } from '@/hooks/use-session-storage';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { submitQuiz } from '@/lib/actions/quiz';
+import { createPlan } from '@/lib/actions/plan';
 import type { MapItem } from '@/components/map/types';
 import type { QuizAnswers, MatchResult, MustHaves } from '@/lib/types';
 
@@ -113,8 +114,21 @@ export default function ResultsPage() {
     [results],
   );
 
+  const router = useRouter();
   const isMobile = useIsMobile();
   const [showMap, setShowMap] = useState(false);
+  const [isCreatingPlan, setIsCreatingPlan] = useState(false);
+
+  async function handleCreatePlan() {
+    if (!results || isCreatingPlan) return;
+    setIsCreatingPlan(true);
+    try {
+      const planId = await createPlan(answers, results);
+      router.push(`/plan/${planId}`);
+    } catch {
+      setIsCreatingPlan(false);
+    }
+  }
 
   if (!hydrated || isPending) {
     return <ResultsSkeleton />;
@@ -143,23 +157,26 @@ export default function ResultsPage() {
                   Your Recommendations
                 </h1>
                 <p className="text-stone mt-2 text-pretty">
-                  {results.length} wineries matched your preferences
+                  We found {results.length} wineries we think you&rsquo;ll love
                 </p>
               </div>
-              <div className="flex shrink-0 gap-2">
-                <Button variant="outline" size="sm" className="gap-1.5">
-                  <Share2 className="size-3.5" />
-                  Share
-                </Button>
-                <Button variant="outline" size="sm" className="gap-1.5">
-                  <Printer className="size-3.5" />
-                  Print
-                </Button>
-                <Button variant="outline" size="sm" className="gap-1.5">
-                  <Mail className="size-3.5" />
-                  Email
-                </Button>
-              </div>
+              <Button
+                onClick={handleCreatePlan}
+                disabled={isCreatingPlan}
+                className="group shrink-0 gap-2 rounded-full py-2.5 pr-5 pl-6 text-sm font-medium"
+              >
+                {isCreatingPlan ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Creating&hellip;
+                  </>
+                ) : (
+                  <>
+                    Create Your Plan
+                    <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                  </>
+                )}
+              </Button>
             </div>
           </AnimatedSection>
 

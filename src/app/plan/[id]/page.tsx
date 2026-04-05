@@ -1,19 +1,54 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Printer, Mail, Link2, Star, ExternalLink, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { notFound } from 'next/navigation';
+import { Star, ExternalLink, Check } from 'lucide-react';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import { PlanMap } from './plan-map';
-import { mockResultsCasualCouple } from '@/lib/mock-data';
+import { PlanActions } from './plan-actions';
+import { createServerSupabase } from '@/lib/supabase-server';
 import type { MapItem } from '@/components/map/types';
-import type { MatchResult } from '@/lib/types';
+import type { MatchResult, QuizAnswers, MustHaves } from '@/lib/types';
 
-const MOCK_PLAN = {
-  id: 'abc123',
-  createdAt: '2026-04-02',
-  preferences: ['Pinot Noir', 'Zinfandel', 'Relaxed & Scenic', '$$', 'Dog Friendly', 'Views'],
-  results: mockResultsCasualCouple,
+const MUST_HAVE_LABELS: Record<keyof MustHaves, string> = {
+  views: 'Views',
+  foodPairing: 'Food Pairing',
+  outdoorSeating: 'Outdoor Seating',
+  dogFriendly: 'Dog Friendly',
+  kidFriendly: 'Kid Friendly',
+  wheelchairAccessible: 'Accessible',
 };
+
+async function getPlan(id: string) {
+  const supabase = createServerSupabase();
+  const { data, error } = await supabase
+    .from('shared_itineraries')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) return null;
+
+  return {
+    id: data.id,
+    createdAt: data.created_at,
+    quizAnswers: data.quiz_answers as unknown as QuizAnswers,
+    results: data.results as unknown as MatchResult[],
+  };
+}
+
+function derivePreferenceBadges(answers: QuizAnswers): string[] {
+  const badges: string[] = [];
+  answers.selectedVarietals.forEach((v) => badges.push(v));
+  answers.selectedVibes.forEach((v) => badges.push(v));
+  if (answers.budgetBand) badges.push(answers.budgetBand);
+  answers.preferredRegions.forEach((r) => badges.push(r));
+  Object.entries(answers.mustHaves).forEach(([key, val]) => {
+    if (val) badges.push(MUST_HAVE_LABELS[key as keyof MustHaves]);
+  });
+  if (answers.groupSize) badges.push(`${answers.groupSize}+ guests`);
+  if (answers.includeMembersOnly) badges.push('Members-only OK');
+  return badges;
+}
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -24,17 +59,18 @@ function formatDate(dateStr: string) {
   });
 }
 
-function getPlan(_id: string) {
-  return MOCK_PLAN;
-}
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const plan = getPlan(id);
+  const plan = await getPlan(id);
+
+  if (!plan) {
+    return { title: 'Plan Not Found' };
+  }
+
   const wineryNames = plan.results.map((r) => r.winery.name);
   const description = `A ${plan.results.length}-stop Sonoma County wine day: ${wineryNames.join(', ')}. Curated by Sonoma Sip.`;
 
@@ -57,7 +93,13 @@ export async function generateMetadata({
 
 export default async function SharedPlanPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const plan = MOCK_PLAN;
+  const plan = await getPlan(id);
+
+  if (!plan) {
+    notFound();
+  }
+
+  const preferences = derivePreferenceBadges(plan.quizAnswers);
 
   const mapItems: MapItem[] = plan.results.map((r) => ({
     id: r.winery.id,
@@ -85,34 +127,25 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
               {plan.results.length} stops &middot; Generated {formatDate(plan.createdAt)}
             </p>
 
-            <div className="mt-6">
-              <p className="text-bark text-sm font-medium">Preferences</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {plan.preferences.map((p) => (
-                  <span
-                    key={p}
-                    className="bg-linen text-oak rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-black/5"
-                  >
-                    {p}
-                  </span>
-                ))}
+            {preferences.length > 0 && (
+              <div className="mt-6">
+                <p className="text-bark text-sm font-medium">Preferences</p>
+                <div className="mt-2 flex flex-wrap gap-x-1.5 gap-y-2">
+                  {preferences.map((p) => (
+                    <span
+                      key={p}
+                      className="bg-linen text-oak rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-black/5"
+                    >
+                      {p}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="mt-8 flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <Link2 className="size-3.5" />
-                Copy Link
-              </Button>
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <Printer className="size-3.5" />
-                Print
-              </Button>
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <Mail className="size-3.5" />
-                Email
-              </Button>
-            </div>
+            <PlanActions
+              planUrl={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/plan/${plan.id}`}
+            />
 
             <div className="mt-8">
               <PlanMap items={mapItems} />
@@ -131,7 +164,7 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
         </div>
       </div>
 
-      <div className="border-t border-black/5 py-8">
+      <div className="mt-8 border-t border-black/5 py-8">
         <p className="text-stone/70 text-sm text-pretty">
           Sonoma Sip is an independent guide — not affiliated with any listed winery. Hours, prices,
           and policies may change. Always verify details directly with the winery before visiting.
@@ -142,7 +175,7 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
 }
 
 function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: boolean }) {
-  const { winery, rank, score, matchReasons } = result;
+  const { winery, rank, matchReasons } = result;
   const badges: string[] = [];
   if (winery.reservationType === 'walk_ins_welcome') badges.push('Walk-in');
   if (winery.reservationType === 'reservations_recommended')
@@ -185,7 +218,7 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
           <ul className="mt-3 flex flex-col gap-1" role="list">
             {matchReasons.map((reason) => (
               <li key={reason} className="text-stone flex items-start gap-2 text-sm text-pretty">
-                <Check className="text-sage mt-0.5 size-3.5 shrink-0" />
+                <Check className="text-wine mt-0.5 size-3.5 shrink-0" />
                 {reason}
               </li>
             ))}
@@ -194,7 +227,10 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
           {badges.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {badges.map((b) => (
-                <span key={b} className="bg-fog/80 text-stone rounded-full px-2 py-0.5 text-xs">
+                <span
+                  key={b}
+                  className="bg-linen text-oak rounded-full px-3 py-1 text-sm font-medium ring-1 ring-black/5"
+                >
                   {b}
                 </span>
               ))}
