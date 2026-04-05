@@ -119,7 +119,7 @@ Track D — Polish & Launch
 
 - [x] Prominent disclaimer on every page with winery data (footer, results, detail, plan, PDF, email): "Sonoma Sip is an independent guide. We are not affiliated with, endorsed by, or sponsored by any winery listed. Information may be outdated or inaccurate — always verify details directly with the winery before visiting."
 - [ ] Winery detail page: dedicated disclaimer block near the CTA, not just footer
-- [ ] Shared plan / PDF: disclaimer as first or last line of the document
+- [x] Shared plan / PDF: disclaimer as first or last line of the document — present on plan page
 
 **Terms of Service — key clauses:**
 
@@ -146,7 +146,7 @@ Track D — Polish & Launch
 
 - [x] Fonts, color tokens, spacing (WCAG AA on controls)
 - [x] Component inventory: Button, Chip, Slider, Stepper, Card, Modal, Toast, Skeleton, list row, map callout
-- [ ] Key screens: landing, quiz step, results split, detail, print _(covered by Phase 3.5)_
+- [x] Key screens: landing, quiz step, results split, detail, print _(covered by Phase 3.5)_
 - [ ] Imagery policy (avoid implying winery endorsement)
 
 ### 0.5b shadcn/ui integration
@@ -174,10 +174,6 @@ Track D — Polish & Launch
 ### 3.2 Config
 
 - [x] `env.ts` with Zod validation; separate public vs server secrets — `src/lib/env.ts` with `publicSchema` (MAPBOX_TOKEN, SITE_URL) and `serverSchema` (extensible for Supabase, Resend)
-
-### 3.3 CI
-
-- [ ] `pnpm typecheck`, `lint`, `test` in CI
 
 ---
 
@@ -830,32 +826,32 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 
 ### D7.1 Data layer
 
-- [ ] Create `lib/data/wineries.ts` — Supabase queries for fetching wineries
-- [ ] `getWineriesForMatching()` — flat, pre-joined, all scoring fields
-- [ ] `getWineryBySlug(slug)` — full detail for display
-- [ ] `getAllWinerySlugs()` — for `generateStaticParams`
-- [ ] Cache strategy: ISR with revalidate (hourly or on-demand)
+- [x] Create `lib/data/wineries.ts` — Supabase queries for fetching wineries
+- [x] `getWineriesForMatching()` — flat, pre-joined, all scoring fields
+- [x] `getWineryBySlug(slug)` — full detail for display
+- [x] `getAllWinerySlugs()` — for `generateStaticParams`
+- [x] Cache strategy: ISR with revalidate (hourly or on-demand)
 
 ### D7.2 Server actions
 
-- [ ] Quiz submit → server action → fetch wineries → matching engine → results
-- [ ] Server authority: recommendations computed server-side for persistence
+- [x] Quiz submit → server action → fetch wineries → matching engine → results
+- [x] Server authority: recommendations computed server-side for persistence
 
 ### D7.3 Results page
 
-- [ ] Replace mock data with real `MatchResult[]` from server action
-- [ ] Wire up "why this winery" explanations
+- [x] Replace mock data with real `MatchResult[]` from server action
+- [x] Wire up "why this winery" explanations
 
 ### D7.4 Winery detail pages
 
-- [ ] `generateStaticParams` from `getAllWinerySlugs()`
-- [ ] Revalidate policy (ISR, hourly)
-- [ ] Replace mock winery data with `getWineryBySlug()`
+- [x] `generateStaticParams` from `getAllWinerySlugs()`
+- [x] Revalidate policy (ISR, hourly)
+- [x] Replace mock winery data with `getWineryBySlug()`
 
 ### D7.5 Browse page
 
-- [ ] Replace mock winery list with Supabase query
-- [ ] Wire up filters to real data
+- [x] Replace mock winery list with Supabase query
+- [x] Wire up filters to real data
 
 ### D7.6 Share flow
 
@@ -1087,9 +1083,9 @@ _Winery info changes: hours shift seasonally, flights get repriced, wineries clo
 
 **Schema support:**
 
-- [ ] Add `last_verified_at` timestamp column to `wineries` table
-- [ ] Add `data_health_checks` table: `winery_id`, `check_type` (url_health | places_sync | manual_audit), `status`, `details_json`, `checked_at`
-- [ ] Add `verification_notes` text column for auditor comments
+- [x] Add `last_verified_at` timestamp column to `wineries` table — already in migration 002 (create_wineries.sql)
+- [x] Add `data_health_checks` table: `winery_id`, `check_type` (url_health | places_sync | manual_audit), `status`, `details_json`, `checked_at` — migration 007
+- [x] Add `verification_notes` text column for auditor comments — already in migration 002
 - [ ] Admin dashboard or simple script to surface flagged wineries
 
 **User-facing transparency:**
@@ -1107,8 +1103,8 @@ _Every third-party service has usage-based pricing. Every server action has comp
 ### 7.5.1 Client-side map load protection
 
 - [ ] **Session-based map load cap:** Track map initializations per browser session in `sessionStorage`. After N loads (e.g., 20) in a single session, show a static map image (Mapbox Static Images API — 50K free/mo) instead of the interactive GL map. Display a message: "Interactive map limit reached for this session. Refresh tomorrow for full access."
-- [ ] **`reuseMaps` prop:** Enable on `react-map-gl` `<Map>` to reuse GL context across soft navigations instead of re-initializing (avoids counting new map loads on back/forward)
-- [ ] **Lazy-load only:** Map component mounts via `IntersectionObserver` — never loads unless user scrolls to it. This alone prevents map loads from bots/crawlers hitting the page
+- [x] **`reuseMaps` prop:** Enable on `react-map-gl` `<Map>` to reuse GL context across soft navigations instead of re-initializing (avoids counting new map loads on back/forward)
+- [x] **Lazy-load only:** Map component mounts via `IntersectionObserver` — never loads unless user scrolls to it. This alone prevents map loads from bots/crawlers hitting the page
 - [ ] **Bot/crawler exclusion:** Check `navigator.webdriver` and common bot user-agent patterns client-side before mounting the map. Bots get the static placeholder only
 
 ### 7.5.2 Server-side rate limiting (API routes / server actions)
@@ -1304,3 +1300,10 @@ Then your PostHog sink and Axiom sink both get the sampled stream — errors alw
 | 2026-04-03 | Added D8 (content pipeline: Cloudflare scrape → LLM enrichment), D9 (admin pages), D10 (click attribution)                                                                                                                                                                                                                                                                                    |
 | 2026-04-04 | Schema review: resolved 11 design gaps. Updated types.ts (StyleScores, Setting, signatureVarietals, expanded enums, Sonoma Coast). Full SCORING.md spec (budget bands, style weights, filters, scoring formula, tie-breakers, 5 worked examples). Updated mock data + all page references. Marked D1.2 enums + D1.5 type reconciliation + D3 spec as done.                                    |
 | 2026-04-04 | Added Phase D0 (Winery Discovery & Registry): plan to expand from 68 editorial wineries to comprehensive Sonoma + Napa coverage (~400-600 wineries) using free sources (OpenStreetMap Overpass API, wine association directories, Wikidata). Added coverage tiers (editorial/verified/discovered). Updated data source authority hierarchy. Expanded geographic scope to include Napa Valley. |
+| 2026-04-05 | Cross-referenced TODO with codebase: checked off D7.1–D7.5 (data layer fully wired), key screens (0.5), map optimizations (reuseMaps, IntersectionObserver), schema items (last_verified_at, data_health_checks, verification_notes already in migrations). Moved CI (3.3) to bottom — deferred until app is ready. |
+
+---
+
+## Deferred — CI _(move back up when app is ready for launch)_
+
+- [ ] `pnpm typecheck`, `lint`, `test` in CI
