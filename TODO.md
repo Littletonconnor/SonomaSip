@@ -392,7 +392,7 @@ _The empty state, error state, loading skeleton, and overall results UI need a q
 
 ### 3.5.10 Content refresh
 
-- [ ] **"How It Works" section rewrite:** Current copy says "Three questions. One perfect day." but the quiz is 4 steps, not 3 questions. Rethink the headline, step titles, and descriptions to accurately reflect the actual quiz flow (varietals → vibe/budget → must-haves/group → regions/stops). The "three questions" framing is misleading.
+- [x] **"How It Works" section rewrite:** Current copy says "Three questions. One perfect day." but the quiz is 4 steps, not 3 questions. Rethink the headline, step titles, and descriptions to accurately reflect the actual quiz flow (varietals → vibe/budget → must-haves/group → regions/stops). The "three questions" framing is misleading.
 - [ ] **Logo redesign:** Current wine glass icon (`src/app/icon.tsx`, `src/app/apple-icon.tsx`, navbar) looks like a goblet. Replace with a more refined, professional wine glass silhouette that feels editorial/luxury. Update favicon, apple icon, navbar logo, and manifest icons.
 
 ---
@@ -816,11 +816,11 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 
 ### D6.9 Scoring & data quality refinements _(from LLM verification report — `docs/quiz-results-verification.md`)_
 
-- [ ] **Fix `style_classic` → `styleRelaxed` mapping:** "Classic" (traditional, downtown tasting rooms) is not "Relaxed & Scenic" (calm, views, pastoral). Sebastiani scores as top "relaxed" pick when it shouldn't. Consider splitting or re-weighting the relaxed dimension to incorporate view/setting signals.
-- [ ] **Add `ava_secondary` to region matching:** Iron Horse (primary: Green Valley, secondary: Russian River Valley) fails the RRV region filter despite being geographically within the appellation. Match on `ava_secondary` as a fallback before triggering region relaxation.
-- [ ] **Audit `has_outdoor_seating` data:** Many wineries with described outdoor areas (patios, terraces, gardens) have `has_outdoor_seating = FALSE`. Cross-reference descriptions with the flag and fix inaccuracies. This causes unnecessary filter relaxation for the `casualCouple` profile.
-- [ ] **Increase rating weight for no-vibe profiles:** When no vibes are selected, the 40-point style match produces uniform scores, making the 15-point rating blend an insufficient tiebreaker. Consider boosting rating to 25 and style to 30 when weights are uniform, or add a quality-tier bonus for top-rated wineries.
-- [ ] **Deduplicate Cline entries:** `cline-cellars` and `cline-family-cellars` appear in the data with the same address. Merge into one canonical entry. This may cause a qualified family-friendly option to be missed in the `familyTrip` profile.
+- [x] **Fix `style_classic` → `styleRelaxed` mapping:** "Classic" (traditional, downtown tasting rooms) is not "Relaxed & Scenic" (calm, views, pastoral). Sebastiani scores as top "relaxed" pick when it shouldn't. Consider splitting or re-weighting the relaxed dimension to incorporate view/setting signals.
+- [x] **Add `ava_secondary` to region matching:** Iron Horse (primary: Green Valley, secondary: Russian River Valley) fails the RRV region filter despite being geographically within the appellation. Match on `ava_secondary` as a fallback before triggering region relaxation.
+- [x] **Audit `has_outdoor_seating` data:** Many wineries with described outdoor areas (patios, terraces, gardens) have `has_outdoor_seating = FALSE`. Cross-reference descriptions with the flag and fix inaccuracies. This causes unnecessary filter relaxation for the `casualCouple` profile.
+- [x] **Increase rating weight for no-vibe profiles:** When no vibes are selected, the 40-point style match produces uniform scores, making the 15-point rating blend an insufficient tiebreaker. Consider boosting rating to 25 and style to 30 when weights are uniform, or add a quality-tier bonus for top-rated wineries.
+- [x] **Deduplicate Cline entries:** `cline-cellars` and `cline-family-cellars` appear in the data with the same address. Merge into one canonical entry. This may cause a qualified family-friendly option to be missed in the `familyTrip` profile.
 - [ ] **Review `style_sustainable` → `styleEducational` mapping:** Overlaps for biodynamic/organic wineries but misses educational tour-focused wineries. Benziger's tram tour is valued for sustainability score, which happens to be correct but for the wrong reason.
 - [ ] Re-run `pnpm test:golden -- --update` after scoring changes and review updated snapshots
 

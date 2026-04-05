@@ -7,6 +7,7 @@ function makeWinery(overrides: Partial<WineryForMatching> = {}): WineryForMatchi
     id: 'test-winery',
     slug: 'test-winery',
     region: 'Russian River Valley',
+    regionSecondary: null,
     reservationType: 'walk_ins_welcome',
     isMembersOnly: false,
     groupSizeMax: null,
