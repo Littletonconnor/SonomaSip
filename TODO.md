@@ -353,19 +353,9 @@ _The empty state, error state, loading skeleton, and overall results UI need a q
 - [x] Retry action: add a "Try Again" button that re-runs the quiz submission without navigating away
 - [x] Contact fallback: small "If this keeps happening, let us know" link or text
 
-#### Loading skeleton (`ResultsSkeleton`)
-
-- [ ] Polish shimmer effect: use a warm-toned shimmer (cream/linen gradient) instead of default gray pulse
-- [ ] Add skeleton for preference badges section
-- [ ] Skeleton map placeholder on desktop side
-
 #### Result cards (`ResultCard`)
 
 - [x] Score ring animation: animate the SVG stroke on mount (draw-in effect)
-- [ ] Hover state: more pronounced card lift/shadow on hover for better affordance
-- [ ] Winery image: placeholder for future winery photo (gradient or pattern placeholder that looks intentional)
-- [ ] "Book a Tasting" inline CTA: small secondary action on each card so users don't have to click through to detail page
-- [ ] Truncate long match reason lists: show top 3, expandable "Show more" if >3
 - [x] Rank circle number centering: numbers aren't visually centered in the rank circles on both result cards and plan page winery stops — adjust alignment so all digits (1–9, 10+) look properly centered
 - [x] Plan page map parity: make the plan page map match the results page map — clickable winery pins with popups, fly-to on click, same interactive behavior (currently uses a simpler PlanMap component)
 
@@ -380,13 +370,6 @@ _The empty state, error state, loading skeleton, and overall results UI need a q
 
 - [x] Highlight card ↔ map pin interaction: hovering a result card highlights the corresponding map pin (and vice versa)
 - [x] Fly-to on card click: clicking a card briefly highlights the pin on the map before navigating to detail
-- [ ] Mobile map: full-screen expandable overlay instead of inline collapse
-
-#### Responsive & polish
-
-- [ ] Mobile card layout: optimize spacing and typography for small screens (375px)
-- [ ] Print stylesheet: hide map, nav, footer; clean card layout for printing
-- [ ] Page transition: smooth entrance animation when navigating from quiz to results
 
 ### 3.5.10 Content refresh
 
