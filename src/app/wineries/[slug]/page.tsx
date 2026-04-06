@@ -142,6 +142,10 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
                 <p className="text-stone text-center text-sm tabular-nums">
                   ${winery.minFlightPrice}&ndash;{winery.maxFlightPrice} per flight
                 </p>
+                <p className="text-stone/50 mt-1 text-center text-xs text-pretty">
+                  Sonoma Sip is not affiliated with {winery.name}. Hours, prices, and availability
+                  may change &mdash; verify directly with the winery before visiting.
+                </p>
               </div>
 
               <div className="mt-8 flex flex-col gap-3">

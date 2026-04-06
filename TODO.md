@@ -118,7 +118,7 @@ Track D — Polish & Launch
 **Accuracy & liability disclaimer:**
 
 - [x] Prominent disclaimer on every page with winery data (footer, results, detail, plan, PDF, email): "Sonoma Sip is an independent guide. We are not affiliated with, endorsed by, or sponsored by any winery listed. Information may be outdated or inaccurate — always verify details directly with the winery before visiting."
-- [ ] Winery detail page: dedicated disclaimer block near the CTA, not just footer
+- [x] Winery detail page: dedicated disclaimer block near the CTA, not just footer
 - [x] Shared plan / PDF: disclaimer as first or last line of the document — present on plan page
 
 **Terms of Service — key clauses:**
@@ -529,7 +529,7 @@ _Values below are locked in `src/lib/types.ts` as of 2026-04-04. DB enums must m
 - [x] `data_health_checks` table: URL health, hours drift, rating drift, missing data, user reports
 - [x] `field_overrides` table: editorial override audit trail
 - [x] Provenance fields on `wineries`: `last_verified_at`, `last_places_sync_at`, `data_source`, `verification_notes`, `is_active`
-- [ ] Document the ERD (can be a markdown table or mermaid diagram)
+- [x] Document the ERD (can be a markdown table or mermaid diagram)
 
 ### D1.4 RLS plan
 
@@ -739,7 +739,7 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 
 - [x] `db:import` — run import against configured Supabase
 - [x] `db:import:dry` — dry-run mode
-- [ ] `db:reset` — reset local DB + re-import
+- [x] `db:reset` — reset local DB + re-import
 - [x] ~~`db:types`~~ — already exists as `db:gen-types`
 
 ---
