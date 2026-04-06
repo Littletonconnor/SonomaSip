@@ -5,6 +5,8 @@ import { Star, ExternalLink, Check } from 'lucide-react';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import { PlanMap } from './plan-map';
 import { PlanActions } from './plan-actions';
+import { PlanHoverProvider } from './plan-hover-context';
+import { PlanWineryStop } from './plan-winery-stop';
 import { createServerSupabase } from '@/lib/supabase-server';
 import type { MapItem } from '@/components/map/types';
 import type { MatchResult, QuizAnswers, MustHaves } from '@/lib/types';
@@ -115,62 +117,66 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
   }));
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
-      <div className="gap-12 lg:grid lg:grid-cols-[2fr_3fr]">
-        <div className="lg:sticky lg:top-20 lg:self-start lg:pb-12">
-          <AnimatedSection>
-            <p className="text-wine font-mono text-xs tracking-widest">Sonoma Sip Plan</p>
-            <h1 className="font-heading text-bark mt-2 text-3xl font-medium tracking-tight text-balance md:text-4xl">
-              Your Wine Day Itinerary
-            </h1>
-            <p className="text-stone mt-2 text-sm">
-              {plan.results.length} stops &middot; Generated {formatDate(plan.createdAt)}
-            </p>
+    <PlanHoverProvider>
+      <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
+        <div className="gap-12 lg:grid lg:grid-cols-[2fr_3fr]">
+          <div className="lg:sticky lg:top-20 lg:self-start lg:pb-12">
+            <AnimatedSection>
+              <p className="text-wine font-mono text-xs tracking-widest">Sonoma Sip Plan</p>
+              <h1 className="font-heading text-bark mt-2 text-3xl font-medium tracking-tight text-balance md:text-4xl">
+                Your Wine Day Itinerary
+              </h1>
+              <p className="text-stone mt-2 text-sm">
+                {plan.results.length} stops &middot; Generated {formatDate(plan.createdAt)}
+              </p>
 
-            {preferences.length > 0 && (
-              <div className="mt-6">
-                <p className="text-bark text-sm font-medium">Preferences</p>
-                <div className="mt-2 flex flex-wrap gap-x-1.5 gap-y-2">
-                  {preferences.map((p) => (
-                    <span
-                      key={p}
-                      className="bg-linen text-oak rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-black/5"
-                    >
-                      {p}
-                    </span>
-                  ))}
+              {preferences.length > 0 && (
+                <div className="mt-6">
+                  <p className="text-bark text-sm font-medium">Preferences</p>
+                  <div className="mt-2 flex flex-wrap gap-x-1.5 gap-y-2">
+                    {preferences.map((p) => (
+                      <span
+                        key={p}
+                        className="bg-linen text-oak rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-black/5"
+                      >
+                        {p}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+              )}
+
+              <PlanActions
+                planUrl={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/plan/${plan.id}`}
+              />
+
+              <div className="mt-8">
+                <PlanMap items={mapItems} />
               </div>
-            )}
+            </AnimatedSection>
+          </div>
 
-            <PlanActions
-              planUrl={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/plan/${plan.id}`}
-            />
-
-            <div className="mt-8">
-              <PlanMap items={mapItems} />
-            </div>
-          </AnimatedSection>
+          <div className="max-lg:mt-10">
+            <StaggerChildren staggerDelay={0.08}>
+              {plan.results.map((result, i) => (
+                <StaggerItem key={result.winery.id}>
+                  <PlanWineryStop wineryId={result.winery.id}>
+                    <WineryStop result={result} showBorder={i > 0} />
+                  </PlanWineryStop>
+                </StaggerItem>
+              ))}
+            </StaggerChildren>
+          </div>
         </div>
 
-        <div className="max-lg:mt-10">
-          <StaggerChildren staggerDelay={0.08}>
-            {plan.results.map((result, i) => (
-              <StaggerItem key={result.winery.id}>
-                <WineryStop result={result} showBorder={i > 0} />
-              </StaggerItem>
-            ))}
-          </StaggerChildren>
+        <div className="mt-8 border-t border-black/5 py-8">
+          <p className="text-stone/70 text-sm text-pretty">
+            Sonoma Sip is an independent guide — not affiliated with any listed winery. Hours, prices,
+            and policies may change. Always verify details directly with the winery before visiting.
+          </p>
         </div>
       </div>
-
-      <div className="mt-8 border-t border-black/5 py-8">
-        <p className="text-stone/70 text-sm text-pretty">
-          Sonoma Sip is an independent guide — not affiliated with any listed winery. Hours, prices,
-          and policies may change. Always verify details directly with the winery before visiting.
-        </p>
-      </div>
-    </div>
+    </PlanHoverProvider>
   );
 }
 
@@ -186,10 +192,10 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
 
   return (
     <div
-      className={`hover:bg-linen/50 rounded-xl py-6 transition-colors sm:py-8 ${showBorder ? 'border-t border-black/5' : ''}`}
+      className={`py-6 sm:py-8 ${showBorder ? 'border-t border-black/5' : ''}`}
     >
       <div className="flex items-start gap-5 px-2">
-        <div className="bg-gold/20 font-heading text-bark flex size-10 shrink-0 items-center justify-center rounded-full text-lg font-medium tabular-nums">
+        <div className="bg-gold/20 text-bark grid size-10 shrink-0 place-items-center rounded-full text-sm/10 font-medium tabular-nums">
           {rank}
         </div>
         <div className="min-w-0 flex-1">

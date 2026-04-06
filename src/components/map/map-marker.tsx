@@ -7,10 +7,18 @@ import type { MapItem } from './types';
 type MapMarkerProps = {
   item: MapItem;
   isSelected: boolean;
+  isHighlighted?: boolean;
   onClick: (id: string) => void;
+  onHover?: (id: string | null) => void;
 };
 
-export function MapMarker({ item, isSelected, onClick }: MapMarkerProps) {
+export function MapMarker({
+  item,
+  isSelected,
+  isHighlighted,
+  onClick,
+  onHover,
+}: MapMarkerProps) {
   return (
     <Marker
       latitude={item.latitude}
@@ -24,11 +32,15 @@ export function MapMarker({ item, isSelected, onClick }: MapMarkerProps) {
       <button
         type="button"
         aria-label={`${item.label}, #${item.rank ?? ''} match`}
+        onMouseEnter={() => onHover?.(item.id)}
+        onMouseLeave={() => onHover?.(null)}
         className={cn(
-          'shadow-warm flex size-7 items-center justify-center rounded-full text-[0.6875rem] font-semibold tabular-nums ring-2 ring-white transition-transform',
+          'shadow-warm grid size-7 place-items-center rounded-full text-[0.6875rem]/7 font-semibold tabular-nums ring-2 ring-white transition-transform',
           isSelected
             ? 'bg-wine-dark shadow-warm-lg scale-115 text-white'
-            : 'bg-wine text-white hover:scale-105',
+            : isHighlighted
+              ? 'bg-wine-dark scale-110 text-white'
+              : 'bg-wine text-white hover:scale-105',
         )}
       >
         {item.rank ?? '·'}

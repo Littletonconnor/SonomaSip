@@ -341,57 +341,40 @@ _The empty state, error state, loading skeleton, and overall results UI need a q
 
 #### Empty state (`EmptyState` component)
 
-- [ ] Richer illustration: replace the plain Search icon with a wine-themed empty state (e.g., empty wine glass, vineyard silhouette, or custom SVG) — should feel warm, not sterile
-- [ ] Better copy hierarchy: larger, more empathetic headline ("We couldn't find a perfect match — yet"), supportive sub-copy explaining what they can do
-- [ ] Actionable suggestions: show 2–3 specific tips for broadening their search (e.g., "Try adding more regions", "Relax your budget filter", "Remove some must-haves") based on which filters were most restrictive
-- [ ] Secondary CTA: add "Browse All Wineries" link alongside "Retake the Quiz" so users have options
-- [ ] Subtle animation: gentle fade-in or illustration animation to soften the disappointment
+- [x] Richer illustration: replace the plain Search icon with a wine-themed empty state (e.g., empty wine glass, vineyard silhouette, or custom SVG) — should feel warm, not sterile
+- [x] Better copy hierarchy: larger, more empathetic headline ("We couldn't find a perfect match — yet"), supportive sub-copy explaining what they can do
+- [x] Actionable suggestions: show 2–3 specific tips for broadening their search (e.g., "Try adding more regions", "Relax your budget filter", "Remove some must-haves") based on which filters were most restrictive
+- [x] Secondary CTA: add "Browse All Wineries" link alongside "Retake the Quiz" so users have options
+- [x] Subtle animation: gentle fade-in or illustration animation to soften the disappointment
 
 #### Error state (`ErrorState` component)
 
-- [ ] Friendlier tone: softer headline ("Something didn't go as planned"), reassuring sub-copy
-- [ ] Retry action: add a "Try Again" button that re-runs the quiz submission without navigating away
-- [ ] Contact fallback: small "If this keeps happening, let us know" link or text
-
-#### Loading skeleton (`ResultsSkeleton`)
-
-- [ ] Polish shimmer effect: use a warm-toned shimmer (cream/linen gradient) instead of default gray pulse
-- [ ] Add skeleton for preference badges section
-- [ ] Skeleton map placeholder on desktop side
+- [x] Friendlier tone: softer headline ("Something didn't go as planned"), reassuring sub-copy
+- [x] Retry action: add a "Try Again" button that re-runs the quiz submission without navigating away
+- [x] Contact fallback: small "If this keeps happening, let us know" link or text
 
 #### Result cards (`ResultCard`)
 
-- [ ] Score ring animation: animate the SVG stroke on mount (draw-in effect)
-- [ ] Hover state: more pronounced card lift/shadow on hover for better affordance
-- [ ] Winery image: placeholder for future winery photo (gradient or pattern placeholder that looks intentional)
-- [ ] "Book a Tasting" inline CTA: small secondary action on each card so users don't have to click through to detail page
-- [ ] Truncate long match reason lists: show top 3, expandable "Show more" if >3
-- [ ] Rank circle number centering: numbers aren't visually centered in the rank circles on both result cards and plan page winery stops — adjust alignment so all digits (1–9, 10+) look properly centered
-- [ ] Plan page map parity: make the plan page map match the results page map — clickable winery pins with popups, fly-to on click, same interactive behavior (currently uses a simpler PlanMap component)
+- [x] Score ring animation: animate the SVG stroke on mount (draw-in effect)
+- [x] Rank circle number centering: numbers aren't visually centered in the rank circles on both result cards and plan page winery stops — adjust alignment so all digits (1–9, 10+) look properly centered
+- [x] Plan page map parity: make the plan page map match the results page map — clickable winery pins with popups, fly-to on click, same interactive behavior (currently uses a simpler PlanMap component)
 
 #### Header & actions
 
-- [ ] Functional Share button: copy share URL to clipboard with toast confirmation
-- [ ] Functional Print button: trigger `window.print()` with a print-optimized stylesheet
-- [ ] Functional Email button: open mailto with pre-filled subject and share URL
-- [ ] Results count copy: make it warmer (e.g., "We found 12 wineries you'll love" instead of "12 wineries matched your preferences")
+- [x] Functional Share button: copy share URL to clipboard with toast confirmation
+- [x] Functional Print button: trigger `window.print()` with a print-optimized stylesheet
+- [x] Functional Email button: open mailto with pre-filled subject and share URL
+- [x] Results count copy: make it warmer (e.g., "We found 12 wineries you'll love" instead of "12 wineries matched your preferences")
 
 #### Map integration
 
-- [ ] Highlight card ↔ map pin interaction: hovering a result card highlights the corresponding map pin (and vice versa)
-- [ ] Fly-to on card click: clicking a card briefly highlights the pin on the map before navigating to detail
-- [ ] Mobile map: full-screen expandable overlay instead of inline collapse
-
-#### Responsive & polish
-
-- [ ] Mobile card layout: optimize spacing and typography for small screens (375px)
-- [ ] Print stylesheet: hide map, nav, footer; clean card layout for printing
-- [ ] Page transition: smooth entrance animation when navigating from quiz to results
+- [x] Highlight card ↔ map pin interaction: hovering a result card highlights the corresponding map pin (and vice versa)
+- [x] Fly-to on card click: clicking a card briefly highlights the pin on the map before navigating to detail
 
 ### 3.5.10 Content refresh
 
 - [x] **"How It Works" section rewrite:** Current copy says "Three questions. One perfect day." but the quiz is 4 steps, not 3 questions. Rethink the headline, step titles, and descriptions to accurately reflect the actual quiz flow (varietals → vibe/budget → must-haves/group → regions/stops). The "three questions" framing is misleading.
-- [ ] **Logo redesign:** Current wine glass icon (`src/app/icon.tsx`, `src/app/apple-icon.tsx`, navbar) looks like a goblet. Replace with a more refined, professional wine glass silhouette that feels editorial/luxury. Update favicon, apple icon, navbar logo, and manifest icons.
+- [x] **Logo redesign:** Current wine glass icon (`src/app/icon.tsx`, `src/app/apple-icon.tsx`, navbar) looks like a goblet. Replace with a more refined, professional wine glass silhouette that feels editorial/luxury. Update favicon, apple icon, navbar logo, and manifest icons.
 
 ---
 
@@ -857,13 +840,13 @@ _Initial spec drafted in `docs/SCORING.md` on 2026-04-04. Budget bands, style we
 
 ### D7.6 Share flow
 
-- [ ] Insert `shared_itineraries` → Supabase on share create
-- [ ] Load shared itinerary by ID on share page
+- [x] Insert `shared_itineraries` → Supabase on share create
+- [x] Load shared itinerary by ID on share page
 - [ ] Rate limit share creation by IP
 
 ### D7.7 Plan page
 
-- [ ] Wire up plan/itinerary page to real data
+- [x] Wire up plan/itinerary page to real data
 - [ ] PDF: text-first print route / CSS; v2: Mapbox Static image
 - [ ] Email: send via Resend/Postmark with share URL + summary
 

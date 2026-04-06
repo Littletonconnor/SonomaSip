@@ -6,6 +6,7 @@ import { Map as MapIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { usePlanHover } from './plan-hover-context';
 import type { MapItem } from '@/components/map/types';
 
 const SonomaMap = dynamic(() => import('@/components/map/sonoma-map'), { ssr: false });
@@ -13,6 +14,7 @@ const SonomaMap = dynamic(() => import('@/components/map/sonoma-map'), { ssr: fa
 export function PlanMap({ items }: { items: MapItem[] }) {
   const isMobile = useIsMobile();
   const [showMap, setShowMap] = useState(false);
+  const { hoveredId, setHoveredId } = usePlanHover();
 
   if (isMobile) {
     return (
@@ -35,7 +37,7 @@ export function PlanMap({ items }: { items: MapItem[] }) {
               transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
-              <SonomaMap items={items} />
+              <SonomaMap items={items} showLegend hoveredId={hoveredId} onMarkerHover={setHoveredId} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -43,5 +45,5 @@ export function PlanMap({ items }: { items: MapItem[] }) {
     );
   }
 
-  return <SonomaMap items={items} />;
+  return <SonomaMap items={items} showLegend hoveredId={hoveredId} onMarkerHover={setHoveredId} />;
 }
