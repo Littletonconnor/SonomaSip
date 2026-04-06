@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import {
   ChevronDown,
   Star,
-  Search,
   Check,
   Map as MapIcon,
   Loader2,
@@ -118,6 +117,8 @@ export default function ResultsPage() {
   const isMobile = useIsMobile();
   const [showMap, setShowMap] = useState(false);
   const [isCreatingPlan, setIsCreatingPlan] = useState(false);
+  const [hoveredWineryId, setHoveredWineryId] = useState<string | null>(null);
+  const [activeWineryId, setActiveWineryId] = useState<string | null>(null);
 
   async function handleCreatePlan() {
     if (!results || isCreatingPlan) return;
@@ -130,12 +131,39 @@ export default function ResultsPage() {
     }
   }
 
+  function handleCardClick(id: string, slug: string) {
+    if (isMobile && !showMap) {
+      router.push(`/wineries/${slug}`);
+      return;
+    }
+    setActiveWineryId(id);
+    setTimeout(() => {
+      router.push(`/wineries/${slug}`);
+    }, 650);
+  }
+
   if (!hydrated || isPending) {
     return <ResultsSkeleton />;
   }
 
   if (error) {
-    return <ErrorState message={error} />;
+    return (
+      <ErrorState
+        message={error}
+        onRetry={() => {
+          setError(null);
+          setResults(null);
+          startTransition(async () => {
+            try {
+              const data = await submitQuiz(answers);
+              setResults(data);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : 'Something went wrong');
+            }
+          });
+        }}
+      />
+    );
   }
 
   if (results === null) {
@@ -143,7 +171,7 @@ export default function ResultsPage() {
   }
 
   if (results.length === 0) {
-    return <EmptyState />;
+    return <EmptyState answers={answers} />;
   }
 
   return (
@@ -211,7 +239,13 @@ export default function ResultsPage() {
             <StaggerChildren className="flex flex-col" staggerDelay={0.08}>
               {results.map((result, i) => (
                 <StaggerItem key={result.winery.id}>
-                  <ResultCard result={result} showBorder={i > 0} />
+                  <ResultCard
+                    result={result}
+                    showBorder={i > 0}
+                    isHighlighted={hoveredWineryId === result.winery.id}
+                    onHover={setHoveredWineryId}
+                    onCardClick={handleCardClick}
+                  />
                 </StaggerItem>
               ))}
             </StaggerChildren>
@@ -250,14 +284,26 @@ export default function ResultsPage() {
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <SonomaMap items={mapItems} showLegend />
+                      <SonomaMap
+                        items={mapItems}
+                        showLegend
+                        hoveredId={hoveredWineryId}
+                        onMarkerHover={setHoveredWineryId}
+                        activeId={activeWineryId}
+                      />
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
             ) : (
               <AnimatedSection delay={0.3} direction="right">
-                <SonomaMap items={mapItems} showLegend />
+                <SonomaMap
+                  items={mapItems}
+                  showLegend
+                  hoveredId={hoveredWineryId}
+                  onMarkerHover={setHoveredWineryId}
+                  activeId={activeWineryId}
+                />
               </AnimatedSection>
             )}
           </div>
@@ -267,7 +313,19 @@ export default function ResultsPage() {
   );
 }
 
-function ResultCard({ result, showBorder }: { result: MatchResult; showBorder: boolean }) {
+function ResultCard({
+  result,
+  showBorder,
+  isHighlighted,
+  onHover,
+  onCardClick,
+}: {
+  result: MatchResult;
+  showBorder: boolean;
+  isHighlighted?: boolean;
+  onHover?: (id: string | null) => void;
+  onCardClick?: (id: string, slug: string) => void;
+}) {
   const { winery, rank, score, matchReasons } = result;
 
   const featureBadges: string[] = [];
@@ -284,12 +342,20 @@ function ResultCard({ result, showBorder }: { result: MatchResult; showBorder: b
   return (
     <Link
       href={`/wineries/${winery.slug}`}
-      className={`group flex gap-5 py-7 sm:gap-7 ${showBorder ? 'border-t border-black/5' : ''}`}
+      onClick={(e) => {
+        if (onCardClick) {
+          e.preventDefault();
+          onCardClick(winery.id, winery.slug);
+        }
+      }}
+      className={`group flex gap-5 py-7 sm:gap-7 ${showBorder ? 'border-t border-black/5' : ''} ${isHighlighted ? 'bg-linen/50' : ''}`}
+      onMouseEnter={() => onHover?.(winery.id)}
+      onMouseLeave={() => onHover?.(null)}
     >
       <div className="relative flex size-16 shrink-0 items-center justify-center sm:size-20">
         <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 36 36">
           <circle cx="18" cy="18" r="15.5" fill="none" className="stroke-fog" strokeWidth="2" />
-          <circle
+          <motion.circle
             cx="18"
             cy="18"
             r="15.5"
@@ -297,10 +363,14 @@ function ResultCard({ result, showBorder }: { result: MatchResult; showBorder: b
             className="stroke-wine"
             strokeWidth="2"
             strokeLinecap="round"
-            strokeDasharray={`${score * 0.974} 100`}
+            strokeDasharray="100 100"
+            initial={{ strokeDashoffset: 100 }}
+            whileInView={{ strokeDashoffset: 100 - score * 0.974 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
           />
         </svg>
-        <span className="font-heading text-bark text-lg font-medium tabular-nums sm:text-xl">
+        <span className="font-heading text-bark text-lg/none font-medium tabular-nums sm:text-xl/none">
           {score}
         </span>
       </div>
@@ -385,38 +455,123 @@ function ResultsSkeleton() {
   );
 }
 
-function ErrorState({ message }: { message: string }) {
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="flex min-h-[calc(100dvh-3.5rem)] flex-col items-center justify-center px-6 py-24">
-      <div className="bg-fog flex size-16 items-center justify-center rounded-full">
-        <Search className="text-stone size-7" />
+    <motion.div
+      className="flex min-h-[calc(100dvh-3.5rem)] flex-col items-center justify-center px-6 py-24"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      <div className="bg-linen flex size-20 items-center justify-center rounded-full">
+        <svg
+          className="text-wine/60 size-10"
+          viewBox="0 0 48 48"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        >
+          <circle cx="24" cy="24" r="18" />
+          <path d="M24 16v10" />
+          <circle cx="24" cy="33" r="0.5" fill="currentColor" />
+        </svg>
       </div>
-      <h1 className="font-heading text-bark mt-6 text-2xl font-medium tracking-tight">
-        Something went wrong
+      <h1 className="font-heading text-bark mt-6 text-2xl font-medium tracking-tight text-balance">
+        Something didn&rsquo;t go as planned
       </h1>
       <p className="text-stone mt-2 max-w-sm text-center text-sm text-pretty">{message}</p>
-      <Button className="mt-8 rounded-full px-8" asChild>
-        <Link href="/quiz">Retake the Quiz</Link>
-      </Button>
-    </div>
+      <p className="text-stone/60 mt-1 text-center text-sm">
+        Don&rsquo;t worry &mdash; your quiz answers are saved.
+      </p>
+      <div className="mt-8 flex items-center gap-3">
+        <Button className="rounded-full px-8" onClick={onRetry}>
+          Try Again
+        </Button>
+        <Button variant="outline" className="rounded-full px-8" asChild>
+          <Link href="/quiz">Retake the Quiz</Link>
+        </Button>
+      </div>
+      <p className="text-stone/40 mt-6 text-xs">
+        If this keeps happening, email us at help@sonomasip.com
+      </p>
+    </motion.div>
   );
 }
 
-function EmptyState() {
+function getEmptyStateTips(answers: QuizAnswers): string[] {
+  const tips: string[] = [];
+  const activeMustHaves = Object.entries(answers.mustHaves).filter(([, v]) => v);
+  if (activeMustHaves.length >= 3) {
+    const label = MUST_HAVE_LABELS[activeMustHaves[0][0] as keyof MustHaves];
+    tips.push(`Try removing a must-have like "${label}"`);
+  }
+  if (answers.selectedVarietals.length > 3)
+    tips.push('Try selecting fewer grape varietals');
+  if (answers.budgetBand === '$')
+    tips.push('Expanding your budget range opens up more options');
+  if (answers.preferredRegions.length >= 3)
+    tips.push('Consider exploring all Sonoma regions');
+  if (tips.length === 0 && !answers.includeMembersOnly)
+    tips.push('Including members-only wineries can reveal hidden gems');
+  if (tips.length === 0)
+    tips.push('Try selecting fewer filters to see more wineries');
+  return tips.slice(0, 3);
+}
+
+function EmptyState({ answers }: { answers: QuizAnswers }) {
+  const tips = getEmptyStateTips(answers);
+
   return (
-    <div className="flex min-h-[calc(100dvh-3.5rem)] flex-col items-center justify-center px-6 py-24">
-      <div className="bg-fog flex size-16 items-center justify-center rounded-full">
-        <Search className="text-stone size-7" />
+    <motion.div
+      className="flex min-h-[calc(100dvh-3.5rem)] flex-col items-center justify-center px-6 py-24"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      <div className="bg-linen flex size-20 items-center justify-center rounded-full">
+        <svg
+          className="text-wine/50 size-10"
+          viewBox="0 0 48 48"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M17 6c0 0-3 8-3 14 0 6 4 10 10 10s10-4 10-10c0-6-3-14-3-14" />
+          <line x1="24" y1="30" x2="24" y2="38" />
+          <line x1="18" y1="40" x2="30" y2="40" />
+        </svg>
       </div>
-      <h1 className="font-heading text-bark mt-6 text-2xl font-medium tracking-tight">
-        No wineries matched
+      <h1 className="font-heading text-bark mt-6 text-3xl font-medium tracking-tight text-balance">
+        We couldn&rsquo;t find a perfect match &mdash; yet
       </h1>
-      <p className="text-stone mt-2 max-w-sm text-center text-sm text-pretty">
-        Try relaxing your filters — fewer constraints means more matches.
+      <p className="text-stone mt-2 max-w-md text-center text-sm text-pretty">
+        Your preferences were very specific, which is great &mdash; it just means we need to cast a
+        wider net.
       </p>
-      <Button className="mt-8 rounded-full px-8" asChild>
-        <Link href="/quiz">Retake the Quiz</Link>
-      </Button>
-    </div>
+
+      <ul className="mt-6 flex flex-col gap-2" role="list">
+        {tips.map((tip) => (
+          <li key={tip} className="text-stone flex items-start gap-2 text-sm">
+            <Check className="text-wine mt-0.5 size-3.5 shrink-0" />
+            {tip}
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-8 flex items-center gap-4">
+        <Button className="rounded-full px-8" asChild>
+          <Link href="/quiz">Retake the Quiz</Link>
+        </Button>
+        <Link
+          href="/wineries"
+          className="text-wine decoration-wine/30 hover:decoration-wine text-sm font-medium underline underline-offset-4"
+        >
+          Browse all wineries
+        </Link>
+      </div>
+    </motion.div>
   );
 }

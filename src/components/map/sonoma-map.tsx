@@ -19,9 +19,19 @@ type SonomaMapProps = {
   items: MapItem[];
   className?: string;
   showLegend?: boolean;
+  hoveredId?: string | null;
+  onMarkerHover?: (id: string | null) => void;
+  activeId?: string | null;
 };
 
-export default function SonomaMap({ items, className, showLegend = false }: SonomaMapProps) {
+export default function SonomaMap({
+  items,
+  className,
+  showLegend = false,
+  hoveredId,
+  onMarkerHover,
+  activeId,
+}: SonomaMapProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,6 +57,19 @@ export default function SonomaMap({ items, className, showLegend = false }: Sono
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!activeId) return;
+    const item = items.find((i) => i.id === activeId);
+    if (item && mapRef.current) {
+      setSelectedId(activeId);
+      mapRef.current.flyTo({
+        center: [item.longitude, item.latitude],
+        zoom: 10.5,
+        duration: 600,
+      });
+    }
+  }, [activeId, items]);
 
   const handleMarkerClick = useCallback((id: string) => {
     setSelectedId((prev) => (prev === id ? null : id));
@@ -106,7 +129,9 @@ export default function SonomaMap({ items, className, showLegend = false }: Sono
                 key={item.id}
                 item={item}
                 isSelected={selectedId === item.id}
+                isHighlighted={hoveredId === item.id}
                 onClick={handleMarkerClick}
+                onHover={onMarkerHover}
               />
             ))}
             {selectedItem && <MapPopup item={selectedItem} onClose={() => setSelectedId(null)} />}
@@ -157,7 +182,7 @@ function MapLegend({
         >
           <span
             className={cn(
-              'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums',
+              'grid size-6 shrink-0 place-items-center rounded-full text-xs/6 font-semibold tabular-nums',
               selectedId === item.id ? 'bg-wine text-primary-foreground' : 'bg-wine/10 text-wine',
             )}
           >
