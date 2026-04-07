@@ -339,171 +339,162 @@ _The best free protection layer you can add. Handles WAF, DDoS, and distributed 
 
 ---
 
-## Content pipeline (Phase D8)
+## Data Pipeline — Enterprise Winery Data System
 
-_Detail pages need rich, original content to drive click-throughs. Scrape winery websites → LLM extraction → LLM enrichment → human review → publish._
+_Replace the one-shot CSV import with an automated, multi-source pipeline that keeps data fresh and scales to 400-600+ wineries. Each phase builds on the previous one._
 
 ```
-Registry (winery URLs)
-  → Cloudflare /crawl API (websites → markdown)
-  → Raw scrape storage (winery_scrapes table)
-  → LLM extraction (structured: hours, flights, prices, varietals)
-  → LLM enrichment (stories, taglines, visitor tips, seasonal notes)
-  → Content drafts (content_drafts table, status: draft)
-  → Admin review UI (approve/edit/reject)
-  → Published to wineries table
+Discovery → Crawl → Extract → Enrich → Review → Publish → Monitor
 ```
 
-### Setup
+**Tech choices:**
+| Component | Technology | Rationale |
+|-----------|-----------|-----------|
+| Crawling | Firecrawl (hosted) | Handles JS rendering, returns clean markdown, rate limiting built in |
+| LLM Extraction | Claude Haiku via Anthropic SDK | Fast, cheap, good at structured extraction |
+| LLM Enrichment | Claude Sonnet via Anthropic SDK | Better at creative/editorial content |
+| Scheduling | Vercel Cron or GitHub Actions | Already in the stack |
+| Pipeline orchestration | Next.js API routes (`/api/pipeline/*`) | One deploy |
+| Admin UI | Next.js pages with shadcn/ui | Consistent with app |
 
-- [ ] Cloudflare account + API token (Browser Rendering permission)
-- [ ] Env vars: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
-- [ ] Wrapper: `lib/pipeline/cloudflare-crawl.ts` (initiate crawl, poll, return markdown)
-- [ ] Config: 10 pages/winery, markdown format, skip images/media/fonts
-- [ ] Test with 3 winery websites
-
-### Scrape pipeline
-
-- [ ] `scripts/scrape-wineries.ts` — iterate registry, crawl each site
-- [ ] `winery_scrapes` table: `(id, winery_id, url, raw_markdown, pages_crawled, scraped_at)`
-- [ ] Rate limiting between crawls (68 wineries × 10 pages = ~680 renders)
-- [ ] `--dry-run` mode; npm script: `pnpm pipeline:scrape`
-
-### LLM extraction (structured data)
-
-- [ ] `lib/pipeline/llm-extract.ts` — raw markdown → structured JSON (hours, flights, varietals, policies)
-- [ ] `winery_llm_extractions` table: `(id, winery_id, scrape_id, extracted_data, model_used, tokens_used)`
-- [ ] Diff against current DB values; auto-apply high-confidence changes to drafts; flag low-confidence for review
-
-### LLM enrichment (original content)
-
-- [ ] `lib/pipeline/llm-enrich.ts` — generate: story (2-3 paragraphs), tagline, flight descriptions, visitor tip, seasonal note
-- [ ] System prompt: SonomaSip editorial voice (warm, knowledgeable, opinionated)
-- [ ] Never fabricate facts; include source citations in draft metadata
-- [ ] `content_drafts` table: `(id, winery_id, field_name, current_value, draft_value, status, reviewed_by)`
-- [ ] Status: `draft` → `approved` / `rejected` → `published`
-- [ ] npm script: `pnpm pipeline:enrich`
-
-### Orchestrator
-
-- [ ] `scripts/run-pipeline.ts` — scrape → extract → enrich in sequence
-- [ ] Per-winery error handling; summary report
-- [ ] npm scripts: `pnpm pipeline:run`, `pnpm pipeline:run --winery=slug`
-
-### Schema additions
-
-- [ ] Migration: `winery_scrapes`, `winery_llm_extractions`, `content_drafts` tables
-- [ ] Add `content_status` + `last_scraped_at` to `wineries`
-
-### Cost estimate
-
-~68 wineries × ~3K tokens/winery ≈ 200K tokens/month ≈ $1–3/month (Claude Haiku or GPT-4o-mini). Cloudflare Browser Rendering: ~680 renders/month (free or near-free).
+**Cost at scale:** ~$50/mo at 400 wineries (Firecrawl ~$30, Haiku ~$5, Sonnet ~$15).
 
 ---
 
-## Admin pages (Phase D9)
+### Phase P1: Foundation (DB + tracking infrastructure)
 
-_Two people reviewing content. Speed matters — reviewing 68 wineries should take ~30 minutes._
+- [x] Migration: `pipeline_runs` table — `(id, stage, status, wineries_processed, wineries_failed, error_summary, started_at, completed_at, metadata JSONB)`
+- [x] Migration: `winery_registry` table — `(id, name, normalized_name, source, source_id, website_url, latitude, longitude, matched_winery_id, coverage_tier, created_at, updated_at)`
+- [x] Migration: `winery_scrapes` table — `(id, winery_id, run_id, page_url, page_title, raw_markdown, word_count, scraped_at)`
+- [x] Migration: `winery_extractions` table — `(id, winery_id, run_id, extracted_fields JSONB, model_used, token_count, extracted_at)`
+- [x] Migration: `content_drafts` table — `(id, winery_id, extraction_id, field_name, current_value, proposed_value, confidence, source_quote, status, reviewed_by, reviewed_at, created_at)`
+- [x] Migration: `url_health_checks` table — `(id, winery_id, url, status_code, redirect_url, response_time_ms, checked_at)`
+- [x] Migration: add to `wineries` table — `coverage_tier`, `last_scraped_at`, `last_verified_at`, `content_status`, `data_sources JSONB`
+- [x] Backfill existing 68 wineries as `coverage_tier = 'editorial'`
+- [x] `lib/pipeline/tracking.ts` — helpers to start/complete/fail a pipeline run
+- [x] Migration: `winery_snapshots` table — `(id, winery_id, run_id, snapshot JSONB, reason, created_at)` for rollback
+- [x] RLS policies on all new tables (service role only for writes, admin read)
 
-### Auth
+### Phase P2: Discovery (find new wineries)
 
-- [ ] Password-protected route group: `/admin/*`
-- [ ] Env var: `ADMIN_PASSWORD` (upgrade to Supabase auth later if needed)
-- [ ] Middleware to check auth on all `/admin` routes
+- [x] `scripts/discover-osm.ts` — Overpass API query for `amenity=winery` + `craft=winery` in Sonoma County bounding box
+- [x] Fuzzy dedup engine: Levenshtein ≤ 3 on normalized name, coordinate proximity < 200m, exact domain match (`src/lib/pipeline/dedup.ts`)
+- [ ] Manual override table for known aliases (e.g., "Jordan Vineyard & Winery" = "Jordan Winery")
+- [x] Match against existing 68 wineries; tag matched with `osm_node_id`; unmatched → `discovered` tier
+- [x] `pnpm discover:osm` + `pnpm discover:osm:dry`
+- [ ] Scrape Sonoma County Vintners + Wine Road member directories (public HTML)
+- [ ] Cross-reference against OSM + editorial list; `pnpm discover:associations`
+- [x] `scripts/merge-discoveries.ts` — merge all sources, dedup, report + optional `--promote` to create stub wineries
+- [ ] Coverage tier display: editorial = full detail pages, verified = map + browse + basic matching, discovered = map pin + name + "Visit website" only
+- [ ] Schedule: monthly discovery runs
 
-### Content review (`/admin/review`)
+### Phase P3: Crawl (fetch current winery website content)
 
-- [ ] List pending content drafts grouped by winery
-- [ ] Side-by-side: current published vs LLM draft with diff highlighting
-- [ ] Actions: Approve, Edit (inline), Reject (with note)
+- [x] Firecrawl account + API key
+- [x] `lib/pipeline/crawl.ts` — wrapper: initiate crawl via REST API, poll status, return markdown; 5 pages/winery (free tier budget: 100 wineries/mo), `onlyMainContent`, regex include patterns for visit/tasting/hours/reservation pages
+- [x] `scripts/crawl-wineries.ts` — iterate wineries, crawl each site, store to `winery_scrapes`; supports `--winery=slug`, `--tier=editorial`, `--force`, `--dry-run`; 10s delay between wineries; skips wineries scraped within last 30 days
+- [x] `pnpm pipeline:crawl` + `pnpm pipeline:crawl:dry`
+- [x] `FIRECRAWL_API_KEY` env var (optional in validation, required at runtime by crawl)
+- [x] Tested with 3 wineries (Jordan, Cline, Dry Creek) + 1 with DB writes (Iron Horse)
+- [ ] Schedule: weekly for editorial, monthly for verified, quarterly for discovered
+
+### Phase P4: Extraction (raw content → structured data)
+
+- [ ] `lib/pipeline/extract.ts` — send scraped markdown to Claude Haiku with structured extraction prompt
+- [ ] Extraction prompt: for each field, return `{ value, confidence (0.0–1.0), source_quote }`; fields match `wineries` DB schema (hours, fees, reservation policy, varietals, amenities, pet policy, group limits, etc.)
+- [ ] Confidence scoring: 1.0 = explicitly stated, 0.5 = inferred, 0.0 = not found
+- [ ] Diff engine: compare extracted values to current DB; only changed fields become `content_drafts`
+- [ ] Store to `winery_extractions` table with model used and token count
+- [ ] `pnpm pipeline:extract`; runs automatically after crawl completes
+
+### Phase P5: Enrichment (LLM editorial content)
+
+- [ ] `lib/pipeline/enrich.ts` — send extracted data + raw content to Claude Sonnet
+- [ ] Generate: tagline (≤15 words), description (2-3 sentences), insider tip, best-for tags
+- [ ] Generate: style scores (classic, luxury, family_friendly, social, sustainable, adventure) on 1–5 scale with reasoning
+- [ ] Generate: editorial judgments (hidden_gem, must_visit, local_favorite, quality_score, popularity_score) with reasoning
+- [ ] Voice: warm, knowledgeable, specific over generic ("known for their single-vineyard Pinot Noir" not "best winery"), no fabricated facts
+- [ ] Include source citations in metadata
+- [ ] Only regenerate when underlying data changes or content is >90 days old
+- [ ] Output: rows in `content_drafts` with status `draft`
+- [ ] `pnpm pipeline:enrich`
+- [ ] **Goal: once P5+P6 are stable, the Excel sheet is retired. All data managed through the pipeline + admin UI.**
+
+### Phase P6: Review & Publish (human-in-the-loop)
+
+**Auto-approve rules** (skip human review):
+- Confidence ≥ 0.9 AND field is factual (hours, phone, email, URL, address)
+- Change is an addition (new field value where none existed)
+- Price change within ±20% of current value
+
+**Flag for human review** (everything else):
+- Confidence < 0.9
+- Editorial content (descriptions, taglines, tips)
+- New winery additions
+- Fields affecting match scores (reservation_required, dog_friendly, etc.)
+- Deletions or significant value changes
+
+Admin UI tasks:
+
+- [ ] Password-protected route group: `/admin/*`; env var `ADMIN_PASSWORD`; middleware auth check
+- [ ] `/admin/review` — pending drafts queue sorted by priority (editorial wineries first)
+- [ ] Side-by-side diff: current value vs. proposed value with source quote
+- [ ] Actions: Approve / Reject (with note) / Edit & Approve
 - [ ] Bulk: "Approve all for this winery", "Skip to next"
 - [ ] Keyboard shortcuts: A=approve, E=edit, R=reject, N=next
-- [ ] Progress: "23 of 68 wineries reviewed"
+- [ ] Progress indicator: "23 of 68 wineries reviewed"
 
-### Data health dashboard (`/admin/health`)
+Publish flow:
 
-- [ ] Overview: active winery count, last import/scrape/enrichment dates
-- [ ] Broken URLs, stale data warnings (>90 days), pipeline run history
+- [ ] Snapshot current winery row to `winery_snapshots` before overwriting (JSONB copy + run_id)
+- [ ] Atomic upsert per winery (all approved field changes in one transaction)
+- [ ] Update `last_verified_at`, `coverage_tier` (discovered → verified on first crawl)
+- [ ] `pnpm pipeline:publish`
 
-### Click attribution dashboard (`/admin/clicks`)
+Rollback:
+
+- [ ] `/admin/history/:wineryId` — timeline of snapshots per winery
+- [ ] "Revert to this version" button restores snapshot JSONB to `wineries` row
+- [ ] Revert creates its own snapshot (so you can undo a revert)
+
+### Phase P7: Monitoring & Scheduling
+
+- [ ] URL health check: weekly HEAD request to every winery URL; flag 404s and redirects; store in `url_health_checks`
+- [ ] Staleness detection: alert when winery not verified in >90 days
+- [ ] Pipeline health: success/failure rates per stage per run via `pipeline_runs` queries
+- [ ] Data quality: flag wineries missing critical fields (name, region, lat/lng)
+- [ ] `/admin/health` dashboard — overview: winery count, last import/scrape/enrichment dates, broken URLs, stale data warnings, pipeline run history
+- [ ] Vercel cron config for all scheduled stages (discovery monthly, crawl weekly/monthly, health checks weekly)
+- [ ] Show "Last verified: {date}" on winery detail page
+- [ ] "Report an issue" link on winery detail page
+
+### Phase P8: Pipeline orchestration & ops
+
+- [ ] `scripts/run-pipeline.ts` — discovery → crawl → extract → enrich → auto-approve → publish in sequence
+- [ ] Per-winery error handling; continue on failure; summary report
+- [ ] `pnpm pipeline:run`, `pnpm pipeline:run --winery=slug`
+- [ ] `/admin/pipeline` — manual trigger buttons, run status, last run summary, raw scrape viewer
+- [ ] Sentry + source maps for pipeline error tracking
+- [ ] Health check endpoint: `/api/health`
+
+### Phase P9: Click attribution & analytics
 
 - [ ] `click_events` table: `(id, winery_id, source_page, booking_url, clicked_at, session_id)`
 - [ ] Track "Book a Tasting" clicks via `navigator.sendBeacon` (non-blocking)
 - [ ] Append `?ref=sonomasip` to outbound booking URLs
-- [ ] Dashboard: clicks per winery (7d/30d/all-time), top performers
-- [ ] CSV export for winery partnership outreach
+- [ ] `/admin/clicks` dashboard: clicks per winery (7d/30d/all-time), top performers, CSV export
 
-### Pipeline trigger (`/admin/pipeline`)
+### Future: Geographic expansion
 
-- [ ] Manual trigger buttons: full pipeline, single winery scrape, single winery re-enrich
-- [ ] Run status indicator, last run summary
-- [ ] View raw scrape output per winery (debugging)
+- [ ] Add Napa Valley AVA regions to `ava_region` enum
+- [ ] Update app copy from "Sonoma" to "Sonoma & Napa" where appropriate
 
----
-
-## Reliability & operations (Phase 7)
-
-### Observability
-
-- [ ] Sentry + source maps (error tracking)
-- [ ] Health check endpoint: `/api/health`
-- [ ] Uptime monitoring on `/` and `/api/health`
-
-### Data freshness
-
-- [ ] **URL health check** (weekly): HEAD every `bookingUrl`, flag broken
-- [ ] **Stale data alert**: flag wineries not verified in >90 days
-- [ ] **Quarterly audit**: spot-check 15-20 wineries across all regions
-- [ ] **Seasonal hours** (Mar + Nov): bulk review before summer/winter shift
-- [ ] **Annual full audit** (Jan): verify all editorial wineries, run discovery for new openings
-- [ ] Show "Last verified: {date}" on winery detail page
-- [ ] "Report an issue" link on winery detail page
-
-### Google Places Sync (optional, future)
+### Future: Google Places Sync
 
 - [ ] Map `google_place_id` for each winery
 - [ ] Weekly sync: auto-update `rating_google` + `review_count`; flag hours drift for review
 - [ ] Never auto-update: hours, booking_url, experience flags, style scores
 - [ ] ToS compliance
-
----
-
-## Winery discovery (Phase D0 — expand beyond 68)
-
-_Expand from 68 editorial wineries to a comprehensive Sonoma + Napa registry (target: 400–600+). All discovery sources are free._
-
-### Coverage tiers
-
-- [ ] Add `coverage_tier` enum: `editorial` | `verified` | `discovered`
-  - **Editorial** — full curated data (current 68). Rich detail pages, full quiz matching.
-  - **Verified** — basic info confirmed. Shown on map + browse. Basic quiz matching.
-  - **Discovered** — exists but not reviewed. Map pin + name + "Visit website" only.
-- [ ] Add column to `wineries` table; update detail page, quiz matching, browse/map for tier-aware display
-
-### OpenStreetMap discovery (primary, free)
-
-- [ ] `scripts/discover-osm.ts` — Overpass API query for `amenity=winery` + `craft=winery` in Sonoma/Napa bounding box
-- [ ] Fuzzy-match against existing 68 wineries (name + proximity ~500m)
-- [ ] Tag matched with `osm_node_id`; unmatched become `discovered`
-- [ ] `pnpm discover:osm`
-
-### Wine association directories (cross-validation, free)
-
-- [ ] Scrape Sonoma County Vintners + Napa Valley Vintners member directories
-- [ ] Cross-reference against OSM + editorial list
-- [ ] `pnpm discover:associations`
-
-### Registry merge & dedup
-
-- [ ] `scripts/merge-discoveries.ts` — merge all sources (editorial > OSM > association > Wikidata)
-- [ ] Dedup: fuzzy name + coordinate proximity (<500m)
-- [ ] Output: `docs/csv/winery-registry.csv` with `coverage_tier` + source columns
-- [ ] Human review pass
-
-### Geographic expansion
-
-- [ ] Add Napa Valley AVA regions to `ava_region` enum
-- [ ] Update app copy from "Sonoma" to "Sonoma & Napa" where appropriate
 
 ---
 
@@ -541,7 +532,7 @@ _Expand from 68 editorial wineries to a comprehensive Sonoma + Napa registry (ta
 
 | Decision                                 | Resolution                                                                                            |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Budget band → dollar mapping             | `$` ≤ $35, `$$` ≤ $65, `$$$` ≤ $100, `$$$$` = no cap                                                  |
+| Budget band → dollar mapping             | `$` ≤ $35, `$$` ≤ $65, `$$$` ≤ $100, `$$$$` = no cap                                                 |
 | Style dimension scores                   | 5 numeric columns (1–5): relaxed, adventurous, educational, celebratory, social                       |
 | `ReservationType` values                 | `walk_ins_welcome`, `reservations_recommended`, `appointment_only` + separate `isMembersOnly` boolean |
 | `FlightFormat` expanded                  | `seated, standing, tour, outdoor, picnic, bar`                                                        |
@@ -551,6 +542,9 @@ _Expand from 68 editorial wineries to a comprehensive Sonoma + Napa registry (ta
 | Walk-in filter                           | Passes both `walk_ins_welcome` and `reservations_recommended`                                         |
 | Shared itinerary storage                 | JSONB snapshot (full winery+flight data), not just IDs                                                |
 | Click tracking                           | `navigator.sendBeacon` (non-blocking)                                                                 |
+| Style scores & editorial judgments        | LLM-generated (P5), manually overridable via admin UI. No field is exempt from automation.            |
+| Excel sheet retirement                   | Excel is a one-time bootstrap. Once P5+P6 are stable, all data managed through pipeline + admin UI.   |
+| Pipeline rollback                        | `winery_snapshots` table stores full JSONB row before each publish. Revert via admin UI.              |
 
 ### Data source authority
 
