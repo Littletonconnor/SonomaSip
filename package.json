@@ -16,6 +16,12 @@
     "db:import": "npx tsx scripts/import-wineries.ts",
     "db:import:dry": "npx tsx scripts/import-wineries.ts --dry-run",
     "db:reset": "npx supabase db reset && pnpm db:import",
+    "discover:osm": "npx tsx scripts/discover-osm.ts",
+    "discover:osm:dry": "npx tsx scripts/discover-osm.ts --dry-run",
+    "discover:merge": "npx tsx scripts/merge-discoveries.ts",
+    "discover:merge:promote": "npx tsx scripts/merge-discoveries.ts --promote",
+    "pipeline:crawl": "npx tsx scripts/crawl-wineries.ts",
+    "pipeline:crawl:dry": "npx tsx scripts/crawl-wineries.ts --dry-run",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:golden": "vitest run src/lib/matching/__tests__/golden.test.ts"
