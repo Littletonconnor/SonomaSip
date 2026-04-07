@@ -254,11 +254,11 @@ _Every third-party service has usage-based pricing. This is a pre-public-launch 
 | Email send        | 3     | 1 hour | Resend free tier        |
 | PDF generate      | 5     | 1 hour | Server rendering cost   |
 
-- [ ] Choose rate limiting library: `@upstash/ratelimit` (Redis-backed, Vercel-native) or in-memory for dev
-- [ ] Create `src/lib/rate-limit.ts` utility
-- [ ] Apply to quiz submit, share create, email send server actions
-- [ ] Return `429` with `Retry-After` header + user-friendly message
-- [ ] Edge middleware: global 200 req/min per IP to catch scrapers
+- [x] Choose rate limiting approach: in-memory token bucket (zero dependencies, no paid services)
+- [x] Create `src/lib/rate-limit.ts` utility (token bucket with automatic eviction)
+- [x] Apply to quiz submit (10/hr), plan create (5/hr) server actions
+- [x] Return `429` with `Retry-After` header from middleware
+- [x] Middleware: global 60 req/min per IP to catch scrapers (`src/middleware.ts`)
 
 ### Kill switches (env vars in Vercel dashboard)
 
@@ -271,6 +271,52 @@ _Every third-party service has usage-based pricing. This is a pre-public-launch 
 
 - [ ] Check `navigator.webdriver` + bot user-agents before mounting map; bots get static placeholder
 - [ ] Honeypot fields on quiz and email forms; reject silently if filled
+
+### Cloudflare free tier (future — recommended before public launch)
+
+_The best free protection layer you can add. Handles WAF, DDoS, and distributed rate limiting where in-memory middleware can't (across edge nodes). Requires a custom domain (not `*.vercel.app`)._
+
+#### Step-by-step setup
+
+1. **Create a free Cloudflare account** at cloudflare.com
+2. **Add your domain** — Cloudflare will scan existing DNS records
+3. **Update nameservers** at your registrar to Cloudflare's (they'll tell you which two)
+4. **Wait for propagation** (usually 5–30 minutes, up to 24 hours)
+5. **Set SSL/TLS mode to "Full (strict)"** — Cloudflare → Vercel is already HTTPS
+6. **Enable "Bot Fight Mode"** — Settings → Security → Bots → toggle on. Free, blocks known bad bots automatically.
+7. **Add a rate limiting rule** (1 free rule):
+   - Security → WAF → Rate limiting rules → Create rule
+   - **When:** URI path contains `/results` (catches server action POSTs to the results page)
+   - **Rate:** 20 requests per 10 seconds per IP
+   - **Action:** Block for 60 seconds
+   - This protects `submitQuiz` and `createPlan` at the edge before requests even reach Vercel
+8. **Add WAF custom rules** (5 free rules), suggested:
+   - Block requests with empty `User-Agent`
+   - Block known scraper ASNs if you see abuse in analytics
+   - Challenge requests to `/plan/*` that aren't `GET` (prevents plan creation spam)
+   - Block non-US traffic if your audience is US-only (optional, aggressive)
+9. **Enable "Under Attack Mode"** as a kill switch during active attacks (presents a 5-second challenge page)
+10. **Turn on Cloudflare Analytics** — free, privacy-friendly, see traffic patterns
+
+#### What you get for free
+
+| Feature                    | Free tier                                 |
+| -------------------------- | ----------------------------------------- |
+| DDoS protection (L3/L4/L7) | Unlimited                                 |
+| Bot Fight Mode             | Yes                                       |
+| WAF custom rules           | 5 rules                                   |
+| Rate limiting rules        | 1 rule                                    |
+| SSL/TLS                    | Full                                      |
+| Analytics                  | Basic                                     |
+| Page rules                 | 3 rules                                   |
+| Caching                    | Yes (but Vercel CDN already handles this) |
+
+#### What you don't get (Pro $20/mo)
+
+- WAF managed rulesets (OWASP)
+- More rate limiting rules
+- Bot analytics / super bot fight mode
+- Custom cache rules
 
 ---
 
