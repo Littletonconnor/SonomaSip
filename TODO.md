@@ -8,15 +8,15 @@
 
 ## References
 
-| Artifact                             | Path / URL                                     |
-| ------------------------------------ | ---------------------------------------------- |
-| Product requirements (non-technical) | `docs/PRD.md`                                  |
-| Scoring / filters (technical)        | `docs/SCORING.md`                              |
-| Seed / editorial data (Excel)        | `docs/sonoma-winery-database-complete.xlsx`     |
-| ERD (database schema diagram)        | `docs/ERD.md`                                  |
-| shadcn/ui docs                       | https://ui.shadcn.com/docs                     |
-| shadcn — Tailwind v4 guide           | https://ui.shadcn.com/docs/tailwind-v4         |
-| Next.js agent docs (in node_modules) | `node_modules/next/dist/docs/`                 |
+| Artifact                             | Path / URL                                  |
+| ------------------------------------ | ------------------------------------------- |
+| Product requirements (non-technical) | `docs/PRD.md`                               |
+| Scoring / filters (technical)        | `docs/SCORING.md`                           |
+| Seed / editorial data (Excel)        | `docs/sonoma-winery-database-complete.xlsx` |
+| ERD (database schema diagram)        | `docs/ERD.md`                               |
+| shadcn/ui docs                       | https://ui.shadcn.com/docs                  |
+| shadcn — Tailwind v4 guide           | https://ui.shadcn.com/docs/tailwind-v4      |
+| Next.js agent docs (in node_modules) | `node_modules/next/dist/docs/`              |
 
 ---
 
@@ -43,6 +43,7 @@
 Repo, tooling, Prettier/ESLint, `.env.example`, route list, legal copy (terms, privacy, disclaimers on every data page), design system (fonts, color tokens, WCAG AA), shadcn/ui installed with full Sonoma palette mapped to semantic tokens.
 
 **Still open (non-blocking):**
+
 - [ ] Imagery policy (avoid implying winery endorsement)
 - [ ] Verify components render correctly with Sonoma palette (visual check)
 </details>
@@ -51,12 +52,14 @@ Repo, tooling, Prettier/ESLint, `.env.example`, route list, legal copy (terms, p
 <summary><strong>Phase 3 — Next.js Foundation</strong> ✅</summary>
 
 App Router bootstrap, absolute imports, Tailwind, root layout, `env.ts` with Zod validation, dynamic favicon/OG images, PWA manifest, route-level loading skeletons.
+
 </details>
 
 <details>
 <summary><strong>Phase 3.5 — UI Prototype</strong> ✅</summary>
 
 All screens built and polished with real data:
+
 - **Landing page** — hero, how it works, features grid, featured wineries, CTA
 - **Quiz** — 4-step flow with progress bar, session persistence, animations
 - **Results** — score rings, map with fly-to, share/print/email actions, empty/error states
@@ -66,6 +69,7 @@ All screens built and polished with real data:
 - **Mapbox** — custom "Dawn Wine Country" style, lazy-loaded, interactive markers/popups
 
 **Still open (non-blocking):**
+
 - [ ] Performance: Lighthouse audit on deployed build (CLS, FOUT, <3s load)
 - [ ] Responsive QA: test at 375px, 768px, 1024px, 1440px
 </details>
@@ -80,6 +84,7 @@ All screens built and polished with real data:
 - **Scripts:** `pnpm db:import`, `pnpm db:import:dry`, `pnpm db:reset`, `pnpm db:gen-types`
 
 **Still open (not blocking deploy but needed before public launch):**
+
 - [ ] D2.1 — Confirm closed wineries (Arrowood, Fieldstone, Murphy-Goode); create `scripts/import-config.yml` with exclusions
 - [ ] D2.2 — Audit for duplicate/near-duplicate entries; document merge decisions
 - [ ] D2.4 — HTTP HEAD check on all `booking_url` and `website_url`; fix broken links, ensure HTTPS
@@ -95,6 +100,7 @@ All screens built and polished with real data:
 Filters, scoring, explanations, orchestrator, progressive filter relaxation, 44 unit tests, 7 golden file profiles (55 assertions against real Supabase data). `pnpm test:golden` to run.
 
 **Still open (minor refinements):**
+
 - [ ] Review `style_sustainable` → `styleEducational` mapping overlap
 - [ ] Re-run `pnpm test:golden -- --update` after any scoring changes
 </details>
@@ -103,6 +109,7 @@ Filters, scoring, explanations, orchestrator, progressive filter relaxation, 44 
 <summary><strong>Phase D7 — Wire Up (Mock → Real Data)</strong> ✅</summary>
 
 All pages wired to Supabase: quiz submit → server action → matching engine → results. Winery detail/browse pages use real data. Share flow saves to `shared_itineraries` table. ISR caching on winery pages (hourly revalidation).
+
 </details>
 
 ---
@@ -114,6 +121,7 @@ _Get this in front of coworkers for real product feedback. The app is production
 ### Prerequisites
 
 You already have:
+
 - [x] Supabase project (ref: `rxihebhphpbhzanijfuv`, region: us-east-2)
 - [x] Database with all migrations applied and 68 wineries imported
 - [x] Mapbox account with custom "Dawn Wine Country" style
@@ -140,13 +148,13 @@ vercel env add NEXT_PUBLIC_SITE_URL            # Your production URL (e.g., http
 
 ### Step 2: Environment variables
 
-| Variable | Where to find it | Required |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase dashboard → Settings → API → Project URL | Yes |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase dashboard → Settings → API → `anon` `public` key | Yes |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase dashboard → Settings → API → `service_role` key | Yes |
-| `NEXT_PUBLIC_MAPBOX_TOKEN` | Mapbox dashboard → Access tokens | Yes (for maps) |
-| `NEXT_PUBLIC_SITE_URL` | Your Vercel deployment URL | Optional (defaults to localhost) |
+| Variable                        | Where to find it                                          | Required                         |
+| ------------------------------- | --------------------------------------------------------- | -------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase dashboard → Settings → API → Project URL         | Yes                              |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase dashboard → Settings → API → `anon` `public` key | Yes                              |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Supabase dashboard → Settings → API → `service_role` key  | Yes                              |
+| `NEXT_PUBLIC_MAPBOX_TOKEN`      | Mapbox dashboard → Access tokens                          | Yes (for maps)                   |
+| `NEXT_PUBLIC_SITE_URL`          | Your Vercel deployment URL                                | Optional (defaults to localhost) |
 
 ### Step 3: Verify build locally
 
@@ -177,6 +185,7 @@ git push origin main
 ### Step 6: Share with coworkers
 
 Share the Vercel URL. Ask them to:
+
 1. Take the quiz with real preferences
 2. Review their results — do the recommendations feel right?
 3. Try the "Create Your Plan" flow
@@ -229,27 +238,27 @@ _Every third-party service has usage-based pricing. This is a pre-public-launch 
 
 ### Service limits (free tiers)
 
-| Service | Free tier | Alert at |
-| --- | --- | --- |
-| Mapbox | 50K map loads/mo | 40K |
-| Supabase | 500MB DB + 5GB bandwidth | 80% |
-| Vercel | 100GB bandwidth/mo | 80GB |
-| Resend | 100 emails/day | 80/day |
+| Service  | Free tier                | Alert at |
+| -------- | ------------------------ | -------- |
+| Mapbox   | 50K map loads/mo         | 40K      |
+| Supabase | 500MB DB + 5GB bandwidth | 80%      |
+| Vercel   | 100GB bandwidth/mo       | 80GB     |
+| Resend   | 100 emails/day           | 80/day   |
 
 ### Rate limits to implement
 
-| Endpoint | Limit | Window | Why |
-| --- | --- | --- | --- |
-| Quiz submit | 10 | 1 hour | Matching engine compute |
-| Share/plan create | 5 | 1 hour | DB write spam |
-| Email send | 3 | 1 hour | Resend free tier |
-| PDF generate | 5 | 1 hour | Server rendering cost |
+| Endpoint          | Limit | Window | Why                     |
+| ----------------- | ----- | ------ | ----------------------- |
+| Quiz submit       | 10    | 1 hour | Matching engine compute |
+| Share/plan create | 5     | 1 hour | DB write spam           |
+| Email send        | 3     | 1 hour | Resend free tier        |
+| PDF generate      | 5     | 1 hour | Server rendering cost   |
 
-- [ ] Choose rate limiting library: `@upstash/ratelimit` (Redis-backed, Vercel-native) or in-memory for dev
-- [ ] Create `src/lib/rate-limit.ts` utility
-- [ ] Apply to quiz submit, share create, email send server actions
-- [ ] Return `429` with `Retry-After` header + user-friendly message
-- [ ] Edge middleware: global 200 req/min per IP to catch scrapers
+- [x] Choose rate limiting approach: in-memory token bucket (zero dependencies, no paid services)
+- [x] Create `src/lib/rate-limit.ts` utility (token bucket with automatic eviction)
+- [x] Apply to quiz submit (10/hr), plan create (5/hr) server actions
+- [x] Return `429` with `Retry-After` header from middleware
+- [x] Middleware: global 60 req/min per IP to catch scrapers (`src/middleware.ts`)
 
 ### Kill switches (env vars in Vercel dashboard)
 
@@ -263,14 +272,60 @@ _Every third-party service has usage-based pricing. This is a pre-public-launch 
 - [ ] Check `navigator.webdriver` + bot user-agents before mounting map; bots get static placeholder
 - [ ] Honeypot fields on quiz and email forms; reject silently if filled
 
+### Cloudflare free tier (future — recommended before public launch)
+
+_The best free protection layer you can add. Handles WAF, DDoS, and distributed rate limiting where in-memory middleware can't (across edge nodes). Requires a custom domain (not `*.vercel.app`)._
+
+#### Step-by-step setup
+
+1. **Create a free Cloudflare account** at cloudflare.com
+2. **Add your domain** — Cloudflare will scan existing DNS records
+3. **Update nameservers** at your registrar to Cloudflare's (they'll tell you which two)
+4. **Wait for propagation** (usually 5–30 minutes, up to 24 hours)
+5. **Set SSL/TLS mode to "Full (strict)"** — Cloudflare → Vercel is already HTTPS
+6. **Enable "Bot Fight Mode"** — Settings → Security → Bots → toggle on. Free, blocks known bad bots automatically.
+7. **Add a rate limiting rule** (1 free rule):
+   - Security → WAF → Rate limiting rules → Create rule
+   - **When:** URI path contains `/results` (catches server action POSTs to the results page)
+   - **Rate:** 20 requests per 10 seconds per IP
+   - **Action:** Block for 60 seconds
+   - This protects `submitQuiz` and `createPlan` at the edge before requests even reach Vercel
+8. **Add WAF custom rules** (5 free rules), suggested:
+   - Block requests with empty `User-Agent`
+   - Block known scraper ASNs if you see abuse in analytics
+   - Challenge requests to `/plan/*` that aren't `GET` (prevents plan creation spam)
+   - Block non-US traffic if your audience is US-only (optional, aggressive)
+9. **Enable "Under Attack Mode"** as a kill switch during active attacks (presents a 5-second challenge page)
+10. **Turn on Cloudflare Analytics** — free, privacy-friendly, see traffic patterns
+
+#### What you get for free
+
+| Feature                    | Free tier                                 |
+| -------------------------- | ----------------------------------------- |
+| DDoS protection (L3/L4/L7) | Unlimited                                 |
+| Bot Fight Mode             | Yes                                       |
+| WAF custom rules           | 5 rules                                   |
+| Rate limiting rules        | 1 rule                                    |
+| SSL/TLS                    | Full                                      |
+| Analytics                  | Basic                                     |
+| Page rules                 | 3 rules                                   |
+| Caching                    | Yes (but Vercel CDN already handles this) |
+
+#### What you don't get (Pro $20/mo)
+
+- WAF managed rulesets (OWASP)
+- More rate limiting rules
+- Bot analytics / super bot fight mode
+- Custom cache rules
+
 ---
 
 ## SEO & performance
 
-- [ ] `metadata` export on every winery page (title, description, OG)
-- [ ] JSON-LD structured data (`Winery` / `TouristAttraction`) where info is accurate
-- [ ] `sitemap.xml` from `getAllWinerySlugs()` + static pages
-- [ ] `robots.txt` (allow all, sitemap reference)
+- [x] `metadata` export on every winery page (title, description, OG)
+- [x] JSON-LD structured data (`Winery` / `TouristAttraction`) where info is accurate
+- [x] `sitemap.xml` from `getAllWinerySlugs()` + static pages
+- [x] `robots.txt` (allow all, sitemap reference)
 - [ ] `next/image` for any winery photos (if added)
 - [ ] Lighthouse-driven fixes (LCP, font loading, CLS)
 
@@ -484,29 +539,29 @@ _Expand from 68 editorial wineries to a comprehensive Sonoma + Napa registry (ta
 
 ## Design decisions (reference)
 
-| Decision | Resolution |
-| --- | --- |
-| Budget band → dollar mapping | `$` ≤ $35, `$$` ≤ $65, `$$$` ≤ $100, `$$$$` = no cap |
-| Style dimension scores | 5 numeric columns (1–5): relaxed, adventurous, educational, celebratory, social |
-| `ReservationType` values | `walk_ins_welcome`, `reservations_recommended`, `appointment_only` + separate `isMembersOnly` boolean |
-| `FlightFormat` expanded | `seated, standing, tour, outdoor, picnic, bar` |
-| Sonoma Coast region | Added as 6th region |
-| `Setting` field | `vineyard, estate, downtown, hilltop, cave` (display-only V1) |
-| `primaryVarietal` → `signatureVarietals` | Changed to array; join table uses `is_signature` boolean |
-| Walk-in filter | Passes both `walk_ins_welcome` and `reservations_recommended` |
-| Shared itinerary storage | JSONB snapshot (full winery+flight data), not just IDs |
-| Click tracking | `navigator.sendBeacon` (non-blocking) |
+| Decision                                 | Resolution                                                                                            |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Budget band → dollar mapping             | `$` ≤ $35, `$$` ≤ $65, `$$$` ≤ $100, `$$$$` = no cap                                                  |
+| Style dimension scores                   | 5 numeric columns (1–5): relaxed, adventurous, educational, celebratory, social                       |
+| `ReservationType` values                 | `walk_ins_welcome`, `reservations_recommended`, `appointment_only` + separate `isMembersOnly` boolean |
+| `FlightFormat` expanded                  | `seated, standing, tour, outdoor, picnic, bar`                                                        |
+| Sonoma Coast region                      | Added as 6th region                                                                                   |
+| `Setting` field                          | `vineyard, estate, downtown, hilltop, cave` (display-only V1)                                         |
+| `primaryVarietal` → `signatureVarietals` | Changed to array; join table uses `is_signature` boolean                                              |
+| Walk-in filter                           | Passes both `walk_ins_welcome` and `reservations_recommended`                                         |
+| Shared itinerary storage                 | JSONB snapshot (full winery+flight data), not just IDs                                                |
+| Click tracking                           | `navigator.sendBeacon` (non-blocking)                                                                 |
 
 ### Data source authority
 
-| Source | Trust | Refresh |
-| --- | --- | --- |
-| Curated CSV (68 editorial) | Highest — editorial voice | Manual, quarterly |
-| OpenStreetMap / Overpass | High for existence/location | Quarterly |
-| Wine association directories | High for "is this a real tasting room?" | Annual |
-| Wikidata SPARQL | Medium — incomplete but authoritative | Quarterly |
-| Google Places (optional) | High for facts, low for domain data | Weekly |
-| URL health checks | Binary signal | Weekly |
-| User reports (future) | Lowest — signal only | Real-time submit, async review |
+| Source                       | Trust                                   | Refresh                        |
+| ---------------------------- | --------------------------------------- | ------------------------------ |
+| Curated CSV (68 editorial)   | Highest — editorial voice               | Manual, quarterly              |
+| OpenStreetMap / Overpass     | High for existence/location             | Quarterly                      |
+| Wine association directories | High for "is this a real tasting room?" | Annual                         |
+| Wikidata SPARQL              | Medium — incomplete but authoritative   | Quarterly                      |
+| Google Places (optional)     | High for facts, low for domain data     | Weekly                         |
+| URL health checks            | Binary signal                           | Weekly                         |
+| User reports (future)        | Lowest — signal only                    | Real-time submit, async review |
 
 **Conflict resolution:** Editorial always wins. OSM/Wikidata provide discovery and basic facts but never overwrite editorial fields.

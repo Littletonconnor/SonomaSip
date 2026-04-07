@@ -62,6 +62,20 @@ export const metadata: Metadata = {
   },
 };
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Sonoma Sip',
+  url: env.NEXT_PUBLIC_SITE_URL,
+  description:
+    'Plan your Sonoma wine tasting day with personalized winery recommendations matched to your taste, budget, and group.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Sonoma Sip',
+    url: env.NEXT_PUBLIC_SITE_URL,
+  },
+};
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
@@ -69,6 +83,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       className={`${cormorant.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <TooltipProvider>
           <Navbar />
           <div className="flex flex-1 flex-col pt-14">{children}</div>

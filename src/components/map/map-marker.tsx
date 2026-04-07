@@ -12,13 +12,7 @@ type MapMarkerProps = {
   onHover?: (id: string | null) => void;
 };
 
-export function MapMarker({
-  item,
-  isSelected,
-  isHighlighted,
-  onClick,
-  onHover,
-}: MapMarkerProps) {
+export function MapMarker({ item, isSelected, isHighlighted, onClick, onHover }: MapMarkerProps) {
   return (
     <Marker
       latitude={item.latitude}

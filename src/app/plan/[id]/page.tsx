@@ -171,8 +171,9 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
 
         <div className="mt-8 border-t border-black/5 py-8">
           <p className="text-stone/70 text-sm text-pretty">
-            Sonoma Sip is an independent guide — not affiliated with any listed winery. Hours, prices,
-            and policies may change. Always verify details directly with the winery before visiting.
+            Sonoma Sip is an independent guide — not affiliated with any listed winery. Hours,
+            prices, and policies may change. Always verify details directly with the winery before
+            visiting.
           </p>
         </div>
       </div>
@@ -191,9 +192,7 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
   if (winery.hasFoodPairing) badges.push('Food Pairing');
 
   return (
-    <div
-      className={`py-6 sm:py-8 ${showBorder ? 'border-t border-black/5' : ''}`}
-    >
+    <div className={`py-6 sm:py-8 ${showBorder ? 'border-t border-black/5' : ''}`}>
       <div className="flex items-start gap-5 px-2">
         <div className="bg-gold/20 text-bark grid size-10 shrink-0 place-items-center rounded-full text-sm/10 font-medium tabular-nums">
           {rank}
