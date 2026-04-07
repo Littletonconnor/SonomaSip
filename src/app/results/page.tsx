@@ -4,14 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  ChevronDown,
-  Star,
-  Check,
-  Map as MapIcon,
-  Loader2,
-  ArrowRight,
-} from 'lucide-react';
+import { ChevronDown, Star, Check, Map as MapIcon, Loader2, ArrowRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -506,16 +499,12 @@ function getEmptyStateTips(answers: QuizAnswers): string[] {
     const label = MUST_HAVE_LABELS[activeMustHaves[0][0] as keyof MustHaves];
     tips.push(`Try removing a must-have like "${label}"`);
   }
-  if (answers.selectedVarietals.length > 3)
-    tips.push('Try selecting fewer grape varietals');
-  if (answers.budgetBand === '$')
-    tips.push('Expanding your budget range opens up more options');
-  if (answers.preferredRegions.length >= 3)
-    tips.push('Consider exploring all Sonoma regions');
+  if (answers.selectedVarietals.length > 3) tips.push('Try selecting fewer grape varietals');
+  if (answers.budgetBand === '$') tips.push('Expanding your budget range opens up more options');
+  if (answers.preferredRegions.length >= 3) tips.push('Consider exploring all Sonoma regions');
   if (tips.length === 0 && !answers.includeMembersOnly)
     tips.push('Including members-only wineries can reveal hidden gems');
-  if (tips.length === 0)
-    tips.push('Try selecting fewer filters to see more wineries');
+  if (tips.length === 0) tips.push('Try selecting fewer filters to see more wineries');
   return tips.slice(0, 3);
 }
 
