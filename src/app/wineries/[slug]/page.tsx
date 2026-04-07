@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -20,13 +21,46 @@ import {
 import { Button } from '@/components/ui/button';
 import { AnimatedSection } from '@/components/ui/animated-section';
 import { getWineryBySlug, getAllWinerySlugs, getAllWineriesForBrowse } from '@/lib/data/wineries';
-import type { WineryForDisplay, Flight } from '@/lib/types';
+import type { Flight } from '@/lib/types';
+import { env } from '@/lib/env';
 
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const slugs = await getAllWinerySlugs();
   return slugs.map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const winery = await getWineryBySlug(slug);
+  if (!winery) return {};
+
+  const title = `${winery.name} — ${winery.region} Winery`;
+  const description = `${winery.tagline} Visit ${winery.name} in ${winery.city}, ${winery.region}. Flights from $${winery.minFlightPrice}–$${winery.maxFlightPrice}. ${winery.varietals.slice(0, 3).join(', ')}.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url: `${env.NEXT_PUBLIC_SITE_URL}/wineries/${slug}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+    alternates: {
+      canonical: `/wineries/${slug}`,
+    },
+  };
 }
 
 export default async function WineryDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -48,6 +82,84 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
     'saturday',
     'sunday',
   ] as const;
+
+  const openingHours = dayNames
+    .filter((day) => winery.hours[day])
+    .map((day) => {
+      const h = winery.hours[day]!;
+      const dayAbbr = {
+        monday: 'Mo',
+        tuesday: 'Tu',
+        wednesday: 'We',
+        thursday: 'Th',
+        friday: 'Fr',
+        saturday: 'Sa',
+        sunday: 'Su',
+      }[day];
+      return `${dayAbbr} ${h.open}-${h.close}`;
+    });
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Winery',
+    name: winery.name,
+    description: winery.tagline,
+    url: `${env.NEXT_PUBLIC_SITE_URL}/wineries/${slug}`,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: winery.city,
+      addressRegion: 'CA',
+      addressCountry: 'US',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: winery.latitude,
+      longitude: winery.longitude,
+    },
+    openingHoursSpecification: openingHours.length > 0 ? openingHours : undefined,
+    priceRange: `$${winery.minFlightPrice}–$${winery.maxFlightPrice}`,
+    ...(winery.averageRating &&
+      winery.ratingsCount && {
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: winery.averageRating,
+          ratingCount: winery.ratingsCount,
+          bestRating: 5,
+          worstRating: 1,
+        },
+      }),
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Tasting Flights',
+      itemListElement: winery.flights.map((flight) => ({
+        '@type': 'Offer',
+        name: flight.name,
+        description: flight.description,
+        price: flight.price,
+        priceCurrency: 'USD',
+      })),
+    },
+    amenityFeature: [
+      ...(winery.isDogFriendly
+        ? [{ '@type': 'LocationFeatureSpecification', name: 'Dog-friendly', value: true }]
+        : []),
+      ...(winery.isKidFriendly
+        ? [{ '@type': 'LocationFeatureSpecification', name: 'Kid-friendly', value: true }]
+        : []),
+      ...(winery.isWheelchairAccessible
+        ? [{ '@type': 'LocationFeatureSpecification', name: 'Wheelchair accessible', value: true }]
+        : []),
+      ...(winery.hasFoodPairing
+        ? [{ '@type': 'LocationFeatureSpecification', name: 'Food pairing', value: true }]
+        : []),
+      ...(winery.hasOutdoorSeating
+        ? [{ '@type': 'LocationFeatureSpecification', name: 'Outdoor seating', value: true }]
+        : []),
+      ...(winery.hasViews
+        ? [{ '@type': 'LocationFeatureSpecification', name: 'Scenic views', value: true }]
+        : []),
+    ],
+  };
 
   const featureItems = [
     { icon: Car, label: 'Parking', value: winery.parking },
@@ -82,8 +194,31 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
     { icon: Eye, label: 'Scenic views', active: winery.hasViews },
   ];
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: env.NEXT_PUBLIC_SITE_URL },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Wineries',
+        item: `${env.NEXT_PUBLIC_SITE_URL}/wineries`,
+      },
+      { '@type': 'ListItem', position: 3, name: winery.name },
+    ],
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div className="border-b border-black/5">
         <div className="mx-auto max-w-6xl px-6 py-4">
           <nav className="text-stone flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">

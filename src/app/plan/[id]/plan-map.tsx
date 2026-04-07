@@ -37,7 +37,12 @@ export function PlanMap({ items }: { items: MapItem[] }) {
               transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
-              <SonomaMap items={items} showLegend hoveredId={hoveredId} onMarkerHover={setHoveredId} />
+              <SonomaMap
+                items={items}
+                showLegend
+                hoveredId={hoveredId}
+                onMarkerHover={setHoveredId}
+              />
             </motion.div>
           )}
         </AnimatePresence>

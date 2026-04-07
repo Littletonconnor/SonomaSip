@@ -1,9 +1,11 @@
 'use server';
 
+import { headers } from 'next/headers';
 import type { MatchResult, QuizAnswers } from '../types';
 import { getWineriesForMatching } from '../data/wineries';
 import { getWineryLookup } from '../data/winery-lookup';
 import { recommend } from '../matching/index';
+import { quizLimiter } from '../rate-limit';
 
 function validateQuizAnswers(answers: unknown): asserts answers is QuizAnswers {
   if (!answers || typeof answers !== 'object') {
@@ -28,6 +30,11 @@ function validateQuizAnswers(answers: unknown): asserts answers is QuizAnswers {
 
 export async function submitQuiz(answers: QuizAnswers): Promise<MatchResult[]> {
   validateQuizAnswers(answers);
+
+  const hdrs = await headers();
+  const ip = hdrs.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '127.0.0.1';
+  const { allowed } = quizLimiter.check(ip);
+  if (!allowed) throw new Error('Too many quiz submissions. Please try again later.');
 
   const [wineries, wineryLookup] = await Promise.all([getWineriesForMatching(), getWineryLookup()]);
 
