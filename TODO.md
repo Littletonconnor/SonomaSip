@@ -424,19 +424,31 @@ Discovery → Crawl → Extract → Enrich → Review → Publish → Monitor
 
 **Auto-approve rules** (skip human review):
 
-- Confidence ≥ 0.9 AND field is factual (hours, phone, email, URL, address)
-- Change is an addition (new field value where none existed)
-- Price change within ±20% of current value
+- [x] Confidence ≥ `AUTO_APPROVE_HIGH_CONFIDENCE` (0.9) AND field is factual (phone, address, hours, reservation_url, max_group_size, tasting_duration_typical)
+- [x] Addition (current_value is null) AND factual AND confidence ≥ `AUTO_APPROVE_ADDITION_CONFIDENCE` (0.7)
+- [ ] Price change within ±20% of current value (N/A — no price field in current draft surface; revisit if pricing gets extracted)
 
 **Flag for human review** (everything else):
 
-- Confidence < 0.9
-- Editorial content (descriptions, taglines, tips)
-- New winery additions
-- Fields affecting match scores (reservation_required, dog_friendly, etc.)
-- Deletions or significant value changes
+- [x] Confidence < 0.9 factual updates
+- [x] Editorial content (`tagline`, `description`, `unique_selling_point`, `best_for`)
+- [x] Editorial judgments (`is_hidden_gem`, `is_must_visit`, `is_local_favorite`, `quality_score`, `popularity_score`)
+- [x] Style scores (`style_classic` … `style_adventure`)
+- [x] Experience flags (`is_dog_friendly`, `has_*`, `private_tasting_available`) — all routed to review so reviewers can eyeball matching impact
+- [x] Fields affecting match scoring (e.g. `reservation_type`) even at high confidence
+- [x] Unknown field names (publisher refuses)
 
-Admin UI tasks:
+**Classification + publish engine** — `src/lib/pipeline/publish.ts`:
+
+- [x] `DRAFT_FIELDS` registry: category (`factual` / `experience_flag` / `editorial` / `style_score` / `editorial_judgment`), storage type (`text` / `boolean` / `integer` / `hours_json`), and `affectsMatching` flag for every publishable field
+- [x] `classifyDraft(draft)` — returns `{ auto, reason }` using the rules above; category checked before `affectsMatching` so reasons are specific (`style_score`, not `affects_matching`)
+- [x] `parseProposedValue(field, text)` — deserializes `content_drafts.proposed_value` (always stored as text) back into the winery column's native type; throws on unknown fields or malformed values
+- [x] `buildWineryPatch(drafts)` — merges a winery's approved drafts into one typed `{ field → value }` patch
+- [x] `nextCoverageTier(current)` — promotes `discovered → verified` on first publish; other tiers unchanged
+- [x] `classifyProposal(proposal)` — convenience wrapper for in-memory `DraftProposal` / `EnrichmentDraftProposal` values
+- [x] 24 unit tests covering auto-approve rules, parsers, patch merging, and tier promotion (`src/lib/pipeline/publish.test.ts`)
+
+Admin UI tasks (deferred — `uidotsh` MCP offline):
 
 - [ ] Password-protected route group: `/admin/*`; env var `ADMIN_PASSWORD`; middleware auth check
 - [ ] `/admin/review` — pending drafts queue sorted by priority (editorial wineries first)
@@ -448,16 +460,21 @@ Admin UI tasks:
 
 Publish flow:
 
-- [ ] Snapshot current winery row to `winery_snapshots` before overwriting (JSONB copy + run_id)
-- [ ] Atomic upsert per winery (all approved field changes in one transaction)
-- [ ] Update `last_verified_at`, `coverage_tier` (discovered → verified on first crawl)
-- [ ] `pnpm pipeline:publish`
+- [x] Snapshot current winery row to `winery_snapshots` before overwriting (JSONB copy + `run_id`, `reason='pipeline_publish'`)
+- [x] Single-statement UPDATE per winery containing every approved field change + `last_verified_at=now()` + `content_status='published'` + coverage-tier promotion
+- [x] Applied drafts deleted after apply; audit trail lives in `pipeline_runs.metadata` (`applied[]` with snapshot_id, field_count, field names, tier transition) and `winery_snapshots` (before-state)
+- [x] `pnpm pipeline:publish` / `pnpm pipeline:publish:dry` (`scripts/publish-wineries.ts`)
+  - `--winery=slug` — limit to a single winery
+  - `--auto-only` — run the auto-approve sweep without applying anything
+  - `--skip-auto` — apply already-approved drafts without re-running the sweep
+  - `--dry-run` — classify + report, no writes
+- [x] Pipeline run tracked with `stage='publish'`; failures mark the run `failed` with an `error_summary`, partial successes mark `partial`
 
 Rollback:
 
-- [ ] `/admin/history/:wineryId` — timeline of snapshots per winery
-- [ ] "Revert to this version" button restores snapshot JSONB to `wineries` row
-- [ ] Revert creates its own snapshot (so you can undo a revert)
+- [ ] `/admin/history/:wineryId` — timeline of snapshots per winery (deferred with admin UI)
+- [ ] "Revert to this version" button restores snapshot JSONB to `wineries` row (deferred with admin UI)
+- [ ] Revert creates its own snapshot (so you can undo a revert) (deferred with admin UI)
 
 ### Phase P7: Monitoring & Scheduling
 
