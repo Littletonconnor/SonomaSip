@@ -398,7 +398,7 @@ Discovery → Crawl → Extract → Enrich → Review → Publish → Monitor
 - [x] Tested with 3 wineries (Jordan, Cline, Dry Creek) + 1 with DB writes (Iron Horse)
 - [ ] Schedule: weekly for editorial, monthly for verified, quarterly for discovered
 
-### Phase P4: Extraction (raw content → structured data)
+### Phase P4: Extraction (raw content → structured data) ✅
 
 - [x] `lib/pipeline/extract.ts` — send scraped markdown to Claude Haiku via tool-use (`extract_winery_fields`); truncates per-page and total markdown to stay within token budget
 - [x] Extraction schema covers factual winery fields: `phone`, `address_{street,city,zip}`, `reservation_url`, `reservation_type`, `hours`, `max_group_size`, `tasting_duration_typical`, and all experience/amenity booleans (`is_dog_friendly`, `has_food_pairing`, `has_outdoor_seating`, `has_sunset_views`, `has_picnic_area`, `has_cave_tour`, etc.). Each field is `{ value, confidence, source_quote }`.
