@@ -28,6 +28,8 @@
     "pipeline:enrich:dry": "npx tsx scripts/enrich-wineries.ts --dry-run",
     "pipeline:publish": "npx tsx scripts/publish-wineries.ts",
     "pipeline:publish:dry": "npx tsx scripts/publish-wineries.ts --dry-run",
+    "pipeline:run": "npx tsx scripts/run-pipeline.ts",
+    "pipeline:run:dry": "npx tsx scripts/run-pipeline.ts --dry-run",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:golden": "vitest run src/lib/matching/__tests__/golden.test.ts"

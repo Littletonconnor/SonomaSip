@@ -489,9 +489,9 @@ Rollback:
 
 ### Phase P8: Pipeline orchestration & ops
 
-- [ ] `scripts/run-pipeline.ts` — discovery → crawl → extract → enrich → auto-approve → publish in sequence
-- [ ] Per-winery error handling; continue on failure; summary report
-- [ ] `pnpm pipeline:run`, `pnpm pipeline:run --winery=slug`
+- [x] `scripts/run-pipeline.ts` — discovery → crawl → extract → enrich → publish (auto-approve + apply) in sequence. Each stage is spawned as its own tsx subprocess so the orchestrator reuses existing per-stage logic (`pipeline_runs` tracking, skip-if-recent windows, draft cleanup).
+- [x] Per-stage error handling: stage failures abort by default; `--continue-on-error` keeps going. Final summary table prints stage, status, wall-clock duration, and exit code/notes.
+- [x] `pnpm pipeline:run`, `pnpm pipeline:run:dry`, `pnpm pipeline:run --winery=<id>` (auto-skips discovery when a winery filter is set), plus `--tier=`, `--limit=`, `--force`, `--only=`, `--skip=`
 - [ ] `/admin/pipeline` — manual trigger buttons, run status, last run summary, raw scrape viewer
 - [ ] Sentry + source maps for pipeline error tracking
 - [ ] Health check endpoint: `/api/health`
