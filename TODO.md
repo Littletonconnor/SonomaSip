@@ -493,8 +493,8 @@ Rollback:
 - [x] Per-stage error handling: stage failures abort by default; `--continue-on-error` keeps going. Final summary table prints stage, status, wall-clock duration, and exit code/notes.
 - [x] `pnpm pipeline:run`, `pnpm pipeline:run:dry`, `pnpm pipeline:run --winery=<id>` (auto-skips discovery when a winery filter is set), plus `--tier=`, `--limit=`, `--force`, `--only=`, `--skip=`
 - [ ] `/admin/pipeline` — manual trigger buttons, run status, last run summary, raw scrape viewer
-- [ ] Sentry + source maps for pipeline error tracking
 - [ ] Health check endpoint: `/api/health`
+- Error tracking → see **Phase P10: Observability — Sentry**
 
 ### Phase P9: Click attribution & analytics
 
@@ -502,6 +502,49 @@ Rollback:
 - [ ] Track "Book a Tasting" clicks via `navigator.sendBeacon` (non-blocking)
 - [ ] Append `?ref=sonomasip` to outbound booking URLs
 - [ ] `/admin/clicks` dashboard: clicks per winery (7d/30d/all-time), top performers, CSV export
+
+### Phase P10: Observability — Sentry
+
+_Goal: every unhandled error in the Next.js app **and** every pipeline stage failure lands in Sentry with enough context (stage, run_id, winery_id, git SHA) to debug without re-running the pipeline. Source maps uploaded on every deploy so stack traces are readable._
+
+**Account + project setup**
+
+- [ ] Create Sentry org + project (`sonomasip-web`); move the stub from the Service accounts list here
+- [ ] Generate auth token with `project:releases` + `project:write` scopes for source map uploads
+- [ ] Add env vars to Vercel and `.env.local`: `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`
+- [ ] Document the vars in `.env.example` and `src/lib/env.ts` (optional at runtime, required in production)
+
+**Next.js integration**
+
+- [ ] `pnpm add @sentry/nextjs`
+- [ ] Run `npx @sentry/wizard@latest -i nextjs` to scaffold `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`, and the `instrumentation.ts` hook
+- [ ] Wrap `next.config.ts` with `withSentryConfig` — enable `hideSourceMaps: true`, `widenClientFileUpload: true`, tunnel route `/monitoring` to bypass ad-blockers
+- [ ] Set release name to the git SHA (`SENTRY_RELEASE=${VERCEL_GIT_COMMIT_SHA}`) so Vercel deploys and Sentry releases line up
+- [ ] `tracesSampleRate`: 1.0 in dev, 0.1 in prod; `profilesSampleRate`: 0 for now (cost)
+- [ ] `beforeSend` hook scrubs: scraped markdown bodies, Firecrawl API keys, anthropic keys, supabase service role, cookies
+- [ ] Verify source map upload on a preview deploy (throw a test error from `/api/sentry-example-api`, confirm symbolicated stack trace in Sentry)
+
+**Pipeline CLI instrumentation**
+
+- [ ] `pnpm add @sentry/node` (separate from `@sentry/nextjs` — the CLI scripts run as `tsx` subprocesses, not in Next.js runtime)
+- [ ] `src/lib/pipeline/sentry.ts` — `initPipelineSentry({ stage, runId })` that calls `Sentry.init` once per subprocess with the same DSN, tags (`stage`, `run_id`), and a `flush(2000)` hook for `process.on('beforeExit')`
+- [ ] Call `initPipelineSentry` at the top of every stage script: `scripts/discover-osm.ts`, `scripts/discover-associations.ts`, `scripts/merge-discoveries.ts`, `scripts/crawl-wineries.ts`, `scripts/extract-wineries.ts`, `scripts/enrich-wineries.ts`, `scripts/publish-wineries.ts`, `scripts/run-pipeline.ts`
+- [ ] Wrap each per-winery loop iteration in `Sentry.withScope` — tag `winery_id`, `winery_slug`, `coverage_tier` so one bad winery doesn't drown out the rest
+- [ ] Report stage failures from `lib/pipeline/tracking.ts::failPipelineRun` as Sentry events with `fingerprint: [stage, error_class]` so repeated failures group
+- [ ] Breadcrumb on each stage transition in `run-pipeline.ts` (`stage_start`, `stage_complete`, `stage_failed`) with duration + exit code
+
+**Alerting**
+
+- [ ] Alert rule: any pipeline event with `level=error` AND `stage in (crawl,extract,enrich,publish)` → email + Slack
+- [ ] Alert rule: spike detection on Next.js server errors (>10/min)
+- [ ] Alert rule: any error tagged `winery_id` repeating across ≥3 consecutive runs (persistent bad winery)
+- [ ] Weekly digest: top 10 issues by frequency
+
+**Verification**
+
+- [ ] Throw a dummy error from `scripts/run-pipeline.ts` behind a `--sentry-test` flag and confirm it shows up with stage + run_id tags
+- [ ] Trigger a client-side error from a dev page and confirm source maps resolve to `.tsx` line numbers
+- [ ] Document Sentry setup + DSN rotation in `docs/OPS.md`
 
 ### Future: Geographic expansion
 
@@ -541,7 +584,7 @@ Rollback:
 - [ ] Mapbox token restricted to app domain(s)
 - [ ] Domain DNS + SSL
 - [ ] Transactional email provider (Resend) + verified domain + API key
-- [ ] Sentry project
+- [ ] Sentry project (tracked in **Phase P10**)
 - [ ] Cloudflare account (for content pipeline)
 - [ ] Plausible analytics account
 
