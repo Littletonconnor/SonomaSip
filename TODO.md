@@ -382,8 +382,8 @@ Discovery → Crawl → Extract → Enrich → Review → Publish → Monitor
 - [ ] Manual override table for known aliases (e.g., "Jordan Vineyard & Winery" = "Jordan Winery")
 - [x] Match against existing 68 wineries; tag matched with `osm_node_id`; unmatched → `discovered` tier
 - [x] `pnpm discover:osm` + `pnpm discover:osm:dry`
-- [ ] Scrape Sonoma County Vintners + Wine Road member directories (public HTML)
-- [ ] Cross-reference against OSM + editorial list; `pnpm discover:associations`
+- [x] Scrape Sonoma County Vintners + Wine Road member directories (public HTML) — `scripts/discover-associations.ts` + `src/lib/pipeline/associations.ts`; anchor-tag parser with per-source member link patterns, social/platform host blocklist, nav/generic-text exclusion, and `--fixture=<path>` flag for offline iteration when association sites return 403 to the bot UA
+- [x] Cross-reference against OSM + editorial list; `pnpm discover:associations` — dedups against live `wineries` via `findBestMatch`, upserts matched into `winery_registry` as `editorial` tier and unmatched as `discovered`, tracks run in `pipeline_runs` with per-source counts. Tests: `src/lib/pipeline/associations.test.ts` (18 cases)
 - [x] `scripts/merge-discoveries.ts` — merge all sources, dedup, report + optional `--promote` to create stub wineries
 - [ ] Coverage tier display: editorial = full detail pages, verified = map + browse + basic matching, discovered = map pin + name + "Visit website" only
 - [ ] Schedule: monthly discovery runs
