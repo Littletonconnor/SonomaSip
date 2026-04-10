@@ -409,25 +409,27 @@ Discovery → Crawl → Extract → Enrich → Review → Publish → Monitor
 
 ### Phase P5: Enrichment (LLM editorial content)
 
-- [ ] `lib/pipeline/enrich.ts` — send extracted data + raw content to Claude Sonnet
-- [ ] Generate: tagline (≤15 words), description (2-3 sentences), insider tip, best-for tags
-- [ ] Generate: style scores (classic, luxury, family_friendly, social, sustainable, adventure) on 1–5 scale with reasoning
-- [ ] Generate: editorial judgments (hidden_gem, must_visit, local_favorite, quality_score, popularity_score) with reasoning
-- [ ] Voice: warm, knowledgeable, specific over generic ("known for their single-vineyard Pinot Noir" not "best winery"), no fabricated facts
-- [ ] Include source citations in metadata
-- [ ] Only regenerate when underlying data changes or content is >90 days old
-- [ ] Output: rows in `content_drafts` with status `draft`
-- [ ] `pnpm pipeline:enrich`
+- [x] `lib/pipeline/enrich.ts` — send extracted data + raw content to Claude Sonnet via tool-use (`generate_winery_editorial`); context block packs name, AVA, scale, signature wines, prior extracted facts, then up to 32k chars of scraped markdown across pages
+- [x] Generate: `tagline` (≤15 words), `description` (2-3 sentences), `unique_selling_point` (insider tip, 1-2 sentences), `best_for` (3-5 comma-separated tags) — each returned as `{ value, reasoning, confidence }`
+- [x] Generate: style scores (`style_classic`, `style_luxury`, `style_family_friendly`, `style_social`, `style_sustainable`, `style_adventure`) on 1–5 integer scale with per-field reasoning
+- [x] Generate: editorial judgments (`is_hidden_gem`, `is_must_visit`, `is_local_favorite`, `quality_score`, `popularity_score` — scores 1–10) with per-field reasoning
+- [x] Voice guardrails baked into the system prompt: warm, specific over generic ("known for their single-vineyard Pinot Noir" not "best winery"), no fabricated facts, omit fields rather than guess, model told to lower confidence when unsure
+- [x] Source citations: every generated field carries its own `reasoning` (stored in `content_drafts.source_quote`); the raw page URLs that fed the model are returned on `EnrichmentResult.sources` and logged per run
+- [x] Regeneration policy: skip wineries whose most recent enrichment draft is <`STALE_CONTENT_DAYS` (90) old AND tied to the current latest extraction; re-enrich on a newer extraction or an older draft (see `scripts/enrich-wineries.ts` + `--force`)
+- [x] Output: proposals written to `content_drafts` with `status='pending'` (matches the existing draft-status enum) via `buildEnrichmentDrafts()` — drops proposals below `MIN_ENRICHMENT_CONFIDENCE = 0.5` and skips fields that already match the current row after normalization
+- [x] `pnpm pipeline:enrich` / `pnpm pipeline:enrich:dry` — CLI runner `scripts/enrich-wineries.ts` with `--winery=`, `--tier=`, `--limit=`, `--force`, `--dry-run`; clears prior pending _enrichment_ drafts (filtered by field_name so extraction drafts stay intact), tracks each run in `pipeline_runs`
 - [ ] **Goal: once P5+P6 are stable, the Excel sheet is retired. All data managed through the pipeline + admin UI.**
 
 ### Phase P6: Review & Publish (human-in-the-loop)
 
 **Auto-approve rules** (skip human review):
+
 - Confidence ≥ 0.9 AND field is factual (hours, phone, email, URL, address)
 - Change is an addition (new field value where none existed)
 - Price change within ±20% of current value
 
 **Flag for human review** (everything else):
+
 - Confidence < 0.9
 - Editorial content (descriptions, taglines, tips)
 - New winery additions
@@ -532,7 +534,7 @@ Rollback:
 
 | Decision                                 | Resolution                                                                                            |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Budget band → dollar mapping             | `$` ≤ $35, `$$` ≤ $65, `$$$` ≤ $100, `$$$$` = no cap                                                 |
+| Budget band → dollar mapping             | `$` ≤ $35, `$$` ≤ $65, `$$$` ≤ $100, `$$$$` = no cap                                                  |
 | Style dimension scores                   | 5 numeric columns (1–5): relaxed, adventurous, educational, celebratory, social                       |
 | `ReservationType` values                 | `walk_ins_welcome`, `reservations_recommended`, `appointment_only` + separate `isMembersOnly` boolean |
 | `FlightFormat` expanded                  | `seated, standing, tour, outdoor, picnic, bar`                                                        |
@@ -542,7 +544,7 @@ Rollback:
 | Walk-in filter                           | Passes both `walk_ins_welcome` and `reservations_recommended`                                         |
 | Shared itinerary storage                 | JSONB snapshot (full winery+flight data), not just IDs                                                |
 | Click tracking                           | `navigator.sendBeacon` (non-blocking)                                                                 |
-| Style scores & editorial judgments        | LLM-generated (P5), manually overridable via admin UI. No field is exempt from automation.            |
+| Style scores & editorial judgments       | LLM-generated (P5), manually overridable via admin UI. No field is exempt from automation.            |
 | Excel sheet retirement                   | Excel is a one-time bootstrap. Once P5+P6 are stable, all data managed through pipeline + admin UI.   |
 | Pipeline rollback                        | `winery_snapshots` table stores full JSONB row before each publish. Revert via admin UI.              |
 
