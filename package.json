@@ -22,11 +22,14 @@
     "discover:merge:promote": "npx tsx scripts/merge-discoveries.ts --promote",
     "pipeline:crawl": "npx tsx scripts/crawl-wineries.ts",
     "pipeline:crawl:dry": "npx tsx scripts/crawl-wineries.ts --dry-run",
+    "pipeline:extract": "npx tsx scripts/extract-wineries.ts",
+    "pipeline:extract:dry": "npx tsx scripts/extract-wineries.ts --dry-run",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:golden": "vitest run src/lib/matching/__tests__/golden.test.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.87.0",
     "@base-ui/react": "^1.3.0",
     "@supabase/ssr": "^0.10.0",
     "@supabase/supabase-js": "^2.101.1",

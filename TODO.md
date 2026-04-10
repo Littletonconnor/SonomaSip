@@ -398,14 +398,14 @@ Discovery → Crawl → Extract → Enrich → Review → Publish → Monitor
 - [x] Tested with 3 wineries (Jordan, Cline, Dry Creek) + 1 with DB writes (Iron Horse)
 - [ ] Schedule: weekly for editorial, monthly for verified, quarterly for discovered
 
-### Phase P4: Extraction (raw content → structured data)
+### Phase P4: Extraction (raw content → structured data) ✅
 
-- [ ] `lib/pipeline/extract.ts` — send scraped markdown to Claude Haiku with structured extraction prompt
-- [ ] Extraction prompt: for each field, return `{ value, confidence (0.0–1.0), source_quote }`; fields match `wineries` DB schema (hours, fees, reservation policy, varietals, amenities, pet policy, group limits, etc.)
-- [ ] Confidence scoring: 1.0 = explicitly stated, 0.5 = inferred, 0.0 = not found
-- [ ] Diff engine: compare extracted values to current DB; only changed fields become `content_drafts`
-- [ ] Store to `winery_extractions` table with model used and token count
-- [ ] `pnpm pipeline:extract`; runs automatically after crawl completes
+- [x] `lib/pipeline/extract.ts` — send scraped markdown to Claude Haiku via tool-use (`extract_winery_fields`); truncates per-page and total markdown to stay within token budget
+- [x] Extraction schema covers factual winery fields: `phone`, `address_{street,city,zip}`, `reservation_url`, `reservation_type`, `hours`, `max_group_size`, `tasting_duration_typical`, and all experience/amenity booleans (`is_dog_friendly`, `has_food_pairing`, `has_outdoor_seating`, `has_sunset_views`, `has_picnic_area`, `has_cave_tour`, etc.). Each field is `{ value, confidence, source_quote }`.
+- [x] Confidence scoring prompt: 1.0 = explicitly stated, 0.5 = inferred, 0.0 = not found; `EXTRACTION_SCHEMA_VERSION` stamped into every extracted row so future shape changes are detectable
+- [x] `lib/pipeline/diff.ts` — typed diff engine comparing extracted values to current `wineries` row; normalizes URLs/phones/strings, canonicalizes `hours` JSON, drops proposals below `MIN_DRAFT_CONFIDENCE = 0.4`, emits `DraftProposal[]` for changed fields only (12 vitest cases in `diff.test.ts`)
+- [x] Store to `winery_extractions` with `model_used`, `token_count` (input + output), and extracted_fields JSONB including `_schema_version`, `_input_tokens`, `_output_tokens`
+- [x] `pnpm pipeline:extract` / `pnpm pipeline:extract:dry` — CLI runner `scripts/extract-wineries.ts` with `--winery=`, `--tier=`, `--limit=`, `--force`, `--dry-run`; loads latest scrape per page_url per winery, skips wineries extracted within 30 days (unless `--force`), clears prior `pending` drafts for the winery before inserting new ones, tracks each run in `pipeline_runs`
 
 ### Phase P5: Enrichment (LLM editorial content)
 
