@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Cormorant_Garamond, Inter, Geist_Mono } from 'next/font/google';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
@@ -92,6 +93,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <div className="flex flex-1 flex-col pt-14">{children}</div>
           <Footer />
         </TooltipProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
