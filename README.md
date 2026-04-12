@@ -1,23 +1,39 @@
 # Sonoma Sip
 
-**Sonoma Sip** is a personal project: a **Sonoma County winery guide** that helps people plan tastings without wading through huge, generic directories. You answer a short questionnaire about wine preferences, budget, vibe, and practical needs (kids, dogs, accessibility, and similar). The app returns a **personalized, ranked list** of wineries—with **plain-language reasons** each one fits—alongside a **map**, **detail pages** for all curated venues, and ways to **share**, **print**, or **email** a plan.
+**Plan your perfect Sonoma wine tasting day in minutes.**
 
-The first version focuses on **68 hand-curated wineries** in Sonoma County. It is an **independent guide** (no official partnerships with listed wineries); booking always happens on each winery’s own site.
+Sonoma County has hundreds of wineries, but finding the right ones for *you* — your taste, your budget, your group — usually means hours of Googling, cross-referencing Yelp reviews, and hoping for the best. Sonoma Sip fixes that.
 
-**How recommendations work (V1):** matching is **deterministic**—rules and scores over structured data—so results stay explainable and testable. The roadmap includes **AI-assisted** features (e.g. natural-language planning) **after** that baseline ships; see **[Future directions](docs/PRD.md#14-future-directions-after-deterministic-v1)** in the PRD.
+## How It Works
 
-## Documentation
+1. **Take a quick quiz.** Tell us what you like to drink (Pinot Noir? Sparkling? All of the above?), your vibe (relaxed & scenic, celebratory, adventurous), your budget, and any must-haves like dog-friendly patios or wheelchair access.
 
-| Doc                                | What it is                                                                     |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| [`docs/PRD.md`](docs/PRD.md)       | Product requirements—goals, scope, flows, policies (no implementation detail). |
-| [`TODO.md`](TODO.md)               | Engineering checklist: stack, phases, and delivery tasks.                      |
-| [`docs/README.md`](docs/README.md) | Index of spreadsheets and supporting files in `docs/`.                         |
+2. **Get personalized matches.** Sonoma Sip scores every winery against your preferences and returns a ranked list — each with a match score and plain-language reasons explaining *why* it’s a good fit for you. No black box, no mystery algorithm.
 
-## Data
+3. **Explore on the map.** Your recommendations appear on an interactive map so you can see what’s nearby and plan a route that makes sense.
 
-Editorial source data lives in **`docs/sonoma-winery-database-complete.xlsx`**. A repeatable import pipeline loads it into the app database during development and operations (see `TODO.md`).
+4. **Save and share your plan.** Print it, email it to your group, or grab a shareable link — no account required.
 
-## Status
+## What Makes This Different
 
-Early build—application code and live deployment are not assumed to exist yet. Track progress in [`TODO.md`](TODO.md).
+- **Curated, not exhaustive.** We feature 68 hand-picked Sonoma County wineries with rich detail on each — tasting options, pricing, hours, atmosphere, accessibility, and more. Quality over quantity.
+
+- **Honest and independent.** This is a personal project, not a marketing platform. No winery pays to be listed or ranked higher. Booking always happens on the winery’s own site.
+
+- **Transparent recommendations.** Every match comes with clear reasons. You’ll always know *why* a winery was recommended — whether it’s the Pinot Noir you love, the scenic views you asked for, or the price point that fits your budget.
+
+- **No account required.** Take the quiz, see your results, share your plan. You never need to sign up.
+
+- **Real-world details that matter.** Group size limits, kid-friendliness, dog policies, wheelchair accessibility, walk-in vs. reservation-only, noise level, parking — the things that actually make or break a visit.
+
+## A Note on Accuracy
+
+Winery hours, prices, and policies change. Sonoma Sip does its best to stay current, but always confirm details directly with a winery before visiting — especially for large groups or special occasions.
+
+## Project Docs
+
+For those interested in the product vision and design:
+
+- **[Product Requirements](docs/PRD.md)** — Goals, user flows, and policies
+- **[Scoring & Matching](docs/SCORING.md)** — How recommendations are calculated
+- **[TODO](TODO.md)** — Development progress and roadmap
