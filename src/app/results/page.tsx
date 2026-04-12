@@ -178,7 +178,7 @@ export default function ResultsPage() {
                   Your Recommendations
                 </h1>
                 <p className="text-stone mt-2 text-pretty">
-                  We found {results.length} wineries we think you&rsquo;ll love
+                  {`We found ${results.length} wineries we think you\u2019ll love`}
                 </p>
               </div>
               <Button
