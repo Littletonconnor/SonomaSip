@@ -118,63 +118,63 @@ export default async function SharedPlanPage({ params }: { params: Promise<{ id:
 
   return (
     <PlanHoverProvider>
-      <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
-        <div className="gap-12 lg:grid lg:grid-cols-[2fr_3fr]">
-          <div className="lg:sticky lg:top-20 lg:self-start lg:pb-12">
-            <AnimatedSection>
-              <p className="text-wine font-mono text-xs tracking-widest">Sonoma Sip Plan</p>
-              <h1 className="font-heading text-bark mt-2 text-3xl font-medium tracking-tight text-balance md:text-4xl">
-                Your Wine Day Itinerary
-              </h1>
-              <p className="text-stone mt-2 text-sm">
-                {plan.results.length} stops &middot; Generated {formatDate(plan.createdAt)}
-              </p>
+      <div className="min-h-[calc(100dvh-3.5rem)]">
+        <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
+          <AnimatedSection>
+            <p className="text-wine font-mono text-xs tracking-widest">Sonoma Sip Plan</p>
+            <h1 className="font-heading text-bark mt-2 text-3xl font-medium tracking-tight text-balance md:text-4xl">
+              Your Wine Day Itinerary
+            </h1>
+            <p className="text-stone mt-2 text-sm">
+              {plan.results.length} stops &middot; Generated {formatDate(plan.createdAt)}
+            </p>
 
-              {preferences.length > 0 && (
-                <div className="mt-6">
-                  <p className="text-bark text-sm font-medium">Preferences</p>
-                  <div className="mt-2 flex flex-wrap gap-x-1.5 gap-y-2">
-                    {preferences.map((p) => (
-                      <span
-                        key={p}
-                        className="bg-linen text-oak rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-black/5"
-                      >
-                        {p}
-                      </span>
-                    ))}
-                  </div>
+            {preferences.length > 0 && (
+              <div className="mt-6">
+                <p className="text-bark text-sm font-medium">Preferences</p>
+                <div className="mt-2 flex flex-wrap gap-x-1.5 gap-y-2">
+                  {preferences.map((p) => (
+                    <span
+                      key={p}
+                      className="bg-linen text-oak rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-black/5"
+                    >
+                      {p}
+                    </span>
+                  ))}
                 </div>
-              )}
-
-              <PlanActions
-                planUrl={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/plan/${plan.id}`}
-              />
-
-              <div className="mt-8">
-                <PlanMap items={mapItems} />
               </div>
-            </AnimatedSection>
+            )}
+
+            <PlanActions
+              planUrl={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/plan/${plan.id}`}
+            />
+          </AnimatedSection>
+
+          <div className="gap-12 lg:grid lg:grid-cols-[3fr_2fr]">
+            <div>
+              <StaggerChildren staggerDelay={0.08}>
+                {plan.results.map((result, i) => (
+                  <StaggerItem key={result.winery.id}>
+                    <PlanWineryStop wineryId={result.winery.id}>
+                      <WineryStop result={result} showBorder={i > 0} />
+                    </PlanWineryStop>
+                  </StaggerItem>
+                ))}
+              </StaggerChildren>
+            </div>
+
+            <div className="max-lg:mt-10 lg:sticky lg:top-20 lg:self-start">
+              <PlanMap items={mapItems} />
+            </div>
           </div>
 
-          <div className="max-lg:mt-10">
-            <StaggerChildren staggerDelay={0.08}>
-              {plan.results.map((result, i) => (
-                <StaggerItem key={result.winery.id}>
-                  <PlanWineryStop wineryId={result.winery.id}>
-                    <WineryStop result={result} showBorder={i > 0} />
-                  </PlanWineryStop>
-                </StaggerItem>
-              ))}
-            </StaggerChildren>
+          <div className="mt-8 border-t border-black/5 py-8">
+            <p className="text-stone/70 text-sm text-pretty">
+              Sonoma Sip is an independent guide — not affiliated with any listed winery. Hours,
+              prices, and policies may change. Always verify details directly with the winery before
+              visiting.
+            </p>
           </div>
-        </div>
-
-        <div className="mt-8 border-t border-black/5 py-8">
-          <p className="text-stone/70 text-sm text-pretty">
-            Sonoma Sip is an independent guide — not affiliated with any listed winery. Hours,
-            prices, and policies may change. Always verify details directly with the winery before
-            visiting.
-          </p>
         </div>
       </div>
     </PlanHoverProvider>

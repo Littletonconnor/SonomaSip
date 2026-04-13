@@ -1,22 +1,19 @@
 'use client';
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, Star, Check, Map as MapIcon, Loader2, ArrowRight } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { ChevronDown, Star, Check, Loader2, ArrowRight } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
+import { MapSection } from '@/components/map/map-section';
 import { useSessionStorage } from '@/hooks/use-session-storage';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { submitQuiz } from '@/lib/actions/quiz';
 import { createPlan } from '@/lib/actions/plan';
 import type { MapItem } from '@/components/map/types';
 import type { QuizAnswers, MatchResult, MustHaves } from '@/lib/types';
-
-const SonomaMap = dynamic(() => import('@/components/map/sonoma-map'), { ssr: false });
 
 const defaultAnswers: QuizAnswers = {
   selectedVarietals: [],
@@ -107,8 +104,6 @@ export default function ResultsPage() {
   );
 
   const router = useRouter();
-  const isMobile = useIsMobile();
-  const [showMap, setShowMap] = useState(false);
   const [isCreatingPlan, setIsCreatingPlan] = useState(false);
   const [hoveredWineryId, setHoveredWineryId] = useState<string | null>(null);
   const [activeWineryId, setActiveWineryId] = useState<string | null>(null);
@@ -125,10 +120,6 @@ export default function ResultsPage() {
   }
 
   function handleCardClick(id: string, slug: string) {
-    if (isMobile && !showMap) {
-      router.push(`/wineries/${slug}`);
-      return;
-    }
     setActiveWineryId(id);
     setTimeout(() => {
       router.push(`/wineries/${slug}`);
@@ -257,48 +248,12 @@ export default function ResultsPage() {
           </div>
 
           <div className="max-lg:mt-10 lg:sticky lg:top-20 lg:self-start">
-            {isMobile ? (
-              <div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mb-4 w-full gap-1.5"
-                  onClick={() => setShowMap((v) => !v)}
-                >
-                  <MapIcon className="size-3.5" />
-                  {showMap ? 'Hide Map' : 'Show Map'}
-                </Button>
-                <AnimatePresence>
-                  {showMap && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <SonomaMap
-                        items={mapItems}
-                        showLegend
-                        hoveredId={hoveredWineryId}
-                        onMarkerHover={setHoveredWineryId}
-                        activeId={activeWineryId}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <AnimatedSection delay={0.3} direction="right">
-                <SonomaMap
-                  items={mapItems}
-                  showLegend
-                  hoveredId={hoveredWineryId}
-                  onMarkerHover={setHoveredWineryId}
-                  activeId={activeWineryId}
-                />
-              </AnimatedSection>
-            )}
+            <MapSection
+              items={mapItems}
+              hoveredId={hoveredWineryId}
+              onMarkerHover={setHoveredWineryId}
+              activeId={activeWineryId}
+            />
           </div>
         </div>
       </div>
