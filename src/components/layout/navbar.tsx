@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -50,6 +51,9 @@ export function WineGlassLogo({ className }: { className?: string }) {
 }
 
 export function Navbar() {
+  const pathname = usePathname();
+  const hideQuizCta =
+    pathname === '/quiz' || pathname === '/results' || pathname.startsWith('/plan/');
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -85,14 +89,16 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-wine/30 text-wine hover:bg-wine hover:text-primary-foreground"
-              asChild
-            >
-              <Link href="/quiz">Plan Your Visit</Link>
-            </Button>
+            {!hideQuizCta && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-wine/30 text-wine hover:bg-wine hover:text-primary-foreground"
+                asChild
+              >
+                <Link href="/quiz">Plan Your Visit</Link>
+              </Button>
+            )}
           </div>
 
           <button
@@ -121,33 +127,36 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <div className="border-border/50 mt-2 border-t pt-3">
-                <Button
-                  className="border-wine/30 text-wine hover:bg-wine hover:text-primary-foreground w-full"
-                  variant="outline"
-                  asChild
-                >
-                  <Link href="/quiz" onClick={() => setMobileOpen(false)}>
-                    Plan Your Visit
-                  </Link>
-                </Button>
-              </div>
+              {!hideQuizCta && (
+                <div className="border-border/50 mt-2 border-t pt-3">
+                  <Button
+                    className="border-wine/30 text-wine hover:bg-wine hover:text-primary-foreground w-full"
+                    variant="outline"
+                    asChild
+                  >
+                    <Link href="/quiz" onClick={() => setMobileOpen(false)}>
+                      Plan Your Visit
+                    </Link>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}
       </header>
 
-      {/* Mobile sticky bottom CTA — appears after scrolling past hero */}
-      <div
-        className={cn(
-          'border-border/50 bg-background/95 fixed right-0 bottom-0 left-0 z-40 border-t px-4 py-3 backdrop-blur-xl transition-all duration-300 md:hidden',
-          scrolled ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0',
-        )}
-      >
-        <Button className="w-full" size="lg" asChild>
-          <Link href="/quiz">Plan Your Visit</Link>
-        </Button>
-      </div>
+      {!hideQuizCta && (
+        <div
+          className={cn(
+            'border-border/50 bg-background/95 fixed right-0 bottom-0 left-0 z-40 border-t px-4 py-3 backdrop-blur-xl transition-all duration-300 md:hidden',
+            scrolled ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0',
+          )}
+        >
+          <Button className="w-full" size="lg" asChild>
+            <Link href="/quiz">Plan Your Visit</Link>
+          </Button>
+        </div>
+      )}
     </>
   );
 }

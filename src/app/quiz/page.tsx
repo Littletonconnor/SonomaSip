@@ -111,7 +111,8 @@ const fadeUpVariants: Variants = {
 
 export default function QuizPage() {
   const router = useRouter();
-  const [step, setStep, { hydrated: stepHydrated }] = useSessionStorage('quiz-step', 0);
+  const [rawStep, setStep, { hydrated: stepHydrated }] = useSessionStorage('quiz-step', 0);
+  const step = Math.min(Math.max(rawStep, 0), STEPS.length - 1);
   const [answers, setAnswers, { hydrated: answersHydrated, remove: clearAnswers }] =
     useSessionStorage<QuizAnswers>('quiz-answers', defaultAnswers);
   const [direction, setDirection] = useState(1);
@@ -261,7 +262,7 @@ export default function QuizPage() {
               )}
             </div>
 
-            <div className="mt-16 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="mt-16 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
               <button
                 type="button"
                 onClick={isLast ? submit : next}
@@ -274,7 +275,7 @@ export default function QuizPage() {
                 <button
                   type="button"
                   onClick={back}
-                  className="text-stone hover:text-bark flex items-center justify-center gap-1.5 text-sm font-medium"
+                  className="text-stone hover:text-bark flex items-center justify-center gap-1.5 rounded-full py-3 text-sm font-medium transition-colors sm:py-2"
                 >
                   <ArrowLeft className="size-4" />
                   Go back
