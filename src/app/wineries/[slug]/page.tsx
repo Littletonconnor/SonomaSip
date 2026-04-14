@@ -42,6 +42,7 @@ export async function generateMetadata({
 
   const title = `${winery.name} — ${winery.region} Winery`;
   const description = `${winery.tagline} Visit ${winery.name} in ${winery.city}, ${winery.region}. Flights from $${winery.minFlightPrice}–$${winery.maxFlightPrice}. ${winery.varietals.slice(0, 3).join(', ')}.`;
+  const ogImage = `/wineries/${slug}/opengraph-image`;
 
   return {
     title,
@@ -52,13 +53,13 @@ export async function generateMetadata({
       type: 'website',
       url: `${env.NEXT_PUBLIC_SITE_URL}/wineries/${slug}`,
       siteName: 'Sonoma Sip',
-      images: ['/opengraph-image'],
+      images: [ogImage],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: ['/opengraph-image'],
+      images: [ogImage],
     },
     alternates: {
       canonical: `/wineries/${slug}`,

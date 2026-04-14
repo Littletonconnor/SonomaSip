@@ -94,7 +94,7 @@ When sharing the home page, the OG preview looks good. But sharing a plan page (
 - [x] **Verify OG tags on all shareable routes.** Audit `/`, `/results`, `/plan/[id]`, and `/wineries/[slug]` to ensure every page that can be shared has proper `og:title`, `og:description`, `og:image`, and `og:url`. Test with the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) and [Twitter Card Validator](https://cards-dev.twitter.com/validator).
   - `/` — root layout defines `openGraph` + `twitter`, root `opengraph-image.tsx` convention auto-attaches. ✓
   - `/plan/[id]` — wired up in earlier commits (metadata reference + dynamic OG image). ✓
-  - `/wineries/[slug]` — previously defined `openGraph`/`twitter` without `images`. Added `images: ['/opengraph-image']` and `siteName` to both. Still uses the root OG image as a fallback — a per-winery dynamic OG image (rendering name + region + price range) is a future enhancement.
+  - `/wineries/[slug]` — previously defined `openGraph`/`twitter` without `images`. Added `images` and `siteName` to both, and added `src/app/wineries/[slug]/opengraph-image.tsx` so each winery gets a dynamic OG image rendering name + region + city + tagline + price range + signature varietals. ✓
   - `/wineries` — previously inherited root OG verbatim. Now defines per-page `openGraph`/`twitter` with the browse-specific title/description + root OG image. ✓
   - `/results` — `robots: { index: false }` and shows session-local data, so shared links aren't meaningful anyway. Inherits root OG for the rare case someone does share. ✓
   - Manual validation with Facebook Sharing Debugger / Twitter Card Validator still TODO (needs a deployed URL).
