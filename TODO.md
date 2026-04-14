@@ -115,7 +115,7 @@ Remove retired code that's no longer needed:
 - [ ] Delete `scripts/merge-discoveries.ts` — multi-source merge, not needed with OSM only (154 lines)
 - [ ] Delete `scripts/validate-coordinates.ts` — one-time utility, already served its purpose (457 lines)
 - [ ] Simplify `scripts/run-pipeline.ts` — replace 336-line subprocess spawner with a simple script that runs: discover → crawl → extract → publish
-- [ ] Remove npm scripts from `package.json`: `pipeline:enrich`, `pipeline:enrich:dry`, `discover:associations`, `discover:associations:dry`, `discover:merge`, `discover:merge:promote`
+- [x] Remove npm scripts from `package.json`: `pipeline:enrich`, `pipeline:enrich:dry`, `discover:associations`, `discover:associations:dry`, `discover:merge`, `discover:merge:promote`
 
 ### What Stays
 
