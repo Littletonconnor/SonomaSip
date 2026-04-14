@@ -107,14 +107,16 @@ No association scraping, no LLM-generated editorial, no multi-source merging. OS
 
 Remove retired code that's no longer needed:
 
-- [ ] Delete `scripts/enrich-wineries.ts` — LLM editorial generation replaced by manual editing in admin
-- [ ] Delete `src/lib/pipeline/enrich.ts` — enrichment library (473 lines)
-- [ ] Delete `scripts/discover-associations.ts` — association HTML scraping (368 lines)
-- [ ] Delete `src/lib/pipeline/associations.ts` — association parsing library (198 lines)
-- [ ] Delete `src/lib/pipeline/associations.test.ts` — association tests (203 lines)
-- [ ] Delete `scripts/merge-discoveries.ts` — multi-source merge, not needed with OSM only (154 lines)
-- [ ] Delete `scripts/validate-coordinates.ts` — one-time utility, already served its purpose (457 lines)
-- [ ] Simplify `scripts/run-pipeline.ts` — replace 336-line subprocess spawner with a simple script that runs: discover → crawl → extract → publish
+- [ ] Delete `scripts/enrich-wineries.ts` — LLM editorial generation replaced by manual editing in admin. **⚠ Deferred: still subprocess-spawned by `scripts/run-pipeline.ts` (the orchestrator). Deleting it without touching the orchestrator would leave `pnpm pipeline:run` broken at runtime when it hits the enrich stage. Two ways to clean up:**
+  - **(a) Surgical removal:** in `scripts/run-pipeline.ts`, drop `'enrich'` from the `StageName` union (~line 40), the `STAGES` array entry (~lines 76-83), the `valid` set in `splitStageList` (~line 137), and the doc comments at the top (~lines 6, 16, 19, 20). Then delete the two enrich files. ~20-line edit + 2 deletions.
+  - **(b) Pair with the bigger rewrite below:** do this as part of "Simplify `scripts/run-pipeline.ts`" since that task already involves rewriting the stage list. Cleaner if you're going to rewrite that file anyway.
+- [ ] Delete `src/lib/pipeline/enrich.ts` — enrichment library (473 lines). Same dependency note as above — only imported by `scripts/enrich-wineries.ts`, so it goes in the same commit.
+- [x] Delete `scripts/discover-associations.ts` — association HTML scraping (368 lines)
+- [x] Delete `src/lib/pipeline/associations.ts` — association parsing library (198 lines)
+- [x] Delete `src/lib/pipeline/associations.test.ts` — association tests (203 lines)
+- [x] Delete `scripts/merge-discoveries.ts` — multi-source merge, not needed with OSM only (154 lines)
+- [x] Delete `scripts/validate-coordinates.ts` — one-time utility, already served its purpose (457 lines)
+- [ ] Simplify `scripts/run-pipeline.ts` — replace 336-line subprocess spawner with a simple script that runs: discover → crawl → extract → publish. **Pair this with the enrich deletion above (option b).**
 - [x] Remove npm scripts from `package.json`: `pipeline:enrich`, `pipeline:enrich:dry`, `discover:associations`, `discover:associations:dry`, `discover:merge`, `discover:merge:promote`
 
 ### What Stays
