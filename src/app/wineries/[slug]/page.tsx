@@ -23,6 +23,10 @@ import { AnimatedSection } from '@/components/ui/animated-section';
 import { getWineryBySlug, getAllWinerySlugs, getAllWineriesForBrowse } from '@/lib/data/wineries';
 import type { Flight } from '@/lib/types';
 import { env } from '@/lib/env';
+import { haversineDistance } from '@/lib/geo';
+
+const NEARBY_RADIUS_MILES = 5;
+const NEARBY_MIN_RESULTS = 3;
 
 export const revalidate = 3600;
 
@@ -42,6 +46,7 @@ export async function generateMetadata({
 
   const title = `${winery.name} — ${winery.region} Winery`;
   const description = `${winery.tagline} Visit ${winery.name} in ${winery.city}, ${winery.region}. Flights from $${winery.minFlightPrice}–$${winery.maxFlightPrice}. ${winery.varietals.slice(0, 3).join(', ')}.`;
+  const ogImage = `/wineries/${slug}/opengraph-image`;
 
   return {
     title,
@@ -51,11 +56,14 @@ export async function generateMetadata({
       description,
       type: 'website',
       url: `${env.NEXT_PUBLIC_SITE_URL}/wineries/${slug}`,
+      siteName: 'Sonoma Sip',
+      images: [ogImage],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [ogImage],
     },
     alternates: {
       canonical: `/wineries/${slug}`,
@@ -69,9 +77,23 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
   if (!winery) notFound();
 
   const allWineries = await getAllWineriesForBrowse();
-  const relatedWineries = allWineries
-    .filter((w) => w.id !== winery.id && w.region === winery.region)
-    .slice(0, 3);
+  const otherWineries = allWineries
+    .filter((w) => w.id !== winery.id)
+    .map((w) => ({
+      winery: w,
+      distance: haversineDistance(winery.latitude, winery.longitude, w.latitude, w.longitude),
+    }))
+    .sort((a, b) => a.distance - b.distance);
+
+  const withinRadius = otherWineries.filter((x) => x.distance <= NEARBY_RADIUS_MILES);
+  const sameRegionBackfill = otherWineries.filter(
+    (x) => x.distance > NEARBY_RADIUS_MILES && x.winery.region === winery.region,
+  );
+  const relatedWineries = (
+    withinRadius.length >= NEARBY_MIN_RESULTS
+      ? withinRadius.slice(0, NEARBY_MIN_RESULTS)
+      : [...withinRadius, ...sameRegionBackfill.slice(0, NEARBY_MIN_RESULTS - withinRadius.length)]
+  ).slice(0, NEARBY_MIN_RESULTS);
 
   const dayNames = [
     'monday',
@@ -274,10 +296,10 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
                     <ExternalLink className="size-4" />
                   </a>
                 </Button>
-                <p className="text-stone text-center text-sm tabular-nums">
+                <p className="text-stone text-sm tabular-nums">
                   ${winery.minFlightPrice}&ndash;{winery.maxFlightPrice} per flight
                 </p>
-                <p className="text-stone/50 mt-1 text-center text-xs text-pretty">
+                <p className="text-stone/50 mt-1 text-xs text-pretty">
                   Sonoma Sip is not affiliated with {winery.name}. Hours, prices, and availability
                   may change &mdash; verify directly with the winery before visiting.
                 </p>
@@ -374,7 +396,7 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
                 Nearby Wineries
               </h2>
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                {relatedWineries.map((w) => (
+                {relatedWineries.map(({ winery: w, distance }) => (
                   <Link
                     key={w.slug}
                     href={`/wineries/${w.slug}`}
@@ -384,11 +406,12 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
                       {w.name}
                     </p>
                     <p className="text-stone mt-1 text-sm">{w.tagline}</p>
-                    <div className="text-stone mt-3 flex items-center gap-3 text-sm">
+                    <div className="text-stone mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                       <span>{w.region}</span>
                       <span className="tabular-nums">
                         ${w.minFlightPrice}&ndash;{w.maxFlightPrice}
                       </span>
+                      <span className="tabular-nums">{distance.toFixed(1)} mi away</span>
                     </div>
                   </Link>
                 ))}

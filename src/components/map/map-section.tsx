@@ -41,7 +41,7 @@ export function MapSection({ items, hoveredId, onMarkerHover, activeId }: MapSec
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="overflow-hidden"
+              className="overflow-hidden rounded-2xl"
             >
               <SonomaMap
                 items={items}

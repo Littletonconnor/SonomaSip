@@ -7,7 +7,7 @@ import { PlanMap } from './plan-map';
 import { PlanActions } from './plan-actions';
 import { PlanHoverProvider } from './plan-hover-context';
 import { PlanWineryStop } from './plan-winery-stop';
-import { createServerSupabase } from '@/lib/supabase-server';
+import { getPlan } from '@/lib/plan';
 import type { MapItem } from '@/components/map/types';
 import type { MatchResult, QuizAnswers, MustHaves } from '@/lib/types';
 
@@ -19,24 +19,6 @@ const MUST_HAVE_LABELS: Record<keyof MustHaves, string> = {
   kidFriendly: 'Kid Friendly',
   wheelchairAccessible: 'Accessible',
 };
-
-async function getPlan(id: string) {
-  const supabase = createServerSupabase();
-  const { data, error } = await supabase
-    .from('shared_itineraries')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error || !data) return null;
-
-  return {
-    id: data.id,
-    createdAt: data.created_at,
-    quizAnswers: data.quiz_answers as unknown as QuizAnswers,
-    results: data.results as unknown as MatchResult[],
-  };
-}
 
 function derivePreferenceBadges(answers: QuizAnswers): string[] {
   const badges: string[] = [];
@@ -75,20 +57,24 @@ export async function generateMetadata({
 
   const wineryNames = plan.results.map((r) => r.winery.name);
   const description = `A ${plan.results.length}-stop Sonoma County wine day: ${wineryNames.join(', ')}. Curated by Sonoma Sip.`;
+  const title = `Wine Day Itinerary — ${plan.results.length} Stops`;
+  const ogImage = `/plan/${id}/opengraph-image`;
 
   return {
-    title: `Wine Day Itinerary — ${plan.results.length} Stops`,
+    title,
     description,
     openGraph: {
-      title: `Wine Day Itinerary — ${plan.results.length} Stops`,
+      title,
       description,
       type: 'website',
       siteName: 'Sonoma Sip',
+      images: [ogImage],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `Wine Day Itinerary — ${plan.results.length} Stops`,
+      title,
       description,
+      images: [ogImage],
     },
   };
 }

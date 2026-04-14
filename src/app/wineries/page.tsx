@@ -4,10 +4,26 @@ import { WineriesBrowser } from './wineries-browser';
 
 export const revalidate = 3600;
 
+const title = 'Browse Sonoma County Wineries';
+const description =
+  'Explore 68 curated Sonoma County wineries. Filter by region, price, amenities, and more. Find dog-friendly, walk-in, and food-pairing wineries across every AVA.';
+
 export const metadata: Metadata = {
-  title: 'Browse Sonoma County Wineries',
-  description:
-    'Explore 68 curated Sonoma County wineries. Filter by region, price, amenities, and more. Find dog-friendly, walk-in, and food-pairing wineries across every AVA.',
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    type: 'website',
+    siteName: 'Sonoma Sip',
+    images: ['/opengraph-image'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title,
+    description,
+    images: ['/opengraph-image'],
+  },
   alternates: {
     canonical: '/wineries',
   },

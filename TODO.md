@@ -10,42 +10,39 @@
 
 Pick these off one at a time. Each is scoped to 1-2 file touches and should be doable in under 15 minutes.
 
-### 1. OG image for plan pages (est. 5 min)
+### 1. OG image for plan pages (est. 5 min) ✅
 
 **Goal:** Make shared `/plan/[id]` URLs render a rich preview card instead of raw URL text.
 
 **Status:** `src/app/plan/[id]/opengraph-image.tsx` already exists and uses Next.js's App Router convention — Next auto-picks it up as `og:image`. But the `generateMetadata` in `src/app/plan/[id]/page.tsx` explicitly sets `openGraph` **without** an `images` key, which **may override** the convention file.
 
 **Plan:**
-- [ ] Open `src/app/plan/[id]/page.tsx` and find `generateMetadata` (around line 64).
-- [ ] Remove the explicit `openGraph` and `twitter` blocks entirely and let the `opengraph-image.tsx` convention + root layout metadata inherit — OR, if you want to keep the explicit block, leave it alone and test first (Next may already be merging).
+- [x] Open `src/app/plan/[id]/page.tsx` and find `generateMetadata` (around line 64).
+- [x] Explicitly reference the convention image route (`/plan/${id}/opengraph-image`) in both `openGraph.images` and `twitter.images` so the image is guaranteed to be attached regardless of Next's auto-merge behavior.
 - [ ] Test: run `pnpm dev`, open a plan URL, paste into [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/). You should see the generated image.
-- [ ] If `opengraph-image.tsx` is not being picked up, the simplest fallback is to add `images: ['/opengraph-image']` to the `openGraph` object in `generateMetadata`.
 
-### 2. Winery detail — left-align centered text on mobile (est. 5 min)
+### 2. Winery detail — left-align centered text on mobile (est. 5 min) ✅
 
 **Goal:** Two `<p>` elements on the winery detail page are incorrectly centered. Should match the left-aligned content flow of the rest of the page.
 
 **Files to edit:** `src/app/wineries/[slug]/page.tsx`
 
 **Plan:**
-- [ ] Line 277: `<p className="text-stone text-center text-sm tabular-nums">` (the price-per-flight line) — change `text-center` to nothing (default left) or verify if it should be centered on desktop but left on mobile.
-- [ ] Line 280: `<p className="text-stone/50 mt-1 text-center text-xs text-pretty">` (the disclaimer) — same treatment.
-- [ ] If both need to remain centered on desktop but left-aligned on mobile: `text-left sm:text-center`. If they should just be left-aligned everywhere, remove `text-center` entirely.
+- [x] Line 277: price-per-flight line — removed `text-center` so it defaults to left.
+- [x] Line 280: disclaimer line — removed `text-center` so it defaults to left.
+- [x] Chose left-aligned everywhere (not `sm:text-center`) to match the surrounding left-aligned sidebar content (name, tagline, star rating).
 - [ ] Verify in browser at 375px width.
 
-### 3. Results page — bottom border-radius clipping on mobile (est. 10 min)
+### 3. Results page — bottom border-radius clipping on mobile (est. 10 min) ✅
 
 **Goal:** The bottom corners of the results card/container render flat on mobile. Needs an `overflow` + `border-radius` fix.
 
 **Plan:**
-- [ ] Open `src/app/results/page.tsx` in DevTools (mobile viewport, 375px).
-- [ ] Inspect the card/container whose bottom corners are being clipped. Look for a parent with `overflow-hidden` paired with a child that's trying to render its own `rounded-*` — the parent's overflow clips the child's corners.
-- [ ] Fix is usually one of:
-  - Move `rounded-*` to the parent that has `overflow-hidden`.
-  - Add `overflow-hidden` to the child that has `rounded-*`.
-  - Remove `overflow-hidden` if it's not needed.
+- [x] Traced the clipping to `src/components/map/map-section.tsx`: the mobile path wraps `SonomaMap` in a `motion.div` with `overflow-hidden` (for the height animation) but no `rounded-*`. `SonomaMap` has `rounded-2xl` on its root, so the parent's overflow-hidden was clipping the child's rounded corners to flat.
+- [x] Added `rounded-2xl` to the `motion.div`'s className so the clipping shape matches the child's rounding.
 - [ ] Verify at 375px and 768px.
+
+(Note: the results page itself has no rounded card — the visible "card" is the map, which is shared between `/results` and `/plan/[id]` via `MapSection`, so this also fixes the same issue on the shared plan page on mobile.)
 
 ---
 
@@ -70,9 +67,9 @@ Set up a safe local/dev workflow so we can develop, create itineraries, tweak da
 
 - [x] **Remove "Get Started" button from quiz page.** The user is already on the quiz — the CTA at the bottom is redundant. Remove or replace with something contextually useful.
 - [x] **Results/Plan page — map overflow on mobile.** On both the results and shared plan pages, the map spills outside its container on iPhone-width screens. Fix: constrain the map to the container width, add proper `border-radius`, and ensure no horizontal overflow. Unified both pages to use a shared `MapSection` component.
-- [ ] **Results page — bottom border-radius clipping.** The bottom corners of the results card/container are being cut off on mobile. Fix the `overflow` / `border-radius` interaction so corners render fully.
+- [x] **Results page — bottom border-radius clipping.** The bottom corners of the results card/container are being cut off on mobile. Fix the `overflow` / `border-radius` interaction so corners render fully.
 - [ ] **Mobile navigation overhaul.** The current navbar/menu doesn't look good on mobile. Redesign using the `/ui` skill and ui.sh picker workflow — generate multiple variants (e.g. slide-out drawer, bottom sheet, hamburger menu) and pick the best one in-browser. Ensure the nav works well across all mobile pages (landing, quiz, results, plan).
-- [ ] **Winery detail page — text alignment on mobile.** Some text on the winery detail page is incorrectly centered on mobile viewports. Should be left-aligned to match the rest of the content flow.
+- [x] **Winery detail page — text alignment on mobile.** Some text on the winery detail page is incorrectly centered on mobile viewports. Should be left-aligned to match the rest of the content flow.
 
 ### Winery Detail Page — Distance-Based Nearby Suggestions
 
@@ -83,18 +80,24 @@ The "Nearby Wineries" section on `/wineries/[slug]` currently filters by same AV
 - **Fallback:** If fewer than 3 wineries fall within 5 miles, backfill with same-region wineries so the section is never empty.
 
 **Implementation:**
-- [ ] **Add a `haversineDistance(lat1, lng1, lat2, lng2)` utility** in `src/lib/` that returns distance in miles between two coordinates.
-- [ ] **Update `/wineries/[slug]` page** to compute distance from the current winery to all others, filter to ≤ 5 mi, and sort closest-first. Fall back to same-region if fewer than 3 results.
-- [ ] **Show distance in the UI** — display something like "2.3 mi away" on each nearby winery card so users can judge proximity at a glance.
-- [ ] **Consider the 5-mile threshold after real data review** — once wired up, spot-check a few wineries in dense areas (Healdsburg, Glen Ellen) and sparse areas to confirm the radius feels right. Adjust if needed.
+- [x] **Add a `haversineDistance(lat1, lng1, lat2, lng2)` utility** in `src/lib/` that returns distance in miles between two coordinates. (`src/lib/geo.ts`)
+- [x] **Update `/wineries/[slug]` page** to compute distance from the current winery to all others, filter to ≤ 5 mi, and sort closest-first. Fall back to same-region if fewer than 3 results. (Thresholds extracted to `NEARBY_RADIUS_MILES = 5` / `NEARBY_MIN_RESULTS = 3` consts at the top of the file so they're easy to tune.)
+- [x] **Show distance in the UI** — display something like "2.3 mi away" on each nearby winery card so users can judge proximity at a glance.
+- [ ] **Consider the 5-mile threshold after real data review** — once wired up, spot-check a few wineries in dense areas (Healdsburg, Glen Ellen) and sparse areas to confirm the radius feels right. Adjust `NEARBY_RADIUS_MILES` in `src/app/wineries/[slug]/page.tsx` if needed.
 
 ### OG Image for Deep Links (Plan Sharing)
 
 When sharing the home page, the OG preview looks good. But sharing a plan page (`/plan/[id]`) shows the raw URL as text instead of a rich preview. The plan page has OG `title` and `description` metadata but is **missing `og:image`**.
 
 - [ ] **Add a default OG image for plan pages.** At minimum, set a static fallback `og:image` in the plan page's `generateMetadata` so every shared link gets a branded preview card instead of raw URL text. Use the same OG image as the home page as a starting point.
-- [ ] **Consider dynamic OG images (stretch).** Use Next.js `opengraph-image.tsx` (or Vercel OG / `@vercel/og`) to generate a dynamic image per plan — e.g. showing the plan title, number of stops, and winery names. This makes each shared link unique and more compelling.
-- [ ] **Verify OG tags on all shareable routes.** Audit `/`, `/results`, `/plan/[id]`, and `/wineries/[slug]` to ensure every page that can be shared has proper `og:title`, `og:description`, `og:image`, and `og:url`. Test with the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) and [Twitter Card Validator](https://cards-dev.twitter.com/validator).
+- [x] **Consider dynamic OG images (stretch).** Use Next.js `opengraph-image.tsx` (or Vercel OG / `@vercel/og`) to generate a dynamic image per plan — e.g. showing the plan title, number of stops, and winery names. This makes each shared link unique and more compelling. (`src/app/plan/[id]/opengraph-image.tsx` now fetches the real plan from Supabase via shared `getPlan` helper in `src/lib/plan.ts`; falls back to generic branding if the plan is missing.)
+- [x] **Verify OG tags on all shareable routes.** Audit `/`, `/results`, `/plan/[id]`, and `/wineries/[slug]` to ensure every page that can be shared has proper `og:title`, `og:description`, `og:image`, and `og:url`. Test with the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) and [Twitter Card Validator](https://cards-dev.twitter.com/validator).
+  - `/` — root layout defines `openGraph` + `twitter`, root `opengraph-image.tsx` convention auto-attaches. ✓
+  - `/plan/[id]` — wired up in earlier commits (metadata reference + dynamic OG image). ✓
+  - `/wineries/[slug]` — previously defined `openGraph`/`twitter` without `images`. Added `images` and `siteName` to both, and added `src/app/wineries/[slug]/opengraph-image.tsx` so each winery gets a dynamic OG image rendering name + region + city + tagline + price range + signature varietals. ✓
+  - `/wineries` — previously inherited root OG verbatim. Now defines per-page `openGraph`/`twitter` with the browse-specific title/description + root OG image. ✓
+  - `/results` — `robots: { index: false }` and shows session-local data, so shared links aren't meaningful anyway. Inherits root OG for the rare case someone does share. ✓
+  - Manual validation with Facebook Sharing Debugger / Twitter Card Validator still TODO (needs a deployed URL).
 
 ---
 
@@ -110,15 +113,17 @@ No association scraping, no LLM-generated editorial, no multi-source merging. OS
 
 Remove retired code that's no longer needed:
 
-- [ ] Delete `scripts/enrich-wineries.ts` — LLM editorial generation replaced by manual editing in admin
-- [ ] Delete `src/lib/pipeline/enrich.ts` — enrichment library (473 lines)
-- [ ] Delete `scripts/discover-associations.ts` — association HTML scraping (368 lines)
-- [ ] Delete `src/lib/pipeline/associations.ts` — association parsing library (198 lines)
-- [ ] Delete `src/lib/pipeline/associations.test.ts` — association tests (203 lines)
-- [ ] Delete `scripts/merge-discoveries.ts` — multi-source merge, not needed with OSM only (154 lines)
-- [ ] Delete `scripts/validate-coordinates.ts` — one-time utility, already served its purpose (457 lines)
-- [ ] Simplify `scripts/run-pipeline.ts` — replace 336-line subprocess spawner with a simple script that runs: discover → crawl → extract → publish
-- [ ] Remove npm scripts from `package.json`: `pipeline:enrich`, `pipeline:enrich:dry`, `discover:associations`, `discover:associations:dry`, `discover:merge`, `discover:merge:promote`
+- [ ] Delete `scripts/enrich-wineries.ts` — LLM editorial generation replaced by manual editing in admin. **⚠ Deferred: still subprocess-spawned by `scripts/run-pipeline.ts` (the orchestrator). Deleting it without touching the orchestrator would leave `pnpm pipeline:run` broken at runtime when it hits the enrich stage. Two ways to clean up:**
+  - **(a) Surgical removal:** in `scripts/run-pipeline.ts`, drop `'enrich'` from the `StageName` union (~line 40), the `STAGES` array entry (~lines 76-83), the `valid` set in `splitStageList` (~line 137), and the doc comments at the top (~lines 6, 16, 19, 20). Then delete the two enrich files. ~20-line edit + 2 deletions.
+  - **(b) Pair with the bigger rewrite below:** do this as part of "Simplify `scripts/run-pipeline.ts`" since that task already involves rewriting the stage list. Cleaner if you're going to rewrite that file anyway.
+- [ ] Delete `src/lib/pipeline/enrich.ts` — enrichment library (473 lines). Same dependency note as above — only imported by `scripts/enrich-wineries.ts`, so it goes in the same commit.
+- [x] Delete `scripts/discover-associations.ts` — association HTML scraping (368 lines)
+- [x] Delete `src/lib/pipeline/associations.ts` — association parsing library (198 lines)
+- [x] Delete `src/lib/pipeline/associations.test.ts` — association tests (203 lines)
+- [x] Delete `scripts/merge-discoveries.ts` — multi-source merge, not needed with OSM only (154 lines)
+- [x] Delete `scripts/validate-coordinates.ts` — one-time utility, already served its purpose (457 lines)
+- [ ] Simplify `scripts/run-pipeline.ts` — replace 336-line subprocess spawner with a simple script that runs: discover → crawl → extract → publish. **Pair this with the enrich deletion above (option b).**
+- [x] Remove npm scripts from `package.json`: `pipeline:enrich`, `pipeline:enrich:dry`, `discover:associations`, `discover:associations:dry`, `discover:merge`, `discover:merge:promote`
 
 ### What Stays
 

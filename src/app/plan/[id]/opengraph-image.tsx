@@ -1,20 +1,14 @@
 import { ImageResponse } from 'next/og';
-import { mockResultsCasualCouple } from '@/lib/mock-data';
+import { getPlan } from '@/lib/plan';
 
 export const alt = 'Sonoma Sip — Wine Day Itinerary';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-function getPlan(_id: string) {
-  return {
-    results: mockResultsCasualCouple,
-  };
-}
-
 export default async function OGImage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const plan = getPlan(id);
-  const stops = plan.results.slice(0, 5);
+  const plan = await getPlan(id);
+  const stops = plan?.results.slice(0, 5) ?? [];
 
   return new ImageResponse(
     <div
@@ -69,49 +63,55 @@ export default async function OGImage({ params }: { params: Promise<{ id: string
           marginTop: '12px',
         }}
       >
-        {stops.length} curated stops in Sonoma County
+        {stops.length > 0
+          ? `${stops.length} curated stops in Sonoma County`
+          : 'A curated Sonoma County wine day'}
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          marginTop: '40px',
-        }}
-      >
-        {stops.map((r, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-            }}
-          >
+      {stops.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            marginTop: '40px',
+          }}
+        >
+          {stops.map((r, i) => (
             <div
+              key={i}
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background: 'rgba(196, 164, 105, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 18,
-                fontWeight: 600,
-                color: '#F7F2EC',
+                gap: '16px',
               }}
             >
-              {r.rank}
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  background: 'rgba(196, 164, 105, 0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 18,
+                  fontWeight: 600,
+                  color: '#F7F2EC',
+                }}
+              >
+                {r.rank}
+              </div>
+              <span style={{ fontSize: 22, color: '#F7F2EC', fontWeight: 500 }}>
+                {r.winery.name}
+              </span>
+              <span style={{ fontSize: 18, color: 'rgba(247, 242, 236, 0.4)', marginLeft: '8px' }}>
+                {r.winery.region}
+              </span>
             </div>
-            <span style={{ fontSize: 22, color: '#F7F2EC', fontWeight: 500 }}>{r.winery.name}</span>
-            <span style={{ fontSize: 18, color: 'rgba(247, 242, 236, 0.4)', marginLeft: '8px' }}>
-              {r.winery.region}
-            </span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>,
     { ...size },
   );
