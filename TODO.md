@@ -21,16 +21,16 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 - [x] Explicitly reference the convention image route (`/plan/${id}/opengraph-image`) in both `openGraph.images` and `twitter.images` so the image is guaranteed to be attached regardless of Next's auto-merge behavior.
 - [ ] Test: run `pnpm dev`, open a plan URL, paste into [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/). You should see the generated image.
 
-### 2. Winery detail — left-align centered text on mobile (est. 5 min)
+### 2. Winery detail — left-align centered text on mobile (est. 5 min) ✅
 
 **Goal:** Two `<p>` elements on the winery detail page are incorrectly centered. Should match the left-aligned content flow of the rest of the page.
 
 **Files to edit:** `src/app/wineries/[slug]/page.tsx`
 
 **Plan:**
-- [ ] Line 277: `<p className="text-stone text-center text-sm tabular-nums">` (the price-per-flight line) — change `text-center` to nothing (default left) or verify if it should be centered on desktop but left on mobile.
-- [ ] Line 280: `<p className="text-stone/50 mt-1 text-center text-xs text-pretty">` (the disclaimer) — same treatment.
-- [ ] If both need to remain centered on desktop but left-aligned on mobile: `text-left sm:text-center`. If they should just be left-aligned everywhere, remove `text-center` entirely.
+- [x] Line 277: price-per-flight line — removed `text-center` so it defaults to left.
+- [x] Line 280: disclaimer line — removed `text-center` so it defaults to left.
+- [x] Chose left-aligned everywhere (not `sm:text-center`) to match the surrounding left-aligned sidebar content (name, tagline, star rating).
 - [ ] Verify in browser at 375px width.
 
 ### 3. Results page — bottom border-radius clipping on mobile (est. 10 min)
@@ -71,7 +71,7 @@ Set up a safe local/dev workflow so we can develop, create itineraries, tweak da
 - [x] **Results/Plan page — map overflow on mobile.** On both the results and shared plan pages, the map spills outside its container on iPhone-width screens. Fix: constrain the map to the container width, add proper `border-radius`, and ensure no horizontal overflow. Unified both pages to use a shared `MapSection` component.
 - [ ] **Results page — bottom border-radius clipping.** The bottom corners of the results card/container are being cut off on mobile. Fix the `overflow` / `border-radius` interaction so corners render fully.
 - [ ] **Mobile navigation overhaul.** The current navbar/menu doesn't look good on mobile. Redesign using the `/ui` skill and ui.sh picker workflow — generate multiple variants (e.g. slide-out drawer, bottom sheet, hamburger menu) and pick the best one in-browser. Ensure the nav works well across all mobile pages (landing, quiz, results, plan).
-- [ ] **Winery detail page — text alignment on mobile.** Some text on the winery detail page is incorrectly centered on mobile viewports. Should be left-aligned to match the rest of the content flow.
+- [x] **Winery detail page — text alignment on mobile.** Some text on the winery detail page is incorrectly centered on mobile viewports. Should be left-aligned to match the rest of the content flow.
 
 ### Winery Detail Page — Distance-Based Nearby Suggestions
 
