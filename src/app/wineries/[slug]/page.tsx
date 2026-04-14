@@ -51,11 +51,14 @@ export async function generateMetadata({
       description,
       type: 'website',
       url: `${env.NEXT_PUBLIC_SITE_URL}/wineries/${slug}`,
+      siteName: 'Sonoma Sip',
+      images: ['/opengraph-image'],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: ['/opengraph-image'],
     },
     alternates: {
       canonical: `/wineries/${slug}`,
