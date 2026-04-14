@@ -75,20 +75,24 @@ export async function generateMetadata({
 
   const wineryNames = plan.results.map((r) => r.winery.name);
   const description = `A ${plan.results.length}-stop Sonoma County wine day: ${wineryNames.join(', ')}. Curated by Sonoma Sip.`;
+  const title = `Wine Day Itinerary — ${plan.results.length} Stops`;
+  const ogImage = `/plan/${id}/opengraph-image`;
 
   return {
-    title: `Wine Day Itinerary — ${plan.results.length} Stops`,
+    title,
     description,
     openGraph: {
-      title: `Wine Day Itinerary — ${plan.results.length} Stops`,
+      title,
       description,
       type: 'website',
       siteName: 'Sonoma Sip',
+      images: [ogImage],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `Wine Day Itinerary — ${plan.results.length} Stops`,
+      title,
       description,
+      images: [ogImage],
     },
   };
 }

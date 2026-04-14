@@ -10,17 +10,16 @@
 
 Pick these off one at a time. Each is scoped to 1-2 file touches and should be doable in under 15 minutes.
 
-### 1. OG image for plan pages (est. 5 min)
+### 1. OG image for plan pages (est. 5 min) ✅
 
 **Goal:** Make shared `/plan/[id]` URLs render a rich preview card instead of raw URL text.
 
 **Status:** `src/app/plan/[id]/opengraph-image.tsx` already exists and uses Next.js's App Router convention — Next auto-picks it up as `og:image`. But the `generateMetadata` in `src/app/plan/[id]/page.tsx` explicitly sets `openGraph` **without** an `images` key, which **may override** the convention file.
 
 **Plan:**
-- [ ] Open `src/app/plan/[id]/page.tsx` and find `generateMetadata` (around line 64).
-- [ ] Remove the explicit `openGraph` and `twitter` blocks entirely and let the `opengraph-image.tsx` convention + root layout metadata inherit — OR, if you want to keep the explicit block, leave it alone and test first (Next may already be merging).
+- [x] Open `src/app/plan/[id]/page.tsx` and find `generateMetadata` (around line 64).
+- [x] Explicitly reference the convention image route (`/plan/${id}/opengraph-image`) in both `openGraph.images` and `twitter.images` so the image is guaranteed to be attached regardless of Next's auto-merge behavior.
 - [ ] Test: run `pnpm dev`, open a plan URL, paste into [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/). You should see the generated image.
-- [ ] If `opengraph-image.tsx` is not being picked up, the simplest fallback is to add `images: ['/opengraph-image']` to the `openGraph` object in `generateMetadata`.
 
 ### 2. Winery detail — left-align centered text on mobile (est. 5 min)
 
