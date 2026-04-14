@@ -81,9 +81,9 @@ The "Nearby Wineries" section on `/wineries/[slug]` currently filters by same AV
 
 **Implementation:**
 - [x] **Add a `haversineDistance(lat1, lng1, lat2, lng2)` utility** in `src/lib/` that returns distance in miles between two coordinates. (`src/lib/geo.ts`)
-- [ ] **Update `/wineries/[slug]` page** to compute distance from the current winery to all others, filter to ≤ 5 mi, and sort closest-first. Fall back to same-region if fewer than 3 results.
-- [ ] **Show distance in the UI** — display something like "2.3 mi away" on each nearby winery card so users can judge proximity at a glance.
-- [ ] **Consider the 5-mile threshold after real data review** — once wired up, spot-check a few wineries in dense areas (Healdsburg, Glen Ellen) and sparse areas to confirm the radius feels right. Adjust if needed.
+- [x] **Update `/wineries/[slug]` page** to compute distance from the current winery to all others, filter to ≤ 5 mi, and sort closest-first. Fall back to same-region if fewer than 3 results. (Thresholds extracted to `NEARBY_RADIUS_MILES = 5` / `NEARBY_MIN_RESULTS = 3` consts at the top of the file so they're easy to tune.)
+- [x] **Show distance in the UI** — display something like "2.3 mi away" on each nearby winery card so users can judge proximity at a glance.
+- [ ] **Consider the 5-mile threshold after real data review** — once wired up, spot-check a few wineries in dense areas (Healdsburg, Glen Ellen) and sparse areas to confirm the radius feels right. Adjust `NEARBY_RADIUS_MILES` in `src/app/wineries/[slug]/page.tsx` if needed.
 
 ### OG Image for Deep Links (Plan Sharing)
 

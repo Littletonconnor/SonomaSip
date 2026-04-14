@@ -23,6 +23,10 @@ import { AnimatedSection } from '@/components/ui/animated-section';
 import { getWineryBySlug, getAllWinerySlugs, getAllWineriesForBrowse } from '@/lib/data/wineries';
 import type { Flight } from '@/lib/types';
 import { env } from '@/lib/env';
+import { haversineDistance } from '@/lib/geo';
+
+const NEARBY_RADIUS_MILES = 5;
+const NEARBY_MIN_RESULTS = 3;
 
 export const revalidate = 3600;
 
@@ -73,9 +77,23 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
   if (!winery) notFound();
 
   const allWineries = await getAllWineriesForBrowse();
-  const relatedWineries = allWineries
-    .filter((w) => w.id !== winery.id && w.region === winery.region)
-    .slice(0, 3);
+  const otherWineries = allWineries
+    .filter((w) => w.id !== winery.id)
+    .map((w) => ({
+      winery: w,
+      distance: haversineDistance(winery.latitude, winery.longitude, w.latitude, w.longitude),
+    }))
+    .sort((a, b) => a.distance - b.distance);
+
+  const withinRadius = otherWineries.filter((x) => x.distance <= NEARBY_RADIUS_MILES);
+  const sameRegionBackfill = otherWineries.filter(
+    (x) => x.distance > NEARBY_RADIUS_MILES && x.winery.region === winery.region,
+  );
+  const relatedWineries = (
+    withinRadius.length >= NEARBY_MIN_RESULTS
+      ? withinRadius.slice(0, NEARBY_MIN_RESULTS)
+      : [...withinRadius, ...sameRegionBackfill.slice(0, NEARBY_MIN_RESULTS - withinRadius.length)]
+  ).slice(0, NEARBY_MIN_RESULTS);
 
   const dayNames = [
     'monday',
@@ -378,7 +396,7 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
                 Nearby Wineries
               </h2>
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                {relatedWineries.map((w) => (
+                {relatedWineries.map(({ winery: w, distance }) => (
                   <Link
                     key={w.slug}
                     href={`/wineries/${w.slug}`}
@@ -388,11 +406,12 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
                       {w.name}
                     </p>
                     <p className="text-stone mt-1 text-sm">{w.tagline}</p>
-                    <div className="text-stone mt-3 flex items-center gap-3 text-sm">
+                    <div className="text-stone mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                       <span>{w.region}</span>
                       <span className="tabular-nums">
                         ${w.minFlightPrice}&ndash;{w.maxFlightPrice}
                       </span>
+                      <span className="tabular-nums">{distance.toFixed(1)} mi away</span>
                     </div>
                   </Link>
                 ))}
