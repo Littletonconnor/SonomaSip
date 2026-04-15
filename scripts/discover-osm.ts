@@ -1,9 +1,15 @@
 /**
  * Discover wineries from OpenStreetMap via the Overpass API.
  *
- * Queries for amenity=winery and craft=winery within the Sonoma County
- * bounding box, deduplicates against existing wineries in the database,
- * and inserts new discoveries into winery_registry.
+ * Queries for winery-tagged nodes/ways within the Sonoma County bounding box,
+ * dedups against existing `wineries` rows by name + coords + domain, and
+ * writes directly to the `wineries` table:
+ *   - Existing editorial rows that match an OSM element get their
+ *     osm_type/osm_id stamped on, linking them for future idempotent runs.
+ *   - Brand-new OSM elements become minimal wineries rows (name, slug,
+ *     coords, website_url, phone, address). Editorial fields (ava_primary,
+ *     reservation_type, style scores, flights, varietals) are left null
+ *     for admin to fill in.
  *
  * Usage:
  *   pnpm discover:osm            # run discovery
@@ -11,7 +17,8 @@
  */
 
 import 'dotenv/config';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '../src/lib/database.types.js';
 import {
   normalizeName,
   extractDomain,
@@ -19,9 +26,10 @@ import {
   type WineryCandidate,
 } from '../src/lib/pipeline/dedup.js';
 
+type PipelineClient = SupabaseClient<Database>;
+
 const DRY_RUN = process.argv.includes('--dry-run');
 
-// Sonoma County bounding box (generous to catch edges)
 const BBOX = {
   south: 38.1,
   west: -123.1,
@@ -83,7 +91,8 @@ interface ParsedWinery {
   longitude: number;
   website_url: string | null;
   phone: string | null;
-  address: string | null;
+  address_street: string | null;
+  address_city: string | null;
 }
 
 function parseElements(elements: OverpassElement[]): ParsedWinery[] {
@@ -98,13 +107,14 @@ function parseElements(elements: OverpassElement[]): ParsedWinery[] {
     const lon = el.lon ?? el.center?.lon;
     if (lat == null || lon == null) continue;
 
-    // Deduplicate OSM results (same name + close coordinates)
     const key = `${normalizeName(name)}_${lat.toFixed(3)}_${lon.toFixed(3)}`;
     if (seen.has(key)) continue;
     seen.add(key);
 
-    const website =
-      el.tags?.website || el.tags?.['contact:website'] || el.tags?.url || null;
+    const street = [el.tags?.['addr:housenumber'], el.tags?.['addr:street']]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
 
     results.push({
       osm_type: el.type,
@@ -113,32 +123,101 @@ function parseElements(elements: OverpassElement[]): ParsedWinery[] {
       normalized_name: normalizeName(name),
       latitude: lat,
       longitude: lon,
-      website_url: website,
+      website_url: el.tags?.website || el.tags?.['contact:website'] || el.tags?.url || null,
       phone: el.tags?.phone || el.tags?.['contact:phone'] || null,
-      address: [el.tags?.['addr:housenumber'], el.tags?.['addr:street'], el.tags?.['addr:city']]
-        .filter(Boolean)
-        .join(' ') || null,
+      address_street: street || null,
+      address_city: el.tags?.['addr:city'] || null,
     });
   }
 
   return results;
 }
 
-async function loadExistingWineries(): Promise<
-  (WineryCandidate & { id: string })[]
-> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
+interface ExistingWinery extends WineryCandidate {
+  id: string;
+  slug: string;
+  osm_type: string | null;
+  osm_id: number | null;
+}
 
+async function loadExistingWineries(supabase: PipelineClient): Promise<ExistingWinery[]> {
   const { data, error } = await supabase
     .from('wineries')
-    .select('id, name, latitude, longitude, website_url')
-    .eq('is_active', true);
+    .select('id, slug, name, latitude, longitude, website_url, osm_type, osm_id');
 
   if (error) throw new Error(`Failed to load wineries: ${error.message}`);
-  return (data ?? []) as (WineryCandidate & { id: string })[];
+  return (data ?? []) as unknown as ExistingWinery[];
+}
+
+/**
+ * Kebab-case a name for use as a slug, stripping diacritics and non-ASCII.
+ * Falls back to `winery-{suffix}` if the name has no usable characters.
+ */
+function slugifyName(name: string): string {
+  const base = name
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return base || 'winery';
+}
+
+function uniqueSlug(base: string, taken: Set<string>): string {
+  if (!taken.has(base)) return base;
+  for (let n = 2; n < 1000; n++) {
+    const candidate = `${base}-${n}`;
+    if (!taken.has(candidate)) return candidate;
+  }
+  throw new Error(`Could not generate unique slug for base="${base}"`);
+}
+
+interface Partitioned {
+  alreadyLinked: { osm: ParsedWinery; existing: ExistingWinery }[];
+  fuzzyMatched: { osm: ParsedWinery; existing: ExistingWinery; reasons: string[] }[];
+  newDiscoveries: ParsedWinery[];
+}
+
+function partition(parsed: ParsedWinery[], existing: ExistingWinery[]): Partitioned {
+  const byOsm = new Map<string, ExistingWinery>();
+  for (const e of existing) {
+    if (e.osm_type && e.osm_id != null) {
+      byOsm.set(`${e.osm_type}/${e.osm_id}`, e);
+    }
+  }
+
+  const alreadyLinked: Partitioned['alreadyLinked'] = [];
+  const fuzzyMatched: Partitioned['fuzzyMatched'] = [];
+  const newDiscoveries: Partitioned['newDiscoveries'] = [];
+
+  for (const osm of parsed) {
+    const linked = byOsm.get(`${osm.osm_type}/${osm.osm_id}`);
+    if (linked) {
+      alreadyLinked.push({ osm, existing: linked });
+      continue;
+    }
+
+    const unlinked = existing.filter((e) => !e.osm_type || e.osm_id == null);
+    const candidate: WineryCandidate = {
+      name: osm.name,
+      latitude: osm.latitude,
+      longitude: osm.longitude,
+      website_url: osm.website_url ?? undefined,
+    };
+    const best = findBestMatch(candidate, unlinked);
+    if (best) {
+      fuzzyMatched.push({
+        osm,
+        existing: unlinked[best.index],
+        reasons: best.result.reasons,
+      });
+    } else {
+      newDiscoveries.push(osm);
+    }
+  }
+
+  return { alreadyLinked, fuzzyMatched, newDiscoveries };
 }
 
 async function run() {
@@ -148,49 +227,39 @@ async function run() {
   const parsed = parseElements(elements);
   console.log(`  Parsed ${parsed.length} unique wineries from OSM\n`);
 
-  const existing = await loadExistingWineries();
+  const supabase = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
+
+  const existing = await loadExistingWineries(supabase);
   console.log(`  Loaded ${existing.length} existing wineries from DB\n`);
 
-  const matched: { osm: ParsedWinery; existingId: string; reasons: string[] }[] = [];
-  const newDiscoveries: ParsedWinery[] = [];
+  const { alreadyLinked, fuzzyMatched, newDiscoveries } = partition(parsed, existing);
 
-  for (const osm of parsed) {
-    const candidate: WineryCandidate = {
-      name: osm.name,
-      latitude: osm.latitude,
-      longitude: osm.longitude,
-      website_url: osm.website_url ?? undefined,
-    };
+  console.log(`Partition:`);
+  console.log(`  Already linked (osm_type/osm_id match): ${alreadyLinked.length}`);
+  console.log(`  Fuzzy-matched to existing editorial row: ${fuzzyMatched.length}`);
+  console.log(`  New discoveries:                         ${newDiscoveries.length}\n`);
 
-    const best = findBestMatch(candidate, existing);
-    if (best) {
-      matched.push({
-        osm,
-        existingId: existing[best.index].id,
-        reasons: best.result.reasons,
-      });
-    } else {
-      newDiscoveries.push(osm);
-    }
-  }
-
-  console.log(`Results:`);
-  console.log(`  Matched to existing: ${matched.length}`);
-  console.log(`  New discoveries:     ${newDiscoveries.length}\n`);
-
-  if (matched.length > 0) {
-    console.log('Matches:');
-    for (const m of matched) {
-      console.log(`  ${m.osm.name} → ${m.existingId} (${m.reasons.join(', ')})`);
+  if (fuzzyMatched.length > 0) {
+    console.log('Fuzzy matches (will stamp osm_type/osm_id onto existing row):');
+    for (const m of fuzzyMatched) {
+      console.log(`  ${m.osm.name} → ${m.existing.id} (${m.reasons.join(', ')})`);
     }
     console.log();
   }
 
   if (newDiscoveries.length > 0) {
     console.log('New discoveries:');
-    for (const d of newDiscoveries) {
+    for (const d of newDiscoveries.slice(0, 20)) {
       const domain = extractDomain(d.website_url);
-      console.log(`  ${d.name} (${d.latitude.toFixed(4)}, ${d.longitude.toFixed(4)})${domain ? ` [${domain}]` : ''}`);
+      console.log(
+        `  ${d.name} (${d.latitude.toFixed(4)}, ${d.longitude.toFixed(4)})${domain ? ` [${domain}]` : ''}`,
+      );
+    }
+    if (newDiscoveries.length > 20) {
+      console.log(`  ... and ${newDiscoveries.length - 20} more`);
     }
     console.log();
   }
@@ -200,12 +269,6 @@ async function run() {
     return;
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-
-  // Start a pipeline run
   const { data: runData, error: runError } = await supabase
     .from('pipeline_runs')
     .insert({ stage: 'discovery', metadata: { source: 'osm', bbox: BBOX } })
@@ -215,51 +278,73 @@ async function run() {
   if (runError || !runData) {
     throw new Error(`Failed to start pipeline run: ${runError?.message}`);
   }
-  const runId = runData.id;
+  const runId = (runData as { id: number }).id;
 
-  // Upsert matched wineries into registry
   let processed = 0;
   let failed = 0;
 
-  for (const m of matched) {
-    const { error } = await supabase.from('winery_registry').upsert(
-      {
-        name: m.osm.name,
-        normalized_name: m.osm.normalized_name,
-        source: 'osm',
-        source_id: `${m.osm.osm_type}/${m.osm.osm_id}`,
-        website_url: m.osm.website_url,
-        latitude: m.osm.latitude,
-        longitude: m.osm.longitude,
-        matched_winery_id: m.existingId,
-        coverage_tier: 'editorial',
-      },
-      { onConflict: 'source,source_id', ignoreDuplicates: false },
-    );
+  // 1. Already-linked rows: refresh website/phone/address/coords if OSM has newer data.
+  for (const { osm, existing: e } of alreadyLinked) {
+    const { error } = await supabase
+      .from('wineries')
+      .update({
+        latitude: osm.latitude,
+        longitude: osm.longitude,
+        website_url: osm.website_url ?? undefined,
+        phone: osm.phone ?? undefined,
+        address_street: osm.address_street ?? undefined,
+        address_city: osm.address_city ?? undefined,
+      })
+      .eq('id', e.id);
     if (error) {
-      console.error(`  Failed to upsert ${m.osm.name}: ${error.message}`);
+      console.error(`  Failed to refresh ${e.id}: ${error.message}`);
       failed++;
     } else {
       processed++;
     }
   }
 
-  // Insert new discoveries
+  // 2. Fuzzy matches: stamp osm_type/osm_id onto the existing editorial row.
+  for (const { osm, existing: e } of fuzzyMatched) {
+    const { error } = await supabase
+      .from('wineries')
+      .update({
+        osm_type: osm.osm_type,
+        osm_id: osm.osm_id,
+        website_url: e.website_url ?? osm.website_url ?? undefined,
+        phone: osm.phone ?? undefined,
+      })
+      .eq('id', e.id);
+    if (error) {
+      console.error(`  Failed to link ${e.id} to OSM: ${error.message}`);
+      failed++;
+    } else {
+      processed++;
+    }
+  }
+
+  // 3. New discoveries: insert minimal wineries rows.
+  const takenSlugs = new Set(existing.map((e) => e.slug));
   for (const d of newDiscoveries) {
-    const { error } = await supabase.from('winery_registry').upsert(
-      {
-        name: d.name,
-        normalized_name: d.normalized_name,
-        source: 'osm',
-        source_id: `${d.osm_type}/${d.osm_id}`,
-        website_url: d.website_url,
-        latitude: d.latitude,
-        longitude: d.longitude,
-        matched_winery_id: null,
-        coverage_tier: 'discovered',
-      },
-      { onConflict: 'source,source_id', ignoreDuplicates: false },
-    );
+    const baseSlug = slugifyName(d.name);
+    const slug = uniqueSlug(baseSlug, takenSlugs);
+    takenSlugs.add(slug);
+
+    const { error } = await supabase.from('wineries').insert({
+      id: slug,
+      slug,
+      name: d.name,
+      latitude: d.latitude,
+      longitude: d.longitude,
+      website_url: d.website_url,
+      phone: d.phone,
+      address_street: d.address_street,
+      address_city: d.address_city,
+      osm_type: d.osm_type,
+      osm_id: d.osm_id,
+      data_source: 'osm_auto',
+      is_active: true,
+    });
     if (error) {
       console.error(`  Failed to insert ${d.name}: ${error.message}`);
       failed++;
@@ -268,7 +353,6 @@ async function run() {
     }
   }
 
-  // Complete the pipeline run
   await supabase
     .from('pipeline_runs')
     .update({
@@ -281,7 +365,8 @@ async function run() {
         bbox: BBOX,
         raw_elements: elements.length,
         parsed: parsed.length,
-        matched: matched.length,
+        already_linked: alreadyLinked.length,
+        fuzzy_matched: fuzzyMatched.length,
         new_discoveries: newDiscoveries.length,
       },
     })

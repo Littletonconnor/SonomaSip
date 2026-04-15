@@ -58,17 +58,18 @@ Move from "editorial CSV import + OSM shadow registry" to a single pipeline that
 - **Make currently-NOT-NULL editorial columns nullable** so OSM can insert minimal rows. Admin assigns the rest via the editor.
 - **No auto-extraction of flights or varietals.** Admin enters those manually for new discoveries; the 68 editorial rows keep their existing flight/varietal data.
 
-**Schema changes:**
-- [ ] Migration: drop `NOT NULL` on `wineries.ava_primary`, `wineries.reservation_type`. Audit for any other columns that OSM can't populate but are currently NOT NULL without a default — relax those too.
-- [ ] Migration: drop `winery_registry` table + its indexes (`idx_winery_registry_*`) + `trg_winery_registry_updated_at` trigger + RLS policies (all in `supabase/migrations/20260406000001_create_pipeline_tables.sql`).
-- [ ] Migration: add unique constraint for OSM dedup on `wineries` — either a `(osm_type, osm_id)` composite column pair, or rely on slug uniqueness with a deterministic slug derivation. Decision: go with new columns `osm_type` / `osm_id` so discovery upserts are idempotent.
-- [ ] Change `wineries.data_source` default from `'editorial_excel'` to null (or similar). Discovery sets `'osm_auto'`; existing 68 rows keep `'editorial_excel'` — admin can filter by source.
+**Schema changes:** (migration `20260415000001_pipeline_simplification.sql`)
+- [x] Migration: drop `NOT NULL` on `wineries.ava_primary`, `wineries.reservation_type`. Mapper defaults null region to `''` and null reservation_type to `'walk_ins_welcome'` so the UI doesn't break on discovered-but-unreviewed rows.
+- [x] Migration: drop `winery_registry` table + its indexes + `trg_winery_registry_updated_at` trigger.
+- [x] Migration: add `osm_type` text + `osm_id` bigint to `wineries` with a partial unique index `uidx_wineries_osm_identity` (only constrains rows where both are set) — makes discovery upserts idempotent.
+- [x] Migration: drop the `'editorial_excel'` default on `wineries.data_source`. Existing 68 rows keep their value; discovery sets `'osm_auto'` explicitly.
+- [ ] Apply the migration against the remote Supabase project (`supabase db push` or dashboard). Re-run `pnpm db:gen-types` after apply to refresh `src/lib/database.types.ts` from the real schema (currently hand-edited to match).
 
-**Discovery rewrite (`scripts/discover-osm.ts`):**
-- [ ] Replace the `winery_registry.upsert` call with a direct `wineries.upsert` keyed on `(osm_type, osm_id)`.
-- [ ] Populate from OSM tags: `name`, `slug` (normalized from name, with collision suffix if needed), `latitude`, `longitude`, `website_url`, `phone`, `address_*`. Leave `ava_primary`, `reservation_type`, style/quality/rating/amenity fields null.
-- [ ] Keep the name + coords dedup (`src/lib/pipeline/dedup.ts`) so OSM results that match the existing 68 editorial rows get skipped rather than creating duplicates.
-- [ ] Log added / skipped-as-duplicate counts.
+**Discovery rewrite (`scripts/discover-osm.ts`):** ✅
+- [x] Replace `winery_registry.upsert` with direct writes to `wineries`. Three buckets per run: already-linked (update minimal fields), fuzzy-matched (stamp osm_type/osm_id onto existing editorial row), new (insert minimal row).
+- [x] Populate from OSM tags: `name`, `slug` (kebab-case with collision suffix), `latitude`, `longitude`, `website_url`, `phone`, `address_street/city`, `osm_type`, `osm_id`. Leave editorial fields null.
+- [x] Keep the dedup logic from `src/lib/pipeline/dedup.ts`.
+- [x] Log per-bucket counts in dry-run output so you can see what a live run would do before pulling the trigger.
 
 **CSV import retirement:**
 - [ ] Delete `scripts/import-wineries.ts`.
