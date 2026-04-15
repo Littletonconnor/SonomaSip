@@ -19,7 +19,7 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 **Plan:**
 - [x] Open `src/app/plan/[id]/page.tsx` and find `generateMetadata` (around line 64).
 - [x] Explicitly reference the convention image route (`/plan/${id}/opengraph-image`) in both `openGraph.images` and `twitter.images` so the image is guaranteed to be attached regardless of Next's auto-merge behavior.
-- [ ] Test: run `pnpm dev`, open a plan URL, paste into [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/). You should see the generated image.
+- [x] Test: run `pnpm dev`, open a plan URL, paste into [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/). You should see the generated image.
 
 ### 2. Winery detail — left-align centered text on mobile (est. 5 min) ✅
 
@@ -31,7 +31,7 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 - [x] Line 277: price-per-flight line — removed `text-center` so it defaults to left.
 - [x] Line 280: disclaimer line — removed `text-center` so it defaults to left.
 - [x] Chose left-aligned everywhere (not `sm:text-center`) to match the surrounding left-aligned sidebar content (name, tagline, star rating).
-- [ ] Verify in browser at 375px width.
+- [x] Verify in browser at 375px width.
 
 ### 3. Results page — bottom border-radius clipping on mobile (est. 10 min) ✅
 
@@ -40,7 +40,7 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 **Plan:**
 - [x] Traced the clipping to `src/components/map/map-section.tsx`: the mobile path wraps `SonomaMap` in a `motion.div` with `overflow-hidden` (for the height animation) but no `rounded-*`. `SonomaMap` has `rounded-2xl` on its root, so the parent's overflow-hidden was clipping the child's rounded corners to flat.
 - [x] Added `rounded-2xl` to the `motion.div`'s className so the clipping shape matches the child's rounding.
-- [ ] Verify at 375px and 768px.
+- [x] Verify at 375px and 768px.
 
 (Note: the results page itself has no rounded card — the visible "card" is the map, which is shared between `/results` and `/plan/[id]` via `MapSection`, so this also fixes the same issue on the shared plan page on mobile.)
 
