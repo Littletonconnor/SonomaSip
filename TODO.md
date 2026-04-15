@@ -97,7 +97,7 @@ When sharing the home page, the OG preview looks good. But sharing a plan page (
   - `/wineries/[slug]` — previously defined `openGraph`/`twitter` without `images`. Added `images` and `siteName` to both, and added `src/app/wineries/[slug]/opengraph-image.tsx` so each winery gets a dynamic OG image rendering name + region + city + tagline + price range + signature varietals. ✓
   - `/wineries` — previously inherited root OG verbatim. Now defines per-page `openGraph`/`twitter` with the browse-specific title/description + root OG image. ✓
   - `/results` — `robots: { index: false }` and shows session-local data, so shared links aren't meaningful anyway. Inherits root OG for the rare case someone does share. ✓
-  - Manual validation with Facebook Sharing Debugger / Twitter Card Validator still TODO (needs a deployed URL).
+  - Manual validation with Facebook Sharing Debugger / Twitter Card Validator confirmed against the deployed URL. ✓
 
 ---
 
