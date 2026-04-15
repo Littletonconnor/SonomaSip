@@ -48,6 +48,64 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 
 ## Up Next
 
+### Pipeline Simplification — Discovery Writes Directly to Wineries
+
+Move from "editorial CSV import + OSM shadow registry" to a single pipeline that dynamically discovers, crawls, enriches, and publishes — all writing directly to `wineries`. Admin UI handles delete + manual fill-in for fields OSM/Firecrawl/Places can't supply (flights, varietals, style scores, editorial content, AVA assignment).
+
+**Scope decisions locked in:**
+- Matching engine + all scoring columns stay. Mapper at `src/lib/mappers.ts:57-65` already defaults null `style_*` to 3, and `scoreRating` handles null quality/popularity/rating gracefully — so sparse discovery rows rank middle-of-the-pack until admin fills them in.
+- **Keep the existing 68 wineries.** Discovery upserts new OSM rows alongside them; editorial data is preserved.
+- **Make currently-NOT-NULL editorial columns nullable** so OSM can insert minimal rows. Admin assigns the rest via the editor.
+- **No auto-extraction of flights or varietals.** Admin enters those manually for new discoveries; the 68 editorial rows keep their existing flight/varietal data.
+
+**Schema changes:**
+- [ ] Migration: drop `NOT NULL` on `wineries.ava_primary`, `wineries.reservation_type`. Audit for any other columns that OSM can't populate but are currently NOT NULL without a default — relax those too.
+- [ ] Migration: drop `winery_registry` table + its indexes (`idx_winery_registry_*`) + `trg_winery_registry_updated_at` trigger + RLS policies (all in `supabase/migrations/20260406000001_create_pipeline_tables.sql`).
+- [ ] Migration: add unique constraint for OSM dedup on `wineries` — either a `(osm_type, osm_id)` composite column pair, or rely on slug uniqueness with a deterministic slug derivation. Decision: go with new columns `osm_type` / `osm_id` so discovery upserts are idempotent.
+- [ ] Change `wineries.data_source` default from `'editorial_excel'` to null (or similar). Discovery sets `'osm_auto'`; existing 68 rows keep `'editorial_excel'` — admin can filter by source.
+
+**Discovery rewrite (`scripts/discover-osm.ts`):**
+- [ ] Replace the `winery_registry.upsert` call with a direct `wineries.upsert` keyed on `(osm_type, osm_id)`.
+- [ ] Populate from OSM tags: `name`, `slug` (normalized from name, with collision suffix if needed), `latitude`, `longitude`, `website_url`, `phone`, `address_*`. Leave `ava_primary`, `reservation_type`, style/quality/rating/amenity fields null.
+- [ ] Keep the name + coords dedup (`src/lib/pipeline/dedup.ts`) so OSM results that match the existing 68 editorial rows get skipped rather than creating duplicates.
+- [ ] Log added / skipped-as-duplicate counts.
+
+**CSV import retirement:**
+- [ ] Delete `scripts/import-wineries.ts`.
+- [ ] Delete `docs/csv/*.csv` (8 files) and `docs/sonoma-winery-database-complete.xlsx`.
+- [ ] Remove the `wineries:import` npm script from `package.json`.
+- [ ] The existing 68 `wineries` rows stay in the DB — no data wiped.
+
+**Admin UI — manual fill-in layer:**
+- [ ] **Delete action** on `/admin/wineries/[id]` — confirmation modal, cascades to `flights`, `winery_varietals`, `content_drafts`, `winery_scrapes`, `winery_snapshots`.
+- [ ] **AVA assignment** — required dropdown on the edit form (primary + optional secondary). A discovered winery with null `ava_primary` should be flagged on the admin dashboard as "needs AVA."
+- [ ] **Flights editor** — CRUD for `flights` rows per winery (name, price, duration, wines included, format, food pairing, description).
+- [ ] **Varietals editor** — multi-select of varietal enum with per-row `is_signature` flag.
+- [ ] **Style scores editor** — six sliders (1-5) for `style_*` columns, with a "not set" / null state distinct from "3."
+- [ ] **Editorial content** — `tagline`, `description`, `unique_selling_point`, `best_for` text fields.
+- [ ] **Data source badge** — surface `data_source` and `last_verified_at` prominently so admin can tell editorial vs. auto-discovered at a glance.
+
+**Final pipeline flow:**
+
+```
+discover  (OSM → wineries directly, minimal fields)
+  → crawl    (Firecrawl → winery_scrapes)
+  → extract  (Claude → content_drafts: hours, amenities, phone, address, reservation_type)
+  → places   (Google Places → content_drafts: rating_google, review_count_total)
+  → publish  (auto-approve factual high-confidence → wineries; rest → admin review queue)
+```
+
+One command: `pnpm pipeline:run`. No `winery_registry`, no editorial CSV, no LLM enrichment. Admin panel fills in what the pipeline can't (flights, varietals, style scores, AVA, tagline, description).
+
+**Order of operations (suggested):**
+1. Schema migrations (nullable + drop registry) — reversible, doesn't break anything immediately since registry is only touched by `discover-osm.ts`.
+2. Rewrite discovery script.
+3. Dry-run discovery against production to see what OSM finds and how many dedup against the 68.
+4. Build admin delete + AVA assignment UI (blockers for adopting discovery output).
+5. Delete CSV import + CSV files.
+6. Run full pipeline end-to-end.
+7. Build remaining admin editors (flights, varietals, style scores, editorial) incrementally.
+
 ### Hours & Ratings — Run Existing Pipeline + Add Places Stage
 
 All 68 wineries currently show hours and ratings from the one-time editorial CSV import (`docs/csv/tasting-and-hours.csv`, `docs/csv/ratings.csv`). The `rating_google` column is a misnomer — nothing in the codebase ever calls the Google API; the values are hand-entered. The pipeline we've already built can handle both accurately with one new stage.
