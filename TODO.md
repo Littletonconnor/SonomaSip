@@ -48,6 +48,29 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 
 ## Up Next
 
+### Hours & Ratings — Run Existing Pipeline + Add Places Stage
+
+All 68 wineries currently show hours and ratings from the one-time editorial CSV import (`docs/csv/tasting-and-hours.csv`, `docs/csv/ratings.csv`). The `rating_google` column is a misnomer — nothing in the codebase ever calls the Google API; the values are hand-entered. The pipeline we've already built can handle both accurately with one new stage.
+
+**Hours (already wired — just never been run against production):**
+- [ ] **Run the pipeline end-to-end.** Discovery is complete (68 wineries in DB), so start at crawl. Dry-run first: `pnpm pipeline:run --dry-run --skip=discovery`. Then live: `pnpm pipeline:run --skip=discovery`. Firecrawl scrapes each site, Claude extracts hours into `content_drafts`, publish auto-approves factual high-confidence fields per `src/lib/pipeline/publish.ts:57` (hours is `affectsMatching: false`, threshold 0.9 in `AUTO_APPROVE_HIGH_CONFIDENCE`).
+- [ ] **Spot-check published hours** against 3-5 winery websites to confirm accuracy before fully trusting the auto-approve path. Anything not auto-approved will land in the admin review queue.
+
+**Ratings — new `places` stage:**
+- [ ] **Add `google_place_id` column** via migration (`supabase/migrations/`).
+- [ ] **New stage: `scripts/places-sync.ts` + lib `src/lib/pipeline/places.ts`.** For each winery: resolve `place_id` via Places `findPlaceFromText` using `name + address_city` (cache to the new column), then fetch Place Details for `rating` + `user_ratings_total`. Write proposals to `content_drafts` — same table, same review UX as extract-stage drafts.
+- [ ] **Register `rating_google` and `review_count_total` in `DRAFT_FIELDS`** (`src/lib/pipeline/publish.ts:49`). Both `factual`, `affectsMatching: false` — let high-confidence (exact Places API response) auto-approve, no human gate needed for numeric ratings.
+- [ ] **Wire the new stage into `scripts/run-pipeline.ts`** so a single `pnpm pipeline:run` covers discover → crawl → extract → places → publish.
+- [ ] **Stamp `last_verified_at`** on every winery the places stage touches so the UI can surface freshness.
+- [ ] **Env + ToS:** add `GOOGLE_PLACES_API_KEY` to `.env.example` + Vercel envs; attribute "Google" in the UI near the star display; don't store raw review text; refresh no more than every ~30 days per winery.
+
+**Admin review (the manual-verification layer):**
+- The existing admin "Review Queue" spec (see `### 3. Review Queue`) already handles this — once ratings land in `content_drafts`, the same UI that reviews hours/phones/amenities covers rating proposals too. No new admin work needed beyond what's already planned.
+
+**Cleanup once wired:**
+- [x] Remove the stale "Google Places Sync" entry from `## Future` — replaced by the concrete plan above.
+- [ ] Either hide the star row in `src/app/wineries/[slug]/page.tsx:276-290` until the first places-sync run lands, or accept that the editorial values stand in until then. Decision point for before we share more widely.
+
 ### Supabase Development Environment
 
 Set up a safe local/dev workflow so we can develop, create itineraries, tweak data, and experiment without touching production. Options to evaluate:
@@ -83,7 +106,7 @@ The "Nearby Wineries" section on `/wineries/[slug]` currently filters by same AV
 - [x] **Add a `haversineDistance(lat1, lng1, lat2, lng2)` utility** in `src/lib/` that returns distance in miles between two coordinates. (`src/lib/geo.ts`)
 - [x] **Update `/wineries/[slug]` page** to compute distance from the current winery to all others, filter to ≤ 5 mi, and sort closest-first. Fall back to same-region if fewer than 3 results. (Thresholds extracted to `NEARBY_RADIUS_MILES = 5` / `NEARBY_MIN_RESULTS = 3` consts at the top of the file so they're easy to tune.)
 - [x] **Show distance in the UI** — display something like "2.3 mi away" on each nearby winery card so users can judge proximity at a glance.
-- [ ] **Consider the 5-mile threshold after real data review** — once wired up, spot-check a few wineries in dense areas (Healdsburg, Glen Ellen) and sparse areas to confirm the radius feels right. Adjust `NEARBY_RADIUS_MILES` in `src/app/wineries/[slug]/page.tsx` if needed.
+- [x] **Consider the 5-mile threshold after real data review** — spot-checked wineries in dense areas (Healdsburg, Glen Ellen) and sparse areas; the 5-mile radius feels right. No adjustment needed.
 
 ### OG Image for Deep Links (Plan Sharing)
 
@@ -266,13 +289,13 @@ git push origin main
 
 ### Step 5: Post-deploy smoke test
 
-- [ ] Home page loads, hero renders, CTA works
-- [ ] Quiz: complete all 4 steps → results page shows real wineries with scores
-- [ ] Results: map renders with pins, share button creates a plan URL
-- [ ] Plan page: shared URL loads the saved itinerary
-- [ ] Browse: `/wineries` shows all 68 wineries with working filters
-- [ ] Detail: click any winery → detail page with flights, hours, amenities
-- [ ] Legal: `/terms` and `/privacy` pages render
+- [x] Home page loads, hero renders, CTA works
+- [x] Quiz: complete all 4 steps → results page shows real wineries with scores
+- [x] Results: map renders with pins, share button creates a plan URL
+- [x] Plan page: shared URL loads the saved itinerary
+- [x] Browse: `/wineries` shows all 68 wineries with working filters
+- [x] Detail: click any winery → detail page with flights, hours, amenities
+- [x] Legal: `/terms` and `/privacy` pages render
 
 ### Step 6: Share with coworkers
 
@@ -337,10 +360,6 @@ _After admin panel and core pipeline are solid._
 ### Geographic Expansion
 - [ ] Add Napa Valley AVA regions to `ava_region` enum
 - [ ] Update app copy from "Sonoma" to "Sonoma & Napa"
-
-### Google Places Sync
-- [ ] Map `google_place_id` per winery
-- [ ] Weekly sync for `rating_google` + `review_count`
 
 ---
 
