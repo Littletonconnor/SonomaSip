@@ -344,7 +344,7 @@ export type Database = {
           address_street: string | null
           address_zip: string | null
           annual_cases: number | null
-          ava_primary: Database["public"]["Enums"]["ava_region"]
+          ava_primary: Database["public"]["Enums"]["ava_region"] | null
           ava_secondary: Database["public"]["Enums"]["ava_region"] | null
           awards: string | null
           best_for: string | null
@@ -395,6 +395,8 @@ export type Database = {
           nearest_town: string | null
           noise_level: Database["public"]["Enums"]["noise_level"] | null
           not_ideal_for: string | null
+          osm_id: number | null
+          osm_type: string | null
           ownership_type: string | null
           pairs_well_with: string | null
           parking_notes: string | null
@@ -407,7 +409,7 @@ export type Database = {
           rating_google: number | null
           rating_tripadvisor: number | null
           rating_yelp: number | null
-          reservation_type: Database["public"]["Enums"]["reservation_type"]
+          reservation_type: Database["public"]["Enums"]["reservation_type"] | null
           reservation_url: string | null
           review_count_total: number | null
           setting: Database["public"]["Enums"]["winery_setting"] | null
@@ -437,7 +439,7 @@ export type Database = {
           address_street?: string | null
           address_zip?: string | null
           annual_cases?: number | null
-          ava_primary: Database["public"]["Enums"]["ava_region"]
+          ava_primary?: Database["public"]["Enums"]["ava_region"] | null
           ava_secondary?: Database["public"]["Enums"]["ava_region"] | null
           awards?: string | null
           best_for?: string | null
@@ -488,6 +490,8 @@ export type Database = {
           nearest_town?: string | null
           noise_level?: Database["public"]["Enums"]["noise_level"] | null
           not_ideal_for?: string | null
+          osm_id?: number | null
+          osm_type?: string | null
           ownership_type?: string | null
           pairs_well_with?: string | null
           parking_notes?: string | null
@@ -500,7 +504,7 @@ export type Database = {
           rating_google?: number | null
           rating_tripadvisor?: number | null
           rating_yelp?: number | null
-          reservation_type: Database["public"]["Enums"]["reservation_type"]
+          reservation_type?: Database["public"]["Enums"]["reservation_type"] | null
           reservation_url?: string | null
           review_count_total?: number | null
           setting?: Database["public"]["Enums"]["winery_setting"] | null
@@ -530,7 +534,7 @@ export type Database = {
           address_street?: string | null
           address_zip?: string | null
           annual_cases?: number | null
-          ava_primary?: Database["public"]["Enums"]["ava_region"]
+          ava_primary?: Database["public"]["Enums"]["ava_region"] | null
           ava_secondary?: Database["public"]["Enums"]["ava_region"] | null
           awards?: string | null
           best_for?: string | null
@@ -581,6 +585,8 @@ export type Database = {
           nearest_town?: string | null
           noise_level?: Database["public"]["Enums"]["noise_level"] | null
           not_ideal_for?: string | null
+          osm_id?: number | null
+          osm_type?: string | null
           ownership_type?: string | null
           pairs_well_with?: string | null
           parking_notes?: string | null
@@ -593,7 +599,7 @@ export type Database = {
           rating_google?: number | null
           rating_tripadvisor?: number | null
           rating_yelp?: number | null
-          reservation_type?: Database["public"]["Enums"]["reservation_type"]
+          reservation_type?: Database["public"]["Enums"]["reservation_type"] | null
           reservation_url?: string | null
           review_count_total?: number | null
           setting?: Database["public"]["Enums"]["winery_setting"] | null
@@ -658,59 +664,6 @@ export type Database = {
           {
             foreignKeyName: "winery_extractions_winery_id_fkey"
             columns: ["winery_id"]
-            isOneToOne: false
-            referencedRelation: "wineries"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      winery_registry: {
-        Row: {
-          coverage_tier: Database["public"]["Enums"]["coverage_tier"]
-          created_at: string
-          id: number
-          latitude: number | null
-          longitude: number | null
-          matched_winery_id: string | null
-          name: string
-          normalized_name: string
-          source: string
-          source_id: string | null
-          updated_at: string
-          website_url: string | null
-        }
-        Insert: {
-          coverage_tier?: Database["public"]["Enums"]["coverage_tier"]
-          created_at?: string
-          id?: never
-          latitude?: number | null
-          longitude?: number | null
-          matched_winery_id?: string | null
-          name: string
-          normalized_name: string
-          source: string
-          source_id?: string | null
-          updated_at?: string
-          website_url?: string | null
-        }
-        Update: {
-          coverage_tier?: Database["public"]["Enums"]["coverage_tier"]
-          created_at?: string
-          id?: never
-          latitude?: number | null
-          longitude?: number | null
-          matched_winery_id?: string | null
-          name?: string
-          normalized_name?: string
-          source?: string
-          source_id?: string | null
-          updated_at?: string
-          website_url?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "winery_registry_matched_winery_id_fkey"
-            columns: ["matched_winery_id"]
             isOneToOne: false
             referencedRelation: "wineries"
             referencedColumns: ["id"]

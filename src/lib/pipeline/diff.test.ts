@@ -63,6 +63,8 @@ function makeRow(overrides: Partial<WineryRow> = {}): WineryRow {
     nearest_town: null,
     noise_level: null,
     not_ideal_for: null,
+    osm_id: null,
+    osm_type: null,
     ownership_type: null,
     pairs_well_with: null,
     parking_notes: null,

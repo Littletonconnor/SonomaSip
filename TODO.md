@@ -19,7 +19,7 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 **Plan:**
 - [x] Open `src/app/plan/[id]/page.tsx` and find `generateMetadata` (around line 64).
 - [x] Explicitly reference the convention image route (`/plan/${id}/opengraph-image`) in both `openGraph.images` and `twitter.images` so the image is guaranteed to be attached regardless of Next's auto-merge behavior.
-- [ ] Test: run `pnpm dev`, open a plan URL, paste into [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/). You should see the generated image.
+- [x] Test: run `pnpm dev`, open a plan URL, paste into [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/). You should see the generated image.
 
 ### 2. Winery detail — left-align centered text on mobile (est. 5 min) ✅
 
@@ -31,7 +31,7 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 - [x] Line 277: price-per-flight line — removed `text-center` so it defaults to left.
 - [x] Line 280: disclaimer line — removed `text-center` so it defaults to left.
 - [x] Chose left-aligned everywhere (not `sm:text-center`) to match the surrounding left-aligned sidebar content (name, tagline, star rating).
-- [ ] Verify in browser at 375px width.
+- [x] Verify in browser at 375px width.
 
 ### 3. Results page — bottom border-radius clipping on mobile (est. 10 min) ✅
 
@@ -40,13 +40,95 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 **Plan:**
 - [x] Traced the clipping to `src/components/map/map-section.tsx`: the mobile path wraps `SonomaMap` in a `motion.div` with `overflow-hidden` (for the height animation) but no `rounded-*`. `SonomaMap` has `rounded-2xl` on its root, so the parent's overflow-hidden was clipping the child's rounded corners to flat.
 - [x] Added `rounded-2xl` to the `motion.div`'s className so the clipping shape matches the child's rounding.
-- [ ] Verify at 375px and 768px.
+- [x] Verify at 375px and 768px.
 
 (Note: the results page itself has no rounded card — the visible "card" is the map, which is shared between `/results` and `/plan/[id]` via `MapSection`, so this also fixes the same issue on the shared plan page on mobile.)
 
 ---
 
 ## Up Next
+
+### Pipeline Simplification — Discovery Writes Directly to Wineries
+
+Move from "editorial CSV import + OSM shadow registry" to a single pipeline that dynamically discovers, crawls, enriches, and publishes — all writing directly to `wineries`. Admin UI handles delete + manual fill-in for fields OSM/Firecrawl/Places can't supply (flights, varietals, style scores, editorial content, AVA assignment).
+
+**Scope decisions locked in:**
+- Matching engine + all scoring columns stay. Mapper at `src/lib/mappers.ts:57-65` already defaults null `style_*` to 3, and `scoreRating` handles null quality/popularity/rating gracefully — so sparse discovery rows rank middle-of-the-pack until admin fills them in.
+- **Keep the existing 68 wineries.** Discovery upserts new OSM rows alongside them; editorial data is preserved.
+- **Make currently-NOT-NULL editorial columns nullable** so OSM can insert minimal rows. Admin assigns the rest via the editor.
+- **No auto-extraction of flights or varietals.** Admin enters those manually for new discoveries; the 68 editorial rows keep their existing flight/varietal data.
+
+**Schema changes:** (migration `20260415000001_pipeline_simplification.sql`)
+- [x] Migration: drop `NOT NULL` on `wineries.ava_primary`, `wineries.reservation_type`. Mapper defaults null region to `''` and null reservation_type to `'walk_ins_welcome'` so the UI doesn't break on discovered-but-unreviewed rows.
+- [x] Migration: drop `winery_registry` table + its indexes + `trg_winery_registry_updated_at` trigger.
+- [x] Migration: add `osm_type` text + `osm_id` bigint to `wineries` with a partial unique index `uidx_wineries_osm_identity` (only constrains rows where both are set) — makes discovery upserts idempotent.
+- [x] Migration: drop the `'editorial_excel'` default on `wineries.data_source`. Existing 68 rows keep their value; discovery sets `'osm_auto'` explicitly.
+- [ ] Apply the migration against the remote Supabase project (`supabase db push` or dashboard). Re-run `pnpm db:gen-types` after apply to refresh `src/lib/database.types.ts` from the real schema (currently hand-edited to match).
+
+**Discovery rewrite (`scripts/discover-osm.ts`):** ✅
+- [x] Replace `winery_registry.upsert` with direct writes to `wineries`. Three buckets per run: already-linked (update minimal fields), fuzzy-matched (stamp osm_type/osm_id onto existing editorial row), new (insert minimal row).
+- [x] Populate from OSM tags: `name`, `slug` (kebab-case with collision suffix), `latitude`, `longitude`, `website_url`, `phone`, `address_street/city`, `osm_type`, `osm_id`. Leave editorial fields null.
+- [x] Keep the dedup logic from `src/lib/pipeline/dedup.ts`.
+- [x] Log per-bucket counts in dry-run output so you can see what a live run would do before pulling the trigger.
+
+**CSV import retirement:**
+- [ ] Delete `scripts/import-wineries.ts`.
+- [ ] Delete `docs/csv/*.csv` (8 files) and `docs/sonoma-winery-database-complete.xlsx`.
+- [ ] Remove the `wineries:import` npm script from `package.json`.
+- [ ] The existing 68 `wineries` rows stay in the DB — no data wiped.
+
+**Admin UI — manual fill-in layer:**
+- [ ] **Delete action** on `/admin/wineries/[id]` — confirmation modal, cascades to `flights`, `winery_varietals`, `content_drafts`, `winery_scrapes`, `winery_snapshots`.
+- [ ] **AVA assignment** — required dropdown on the edit form (primary + optional secondary). A discovered winery with null `ava_primary` should be flagged on the admin dashboard as "needs AVA."
+- [ ] **Flights editor** — CRUD for `flights` rows per winery (name, price, duration, wines included, format, food pairing, description).
+- [ ] **Varietals editor** — multi-select of varietal enum with per-row `is_signature` flag.
+- [ ] **Style scores editor** — six sliders (1-5) for `style_*` columns, with a "not set" / null state distinct from "3."
+- [ ] **Editorial content** — `tagline`, `description`, `unique_selling_point`, `best_for` text fields.
+- [ ] **Data source badge** — surface `data_source` and `last_verified_at` prominently so admin can tell editorial vs. auto-discovered at a glance.
+
+**Final pipeline flow:**
+
+```
+discover  (OSM → wineries directly, minimal fields)
+  → crawl    (Firecrawl → winery_scrapes)
+  → extract  (Claude → content_drafts: hours, amenities, phone, address, reservation_type)
+  → places   (Google Places → content_drafts: rating_google, review_count_total)
+  → publish  (auto-approve factual high-confidence → wineries; rest → admin review queue)
+```
+
+One command: `pnpm pipeline:run`. No `winery_registry`, no editorial CSV, no LLM enrichment. Admin panel fills in what the pipeline can't (flights, varietals, style scores, AVA, tagline, description).
+
+**Order of operations (suggested):**
+1. Schema migrations (nullable + drop registry) — reversible, doesn't break anything immediately since registry is only touched by `discover-osm.ts`.
+2. Rewrite discovery script.
+3. Dry-run discovery against production to see what OSM finds and how many dedup against the 68.
+4. Build admin delete + AVA assignment UI (blockers for adopting discovery output).
+5. Delete CSV import + CSV files.
+6. Run full pipeline end-to-end.
+7. Build remaining admin editors (flights, varietals, style scores, editorial) incrementally.
+
+### Hours & Ratings — Run Existing Pipeline + Add Places Stage
+
+All 68 wineries currently show hours and ratings from the one-time editorial CSV import (`docs/csv/tasting-and-hours.csv`, `docs/csv/ratings.csv`). The `rating_google` column is a misnomer — nothing in the codebase ever calls the Google API; the values are hand-entered. The pipeline we've already built can handle both accurately with one new stage.
+
+**Hours (already wired — just never been run against production):**
+- [ ] **Run the pipeline end-to-end.** Discovery is complete (68 wineries in DB), so start at crawl. Dry-run first: `pnpm pipeline:run --dry-run --skip=discovery`. Then live: `pnpm pipeline:run --skip=discovery`. Firecrawl scrapes each site, Claude extracts hours into `content_drafts`, publish auto-approves factual high-confidence fields per `src/lib/pipeline/publish.ts:57` (hours is `affectsMatching: false`, threshold 0.9 in `AUTO_APPROVE_HIGH_CONFIDENCE`).
+- [ ] **Spot-check published hours** against 3-5 winery websites to confirm accuracy before fully trusting the auto-approve path. Anything not auto-approved will land in the admin review queue.
+
+**Ratings — new `places` stage:**
+- [ ] **Add `google_place_id` column** via migration (`supabase/migrations/`).
+- [ ] **New stage: `scripts/places-sync.ts` + lib `src/lib/pipeline/places.ts`.** For each winery: resolve `place_id` via Places `findPlaceFromText` using `name + address_city` (cache to the new column), then fetch Place Details for `rating` + `user_ratings_total`. Write proposals to `content_drafts` — same table, same review UX as extract-stage drafts.
+- [ ] **Register `rating_google` and `review_count_total` in `DRAFT_FIELDS`** (`src/lib/pipeline/publish.ts:49`). Both `factual`, `affectsMatching: false` — let high-confidence (exact Places API response) auto-approve, no human gate needed for numeric ratings.
+- [ ] **Wire the new stage into `scripts/run-pipeline.ts`** so a single `pnpm pipeline:run` covers discover → crawl → extract → places → publish.
+- [ ] **Stamp `last_verified_at`** on every winery the places stage touches so the UI can surface freshness.
+- [ ] **Env + ToS:** add `GOOGLE_PLACES_API_KEY` to `.env.example` + Vercel envs; attribute "Google" in the UI near the star display; don't store raw review text; refresh no more than every ~30 days per winery.
+
+**Admin review (the manual-verification layer):**
+- The existing admin "Review Queue" spec (see `### 3. Review Queue`) already handles this — once ratings land in `content_drafts`, the same UI that reviews hours/phones/amenities covers rating proposals too. No new admin work needed beyond what's already planned.
+
+**Cleanup once wired:**
+- [x] Remove the stale "Google Places Sync" entry from `## Future` — replaced by the concrete plan above.
+- [ ] Either hide the star row in `src/app/wineries/[slug]/page.tsx:276-290` until the first places-sync run lands, or accept that the editorial values stand in until then. Decision point for before we share more widely.
 
 ### Supabase Development Environment
 
@@ -83,7 +165,7 @@ The "Nearby Wineries" section on `/wineries/[slug]` currently filters by same AV
 - [x] **Add a `haversineDistance(lat1, lng1, lat2, lng2)` utility** in `src/lib/` that returns distance in miles between two coordinates. (`src/lib/geo.ts`)
 - [x] **Update `/wineries/[slug]` page** to compute distance from the current winery to all others, filter to ≤ 5 mi, and sort closest-first. Fall back to same-region if fewer than 3 results. (Thresholds extracted to `NEARBY_RADIUS_MILES = 5` / `NEARBY_MIN_RESULTS = 3` consts at the top of the file so they're easy to tune.)
 - [x] **Show distance in the UI** — display something like "2.3 mi away" on each nearby winery card so users can judge proximity at a glance.
-- [ ] **Consider the 5-mile threshold after real data review** — once wired up, spot-check a few wineries in dense areas (Healdsburg, Glen Ellen) and sparse areas to confirm the radius feels right. Adjust `NEARBY_RADIUS_MILES` in `src/app/wineries/[slug]/page.tsx` if needed.
+- [x] **Consider the 5-mile threshold after real data review** — spot-checked wineries in dense areas (Healdsburg, Glen Ellen) and sparse areas; the 5-mile radius feels right. No adjustment needed.
 
 ### OG Image for Deep Links (Plan Sharing)
 
@@ -97,7 +179,7 @@ When sharing the home page, the OG preview looks good. But sharing a plan page (
   - `/wineries/[slug]` — previously defined `openGraph`/`twitter` without `images`. Added `images` and `siteName` to both, and added `src/app/wineries/[slug]/opengraph-image.tsx` so each winery gets a dynamic OG image rendering name + region + city + tagline + price range + signature varietals. ✓
   - `/wineries` — previously inherited root OG verbatim. Now defines per-page `openGraph`/`twitter` with the browse-specific title/description + root OG image. ✓
   - `/results` — `robots: { index: false }` and shows session-local data, so shared links aren't meaningful anyway. Inherits root OG for the rare case someone does share. ✓
-  - Manual validation with Facebook Sharing Debugger / Twitter Card Validator still TODO (needs a deployed URL).
+  - Manual validation with Facebook Sharing Debugger / Twitter Card Validator confirmed against the deployed URL. ✓
 
 ---
 
@@ -266,13 +348,13 @@ git push origin main
 
 ### Step 5: Post-deploy smoke test
 
-- [ ] Home page loads, hero renders, CTA works
-- [ ] Quiz: complete all 4 steps → results page shows real wineries with scores
-- [ ] Results: map renders with pins, share button creates a plan URL
-- [ ] Plan page: shared URL loads the saved itinerary
-- [ ] Browse: `/wineries` shows all 68 wineries with working filters
-- [ ] Detail: click any winery → detail page with flights, hours, amenities
-- [ ] Legal: `/terms` and `/privacy` pages render
+- [x] Home page loads, hero renders, CTA works
+- [x] Quiz: complete all 4 steps → results page shows real wineries with scores
+- [x] Results: map renders with pins, share button creates a plan URL
+- [x] Plan page: shared URL loads the saved itinerary
+- [x] Browse: `/wineries` shows all 68 wineries with working filters
+- [x] Detail: click any winery → detail page with flights, hours, amenities
+- [x] Legal: `/terms` and `/privacy` pages render
 
 ### Step 6: Share with coworkers
 
@@ -337,10 +419,6 @@ _After admin panel and core pipeline are solid._
 ### Geographic Expansion
 - [ ] Add Napa Valley AVA regions to `ava_region` enum
 - [ ] Update app copy from "Sonoma" to "Sonoma & Napa"
-
-### Google Places Sync
-- [ ] Map `google_place_id` per winery
-- [ ] Weekly sync for `rating_google` + `review_count`
 
 ---
 
