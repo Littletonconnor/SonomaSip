@@ -7,10 +7,11 @@
 
 ## Data & archives
 
-| File                                                                                 | Purpose                                            |
-| ------------------------------------------------------------------------------------ | -------------------------------------------------- |
-| [sonoma-winery-database-complete.xlsx](./sonoma-winery-database-complete.xlsx)       | Master editorial dataset (8 sheets, ~68 wineries). |
-| [sonoma-winery-prd.docx](./sonoma-winery-prd.docx)                                   | Original working PRD (historical).                 |
-| [sonoma-winery-website-architecture.xlsx](./sonoma-winery-website-architecture.xlsx) | Supplementary planning workbook (historical).      |
+| File                                                                                 | Purpose                                       |
+| ------------------------------------------------------------------------------------ | --------------------------------------------- |
+| [sonoma-winery-prd.docx](./sonoma-winery-prd.docx)                                   | Original working PRD (historical).            |
+| [sonoma-winery-website-architecture.xlsx](./sonoma-winery-website-architecture.xlsx) | Supplementary planning workbook (historical). |
+
+The original editorial workbook (`sonoma-winery-database-complete.xlsx`) seeded the initial 68 wineries in Supabase and has been retired. New editorial work happens directly against the database via the admin panel.
 
 Implementation tasks and technical phases: **`TODO.md`** in the repository root.

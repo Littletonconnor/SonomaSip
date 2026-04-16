@@ -424,15 +424,14 @@ _After admin panel and core pipeline are solid._
 
 ## References
 
-| Artifact                             | Path / URL                                  |
-| ------------------------------------ | ------------------------------------------- |
-| Product requirements (non-technical) | `docs/PRD.md`                               |
-| Scoring / filters (technical)        | `docs/SCORING.md`                           |
-| Seed / editorial data (Excel)        | `docs/sonoma-winery-database-complete.xlsx` |
-| ERD (database schema diagram)        | `docs/ERD.md`                               |
-| shadcn/ui docs                       | https://ui.shadcn.com/docs                  |
-| shadcn — Tailwind v4 guide           | https://ui.shadcn.com/docs/tailwind-v4      |
-| Next.js agent docs (in node_modules) | `node_modules/next/dist/docs/`              |
+| Artifact                             | Path / URL                             |
+| ------------------------------------ | -------------------------------------- |
+| Product requirements (non-technical) | `docs/PRD.md`                          |
+| Scoring / filters (technical)        | `docs/SCORING.md`                      |
+| ERD (database schema diagram)        | `docs/ERD.md`                          |
+| shadcn/ui docs                       | https://ui.shadcn.com/docs             |
+| shadcn — Tailwind v4 guide           | https://ui.shadcn.com/docs/tailwind-v4 |
+| Next.js agent docs (in node_modules) | `node_modules/next/dist/docs/`         |
 
 ---
 
