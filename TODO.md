@@ -72,10 +72,10 @@ Move from "editorial CSV import + OSM shadow registry" to a single pipeline that
 - [x] Log per-bucket counts in dry-run output so you can see what a live run would do before pulling the trigger.
 
 **CSV import retirement:**
-- [ ] Delete `scripts/import-wineries.ts`.
-- [ ] Delete `docs/csv/*.csv` (8 files) and `docs/sonoma-winery-database-complete.xlsx`.
-- [ ] Remove the `wineries:import` npm script from `package.json`.
-- [ ] The existing 68 `wineries` rows stay in the DB — no data wiped.
+- [x] Delete `scripts/import-wineries.ts`. (Also deleted the now-dead helpers in `scripts/lib/`: `parse-csv.ts`, `transforms.ts`, `validate.ts`.)
+- [x] Delete `docs/csv/*.csv` (8 files) and `docs/sonoma-winery-database-complete.xlsx`.
+- [x] Remove the `db:import` / `db:import:dry` npm scripts from `package.json`. Also removed `db:reset` since it chained into `db:import`.
+- [x] The existing 68 `wineries` rows stay in the DB — no data wiped.
 
 **Admin UI — manual fill-in layer:**
 - [ ] **Delete action** on `/admin/wineries/[id]` — confirmation modal, cascades to `flights`, `winery_varietals`, `content_drafts`, `winery_scrapes`, `winery_snapshots`.
@@ -424,15 +424,14 @@ _After admin panel and core pipeline are solid._
 
 ## References
 
-| Artifact                             | Path / URL                                  |
-| ------------------------------------ | ------------------------------------------- |
-| Product requirements (non-technical) | `docs/PRD.md`                               |
-| Scoring / filters (technical)        | `docs/SCORING.md`                           |
-| Seed / editorial data (Excel)        | `docs/sonoma-winery-database-complete.xlsx` |
-| ERD (database schema diagram)        | `docs/ERD.md`                               |
-| shadcn/ui docs                       | https://ui.shadcn.com/docs                  |
-| shadcn — Tailwind v4 guide           | https://ui.shadcn.com/docs/tailwind-v4      |
-| Next.js agent docs (in node_modules) | `node_modules/next/dist/docs/`              |
+| Artifact                             | Path / URL                             |
+| ------------------------------------ | -------------------------------------- |
+| Product requirements (non-technical) | `docs/PRD.md`                          |
+| Scoring / filters (technical)        | `docs/SCORING.md`                      |
+| ERD (database schema diagram)        | `docs/ERD.md`                          |
+| shadcn/ui docs                       | https://ui.shadcn.com/docs             |
+| shadcn — Tailwind v4 guide           | https://ui.shadcn.com/docs/tailwind-v4 |
+| Next.js agent docs (in node_modules) | `node_modules/next/dist/docs/`         |
 
 ---
 

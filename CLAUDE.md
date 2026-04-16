@@ -28,7 +28,7 @@ src/app/          # Next.js App Router pages and layouts
 src/components/ui # shadcn/ui components (source files — edit directly)
 src/lib/          # Shared utilities (cn(), matching engine, etc.)
 src/hooks/        # Shared React hooks
-docs/             # PRD, scoring spec, editorial data (xlsx)
+docs/             # PRD, scoring spec, ERD
 public/           # Static assets
 components.json   # shadcn/ui configuration
 ```
@@ -74,7 +74,7 @@ This applies to: landing pages, page sections, component creation, layout change
 
 - **Product requirements:** `docs/PRD.md` — goals, scope, user flows, policies
 - **Matching logic:** `docs/SCORING.md` — filters, weights, scoring formula
-- **Editorial data:** `docs/sonoma-winery-database-complete.xlsx` — 68 curated wineries
+- **Editorial data:** 68 curated wineries live in Supabase (`wineries` table). The original seed workbook has been retired — edit wineries via the admin panel.
 
 ### Code Standards
 

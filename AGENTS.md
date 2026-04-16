@@ -26,7 +26,7 @@
 
 - **`docs/PRD.md`** — Product requirements, user flows, policies, acceptance criteria
 - **`docs/SCORING.md`** — Matching engine rules, weights, filter logic, worked examples
-- **`docs/sonoma-winery-database-complete.xlsx`** — Source data for 68 curated wineries
+- **Supabase `wineries` table** — 68 curated wineries (seeded from a now-retired editorial workbook; edit via the admin panel)
 
 ### Components (shadcn/ui)
 

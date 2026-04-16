@@ -13,7 +13,7 @@ This document defines **what** we are building and **why**, for product, design,
 
 This PRD follows common product practice: clear problem and users, explicit **in/out of scope**, prioritized capabilities, testable success metrics, and documented decisions—while leaving **how** engineers build it to the technical roadmap.
 
-**Sources:** Curated research dataset (`sonoma-winery-database-complete.xlsx`), original working spec (`sonoma-winery-prd.docx`, archived in this folder), and stakeholder decisions through April 2026.
+**Sources:** Curated research dataset (originally captured in a spreadsheet workbook, now seeded into the Supabase `wineries` table), original working spec (`sonoma-winery-prd.docx`, archived in this folder), and stakeholder decisions through April 2026.
 
 ---
 
@@ -178,7 +178,7 @@ Priorities: **P0** = required for V1 launch; **P1** = shortly after or if low ef
 
 ### 8.2 Human-editable source
 
-- A **spreadsheet workbook** remains the primary editorial file for non-engineers (`sonoma-winery-database-complete.xlsx`). Engineering maintains a repeatable **import** into the live system.
+- The **Supabase `wineries` table** is the system of record. Non-engineers edit winery data through the **admin panel** (add, update, delete, assign AVA, manage flights/varietals/style scores, write editorial copy). The original seed workbook has been retired.
 
 ### 8.3 Content quality expectations
 
@@ -250,9 +250,10 @@ For **budget matching**, “entry-level tasting price” should ignore **extreme
 
 | File                                      | Description                                                                      |
 | ----------------------------------------- | -------------------------------------------------------------------------------- |
-| `sonoma-winery-database-complete.xlsx`    | Curated winery data (multiple sheets).                                           |
 | `sonoma-winery-prd.docx`                  | Earlier working PRD (includes historical tooling notes—non-binding for product). |
 | `sonoma-winery-website-architecture.xlsx` | Supplementary planning notes (non-binding).                                      |
+
+The original curated dataset (`sonoma-winery-database-complete.xlsx`) seeded the Supabase `wineries` table and has since been retired; see §8.2.
 
 ### B. Engineering cross-references
 
