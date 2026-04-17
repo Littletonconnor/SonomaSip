@@ -109,56 +109,29 @@ Move from "editorial CSV import + OSM shadow registry" to a single pipeline that
 - [x] The existing 68 `wineries` rows stay in the DB — no data wiped.
 
 **Admin UI — manual fill-in layer:**
-- [ ] **Delete action** on `/admin/wineries/[id]` — confirmation modal, cascades to `flights`, `winery_varietals`, `content_drafts`, `winery_scrapes`, `winery_snapshots`.
+- [ ] **Delete action** on `/admin/wineries/[id]` — confirmation modal, cascades to `flights`, `winery_varietals`, `winery_scrapes`, `winery_snapshots`.
 - [ ] **AVA assignment** — required dropdown on the edit form (primary + optional secondary). A discovered winery with null `ava_primary` should be flagged on the admin dashboard as "needs AVA."
 - [ ] **Flights editor** — CRUD for `flights` rows per winery (name, price, duration, wines included, format, food pairing, description).
 - [ ] **Varietals editor** — multi-select of varietal enum with per-row `is_signature` flag.
 - [ ] **Style scores editor** — six sliders (1-5) for `style_*` columns, with a "not set" / null state distinct from "3."
 - [ ] **Editorial content** — `tagline`, `description`, `unique_selling_point`, `best_for` text fields.
 - [ ] **Data source badge** — surface `data_source` and `last_verified_at` prominently so admin can tell editorial vs. auto-discovered at a glance.
+- [ ] **Scrape viewer** — side panel on the edit form showing the latest `winery_scrapes` markdown so admin can read source material while filling fields.
+- [ ] **Publish action** — flips `content_status` from `'draft'` to `'published'`. Gate behind required-field checks (at minimum `ava_primary` not null). Creates a `winery_snapshots` row first for rollback.
 
-**Final pipeline flow:**
+### Hours & Ratings — Manual Entry from Scrape + Future Places Sync
 
-```
-discover  (OSM → wineries directly, minimal fields)
-  → crawl    (Firecrawl → winery_scrapes)
-  → extract  (Claude → content_drafts: hours, amenities, phone, address, reservation_type)
-  → places   (Google Places → content_drafts: rating_google, review_count_total)
-  → publish  (auto-approve factual high-confidence → wineries; rest → admin review queue)
-```
+All 68 wineries currently show hours and ratings from the one-time editorial CSV import. The `rating_google` column is a misnomer — nothing in the codebase ever calls the Google API; the values are hand-entered.
 
-One command: `pnpm pipeline:run`. No `winery_registry`, no editorial CSV, no LLM enrichment. Admin panel fills in what the pipeline can't (flights, varietals, style scores, AVA, tagline, description).
+**Hours — manual entry via scrape viewer:**
+- [ ] Admin reads `winery_scrapes` markdown (shown in the scrape viewer panel of the edit form) and types hours into the winery row directly. No auto-extraction.
 
-**Order of operations (suggested):**
-1. Schema migrations (nullable + drop registry) — reversible, doesn't break anything immediately since registry is only touched by `discover-osm.ts`.
-2. Rewrite discovery script.
-3. Dry-run discovery against production to see what OSM finds and how many dedup against the 68.
-4. Build admin delete + AVA assignment UI (blockers for adopting discovery output).
-5. Delete CSV import + CSV files.
-6. Run full pipeline end-to-end.
-7. Build remaining admin editors (flights, varietals, style scores, editorial) incrementally.
-
-### Hours & Ratings — Run Existing Pipeline + Add Places Stage
-
-All 68 wineries currently show hours and ratings from the one-time editorial CSV import (`docs/csv/tasting-and-hours.csv`, `docs/csv/ratings.csv`). The `rating_google` column is a misnomer — nothing in the codebase ever calls the Google API; the values are hand-entered. The pipeline we've already built can handle both accurately with one new stage.
-
-**Hours (already wired — just never been run against production):**
-- [ ] **Run the pipeline end-to-end.** Discovery is complete (68 wineries in DB), so start at crawl. Dry-run first: `pnpm pipeline:run --dry-run --skip=discovery`. Then live: `pnpm pipeline:run --skip=discovery`. Firecrawl scrapes each site, Claude extracts hours into `content_drafts`, publish auto-approves factual high-confidence fields per `src/lib/pipeline/publish.ts:57` (hours is `affectsMatching: false`, threshold 0.9 in `AUTO_APPROVE_HIGH_CONFIDENCE`).
-- [ ] **Spot-check published hours** against 3-5 winery websites to confirm accuracy before fully trusting the auto-approve path. Anything not auto-approved will land in the admin review queue.
-
-**Ratings — new `places` stage:**
+**Ratings — future `places` stage:**
 - [ ] **Add `google_place_id` column** via migration (`supabase/migrations/`).
-- [ ] **New stage: `scripts/places-sync.ts` + lib `src/lib/pipeline/places.ts`.** For each winery: resolve `place_id` via Places `findPlaceFromText` using `name + address_city` (cache to the new column), then fetch Place Details for `rating` + `user_ratings_total`. Write proposals to `content_drafts` — same table, same review UX as extract-stage drafts.
-- [ ] **Register `rating_google` and `review_count_total` in `DRAFT_FIELDS`** (`src/lib/pipeline/publish.ts:49`). Both `factual`, `affectsMatching: false` — let high-confidence (exact Places API response) auto-approve, no human gate needed for numeric ratings.
-- [ ] **Wire the new stage into `scripts/run-pipeline.ts`** so a single `pnpm pipeline:run` covers discover → crawl → extract → places → publish.
+- [ ] **New stage: `scripts/places-sync.ts` + lib `src/lib/pipeline/places.ts`.** For each winery: resolve `place_id` via Places `findPlaceFromText` using `name + address_city` (cache to the new column), then fetch Place Details for `rating` + `user_ratings_total`. Write directly to `wineries.rating_google` / `wineries.review_count_total` — Google is authoritative, no draft staging needed.
+- [ ] **Wire the new stage into `scripts/run-pipeline.ts`** so a single `pnpm pipeline:run` covers discover → crawl → places.
 - [ ] **Stamp `last_verified_at`** on every winery the places stage touches so the UI can surface freshness.
 - [ ] **Env + ToS:** add `GOOGLE_PLACES_API_KEY` to `.env.example` + Vercel envs; attribute "Google" in the UI near the star display; don't store raw review text; refresh no more than every ~30 days per winery.
-
-**Admin review (the manual-verification layer):**
-- The existing admin "Review Queue" spec (see `### 3. Review Queue`) already handles this — once ratings land in `content_drafts`, the same UI that reviews hours/phones/amenities covers rating proposals too. No new admin work needed beyond what's already planned.
-
-**Cleanup once wired:**
-- [x] Remove the stale "Google Places Sync" entry from `## Future` — replaced by the concrete plan above.
 - [ ] Either hide the star row in `src/app/wineries/[slug]/page.tsx:276-290` until the first places-sync run lands, or accept that the editorial values stand in until then. Decision point for before we share more widely.
 
 ### Supabase Development Environment
@@ -218,37 +191,31 @@ When sharing the home page, the OG preview looks good. But sharing a plan page (
 
 ### The Plan
 
-Simple: **discover wineries (OSM) → scrape their websites (Firecrawl) → extract structured data (Claude) → review & edit in admin UI → publish to database**.
+Simple: **discover wineries (OSM) → scrape their websites (Firecrawl) → admin reads scrape + manually fills fields → publish to production**.
 
-No association scraping, no LLM-generated editorial, no multi-source merging. OSM gives us names, coordinates, and website URLs for Sonoma County wineries. Firecrawl scrapes each winery's own website for hours, contact info, amenities, etc. Humans do the editorial work (taglines, descriptions, style scores) through the admin panel.
+No Claude extraction, no LLM-generated editorial, no per-field proposal queue. OSM gives names, coordinates, and website URLs. Firecrawl scrapes each winery's website for reference material. Humans curate everything through the admin panel — they read the scraped markdown and type values into the edit form.
 
-### Pipeline Cleanup
+### Pipeline Cleanup ✅
 
-Remove retired code that's no longer needed:
+All retired code has been removed:
 
-- [x] Delete `scripts/enrich-wineries.ts` — LLM editorial generation replaced by manual editing in admin.
-- [x] Delete `src/lib/pipeline/enrich.ts` — enrichment library (473 lines).
-- [x] Remove `'enrich'` from `scripts/run-pipeline.ts` (`StageName` union, `STAGES` array, `splitStageList` valid set, doc comments). Also removed unused `EnrichmentDraftProposal` import from `src/lib/pipeline/publish.ts` and simplified the now-dead `classifyProposal` helper.
-- [x] Delete `scripts/discover-associations.ts` — association HTML scraping (368 lines)
-- [x] Delete `src/lib/pipeline/associations.ts` — association parsing library (198 lines)
-- [x] Delete `src/lib/pipeline/associations.test.ts` — association tests (203 lines)
-- [x] Delete `scripts/merge-discoveries.ts` — multi-source merge, not needed with OSM only (154 lines)
-- [x] Delete `scripts/validate-coordinates.ts` — one-time utility, already served its purpose (457 lines)
-- [ ] Simplify `scripts/run-pipeline.ts` — the subprocess-spawning orchestrator works but is ~330 lines. Lower priority now that the enrich stage is gone; revisit if it gets in the way.
-- [x] Remove npm scripts from `package.json`: `pipeline:enrich`, `pipeline:enrich:dry`, `discover:associations`, `discover:associations:dry`, `discover:merge`, `discover:merge:promote`
+- [x] Claude extraction + staging (`extract-wineries.ts`, `publish-wineries.ts`, `src/lib/pipeline/{extract,publish,diff}.ts`, `content_drafts` table, `@anthropic-ai/sdk`)
+- [x] LLM editorial generation (`enrich-wineries.ts`, `src/lib/pipeline/enrich.ts`)
+- [x] Association scraping (`discover-associations.ts`, `src/lib/pipeline/associations.ts`)
+- [x] Multi-source merge (`scripts/merge-discoveries.ts`)
+- [x] Coordinate validator (`scripts/validate-coordinates.ts`)
+- [x] CSV import pipeline (`scripts/import-wineries.ts` + helpers + `docs/csv/*`)
+- [x] Associated npm scripts and types
 
 ### What Stays
 
 | Stage | Script | Library | What it does |
 |-------|--------|---------|-------------|
-| Discover | `scripts/discover-osm.ts` | `src/lib/pipeline/dedup.ts` | Query OSM Overpass API for wineries in Sonoma County. Returns names, coordinates, websites. Dedup against existing DB. |
+| Discover | `scripts/discover-osm.ts` | `src/lib/pipeline/dedup.ts` | Query OSM Overpass API for wineries in Sonoma County. Writes minimal rows to `wineries` with `content_status='draft'`. |
 | Crawl | `scripts/crawl-wineries.ts` | `src/lib/pipeline/crawl.ts` | Firecrawl scrapes up to 5 pages per winery website. Stores markdown in `winery_scrapes`. |
-| Extract | `scripts/extract-wineries.ts` | `src/lib/pipeline/extract.ts` | Claude Haiku extracts structured fields (phone, address, hours, amenities) with confidence scores. Writes proposals to `content_drafts`. |
-| Publish | `scripts/publish-wineries.ts` | `src/lib/pipeline/publish.ts` | Auto-approves high-confidence factual fields, applies approved drafts to `wineries` table, snapshots before overwriting. |
-| Support | — | `src/lib/pipeline/diff.ts` | Change detection: compares extracted values to current DB, only creates drafts for meaningful differences. |
 | Support | — | `src/lib/pipeline/tracking.ts` | Audit trail: records each pipeline run (stage, status, duration, errors) in `pipeline_runs`. |
 
-All scripts support `--dry-run`, `--winery=slug`, `--tier=`, `--limit=`, `--force`.
+All scripts support `--dry-run`, `--winery=slug`, `--tier=`, `--force` (where applicable).
 
 ### Pipeline Improvements
 
@@ -260,48 +227,37 @@ All scripts support `--dry-run`, `--winery=slug`, `--tier=`, `--limit=`, `--forc
 
 ## Admin Panel
 
-_The primary interface for managing winery data. This is where the real quality work happens — reviewing pipeline output, editing wineries directly, writing editorial content._
+_The primary interface for managing winery data. This is where all the quality work happens — editing wineries, reading scrape markdown, publishing drafts to production._
 
 ### 1. Auth & Shell
 
 - [ ] Password-protected `/admin/*` route group — env var `ADMIN_PASSWORD`, cookie-based session
 - [ ] Login page at `/admin` — single password field, no user accounts needed
-- [ ] Admin layout with sidebar nav: Dashboard, Review, Wineries, Pipeline, Health
+- [ ] Admin layout with sidebar nav: Dashboard, Wineries, Pipeline, Health
 
 ### 2. Dashboard (`/admin`)
 
-- [ ] Pending drafts count (link to review queue)
+- [ ] Draft wineries count (link to list filtered by `content_status='draft'`)
 - [ ] Last pipeline run per stage with status and timestamp
-- [ ] Coverage breakdown: editorial / verified / discovered counts
+- [ ] Coverage breakdown: published / draft / `data_source` split
 
-### 3. Review Queue (`/admin/review`)
+### 3. Winery Editor (`/admin/wineries`)
 
-The pipeline writes proposals to `content_drafts` with `status='pending'`. This is where humans approve, reject, or edit them.
+Direct editing — for reading scraped markdown, filling in fields, and publishing drafts.
 
-- [ ] **Queue view** — pending drafts grouped by winery, editorial tier wineries first
-- [ ] **Filters** — by field type (factual / experience flag), confidence level, winery search
-- [ ] **Winery review page** — all pending drafts for one winery on a single page
-- [ ] **Diff display** — current value vs proposed value, confidence badge, expandable source quote
-- [ ] **Actions** — Approve / Reject (with note) / Edit & Approve per draft
-- [ ] **Bulk approve** — "Approve all high-confidence factual" / "Approve all for this winery"
-- [ ] **Keyboard shortcuts** — A=approve, E=edit, R=reject, N=next
-- [ ] **Progress** — "12 of 45 wineries reviewed" with percentage
-
-### 4. Winery Editor (`/admin/wineries`)
-
-Direct editing — for adding wineries OSM missed, fixing typos, writing editorial content (taglines, descriptions, style scores).
-
-- [ ] **Winery list** — searchable, filterable by coverage tier, sortable by name/updated
+- [ ] **Winery list** — searchable, filterable by `content_status` (draft/published) and `data_source`, sortable by name/updated
 - [ ] **Edit form** — all winery fields: contact info, hours, amenities, experience flags, editorial content, style scores
+- [ ] **Scrape viewer** — side panel showing the latest `winery_scrapes` markdown so admin can read source material while filling fields
+- [ ] **Publish action** — flips `content_status` from `'draft'` to `'published'`. Gate behind required-field checks (at minimum `ava_primary` not null). Creates a `winery_snapshots` row first for rollback.
+- [ ] **Delete action** — confirmation modal, cascades to `flights`, `winery_varietals`, `winery_scrapes`, `winery_snapshots`.
 - [ ] **Add winery** — manually create a new winery (for ones not in OSM)
 - [ ] **Change history** — link to snapshots for this winery
 
-### 5. Pipeline Runs (`/admin/pipeline`)
+### 4. Pipeline Runs (`/admin/pipeline`)
 
 - [ ] **Run history table** — stage, status, duration, wineries processed/failed
 - [ ] **Run detail** — expand to see per-winery results and error messages
-- [ ] **Scrape viewer** — read-only markdown of `winery_scrapes` for debugging extraction issues
-- [ ] **Manual trigger** — kick off discovery, crawl, or extract for a specific winery or tier
+- [ ] **Manual trigger** — kick off discovery or crawl for a specific winery or tier
 
 ### 6. Data Health (`/admin/health`)
 
@@ -533,11 +489,11 @@ Full ETL pipeline built as CLI scripts with library modules. Discovery (OSM Over
 <details>
 <summary><strong>Data Pipeline — Retired Code</strong></summary>
 
-The following was built but is being retired in favor of a simpler pipeline + admin UI:
+The following was built but retired in favor of a simpler pipeline + admin UI:
 
+- **Claude extraction + content_drafts staging** (`scripts/extract-wineries.ts`, `scripts/publish-wineries.ts`, `src/lib/pipeline/{extract,publish,diff}.ts`, `content_drafts` table) — ~2200 lines. Claude Haiku extracted structured fields from scraped markdown into a per-field proposal table; publish classified and applied them. Replaced by manual admin curation: admin reads `winery_scrapes` markdown and types values into the edit form directly.
 - **Association discovery** (`scripts/discover-associations.ts`, `src/lib/pipeline/associations.ts`, `associations.test.ts`) — 769 lines. Scraped Sonoma Vintners + Wine Road HTML directories. Fragile (bot challenges, HTML changes). OSM provides better coverage with zero fragility.
 - **LLM enrichment** (`scripts/enrich-wineries.ts`, `src/lib/pipeline/enrich.ts`) — 882 lines. Claude Sonnet auto-generated taglines, descriptions, style scores, editorial judgments. Replaced by manual editing in admin panel — humans write better editorial content.
 - **Merge discoveries** (`scripts/merge-discoveries.ts`) — 154 lines. Cross-source dedup and promotion. Not needed with single OSM discovery source.
-- **Pipeline orchestrator** (`scripts/run-pipeline.ts`) — 336 lines. Over-engineered subprocess spawner with flag forwarding. Being simplified.
 - **Coordinate validator** (`scripts/validate-coordinates.ts`) — 457 lines. One-time utility that already served its purpose during initial data import.
 </details>
