@@ -409,7 +409,9 @@ export type Database = {
           rating_google: number | null
           rating_tripadvisor: number | null
           rating_yelp: number | null
-          reservation_type: Database["public"]["Enums"]["reservation_type"] | null
+          reservation_type:
+            | Database["public"]["Enums"]["reservation_type"]
+            | null
           reservation_url: string | null
           review_count_total: number | null
           setting: Database["public"]["Enums"]["winery_setting"] | null
@@ -504,7 +506,9 @@ export type Database = {
           rating_google?: number | null
           rating_tripadvisor?: number | null
           rating_yelp?: number | null
-          reservation_type?: Database["public"]["Enums"]["reservation_type"] | null
+          reservation_type?:
+            | Database["public"]["Enums"]["reservation_type"]
+            | null
           reservation_url?: string | null
           review_count_total?: number | null
           setting?: Database["public"]["Enums"]["winery_setting"] | null
@@ -599,7 +603,9 @@ export type Database = {
           rating_google?: number | null
           rating_tripadvisor?: number | null
           rating_yelp?: number | null
-          reservation_type?: Database["public"]["Enums"]["reservation_type"] | null
+          reservation_type?:
+            | Database["public"]["Enums"]["reservation_type"]
+            | null
           reservation_url?: string | null
           review_count_total?: number | null
           setting?: Database["public"]["Enums"]["winery_setting"] | null

@@ -195,7 +195,7 @@ describe('nextCoverageTier', () => {
 });
 
 describe('isPublishableField', () => {
-  it('accepts every field referenced in the extract/enrich stages', () => {
+  it('accepts every field referenced in the extract stage', () => {
     expect(isPublishableField('phone')).toBe(true);
     expect(isPublishableField('hours')).toBe(true);
     expect(isPublishableField('tagline')).toBe(true);

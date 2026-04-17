@@ -12,7 +12,6 @@
 
 import type { Tables } from '../database.types.js';
 import type { DraftProposal } from './diff.js';
-import type { EnrichmentDraftProposal } from './enrich.js';
 
 type WineryRow = Tables<'wineries'>;
 
@@ -82,7 +81,7 @@ export const DRAFT_FIELDS = {
     affectsMatching: false,
   },
 
-  // Editorial content produced by the enrichment stage.
+  // Editorial content authored by admins (no auto-approve path).
   tagline: { category: 'editorial', type: 'text', affectsMatching: false },
   description: { category: 'editorial', type: 'text', affectsMatching: false },
   unique_selling_point: { category: 'editorial', type: 'text', affectsMatching: false },
@@ -269,13 +268,11 @@ export function nextCoverageTier(current: WineryRow['coverage_tier']): WineryRow
 }
 
 /**
- * Convenience: any DraftProposal or EnrichmentDraftProposal coming out of
- * the diff/enrich stages already satisfies DraftLike. Exposed so scripts
- * can classify in-memory proposals without a round trip through the DB.
+ * Convenience: any DraftProposal coming out of the diff stage already
+ * satisfies DraftLike. Exposed so scripts can classify in-memory proposals
+ * without a round trip through the DB.
  */
-export function classifyProposal(
-  proposal: DraftProposal | EnrichmentDraftProposal,
-): AutoApproveDecision {
+export function classifyProposal(proposal: DraftProposal): AutoApproveDecision {
   return classifyDraft({
     field_name: proposal.field_name,
     current_value: proposal.current_value,

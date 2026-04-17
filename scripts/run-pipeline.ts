@@ -3,7 +3,7 @@
  *
  * Chains the individual stage scripts into a single command:
  *
- *   discovery → crawl → extract → enrich → publish (auto-approve + apply)
+ *   discovery → crawl → extract → publish (auto-approve + apply)
  *
  * Each stage is spawned as its own tsx subprocess so that the orchestrator
  * doesn't duplicate the per-stage logic (skip-if-recent windows, retry loops,
@@ -13,11 +13,11 @@
  * is printed with status and wall-clock duration per stage.
  *
  * Usage:
- *   pnpm pipeline:run                            # discovery + crawl + extract + enrich + publish
+ *   pnpm pipeline:run                            # discovery + crawl + extract + publish
  *   pnpm pipeline:run --dry-run                  # forward --dry-run to every stage
  *   pnpm pipeline:run --winery=<id>              # per-winery run (skips discovery)
- *   pnpm pipeline:run --tier=editorial           # limit crawl/extract/enrich to a tier
- *   pnpm pipeline:run --limit=5                  # cap extract/enrich batch size
+ *   pnpm pipeline:run --tier=editorial           # limit crawl/extract to a tier
+ *   pnpm pipeline:run --limit=5                  # cap extract batch size
  *   pnpm pipeline:run --only=crawl,extract       # run only the listed stages (comma-separated)
  *   pnpm pipeline:run --skip=discovery,publish   # skip the listed stages
  *   pnpm pipeline:run --force                    # forward --force where supported
@@ -37,7 +37,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-type StageName = 'discovery' | 'crawl' | 'extract' | 'enrich' | 'publish';
+type StageName = 'discovery' | 'crawl' | 'extract' | 'publish';
 
 interface StageDef {
   name: StageName;
@@ -68,14 +68,6 @@ const STAGES: StageDef[] = [
   {
     name: 'extract',
     script: 'scripts/extract-wineries.ts',
-    perWinery: true,
-    supportsTier: true,
-    supportsLimit: true,
-    supportsForce: true,
-  },
-  {
-    name: 'enrich',
-    script: 'scripts/enrich-wineries.ts',
     perWinery: true,
     supportsTier: true,
     supportsLimit: true,
@@ -134,7 +126,7 @@ function parseArgs(argv: string[]): CliArgs {
 }
 
 function splitStageList(value: string): StageName[] {
-  const valid = new Set<StageName>(['discovery', 'crawl', 'extract', 'enrich', 'publish']);
+  const valid = new Set<StageName>(['discovery', 'crawl', 'extract', 'publish']);
   const result: StageName[] = [];
   for (const token of value.split(',')) {
     const trimmed = token.trim();

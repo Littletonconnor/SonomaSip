@@ -63,7 +63,7 @@ Move from "editorial CSV import + OSM shadow registry" to a single pipeline that
 - [x] Migration: drop `winery_registry` table + its indexes + `trg_winery_registry_updated_at` trigger.
 - [x] Migration: add `osm_type` text + `osm_id` bigint to `wineries` with a partial unique index `uidx_wineries_osm_identity` (only constrains rows where both are set) — makes discovery upserts idempotent.
 - [x] Migration: drop the `'editorial_excel'` default on `wineries.data_source`. Existing 68 rows keep their value; discovery sets `'osm_auto'` explicitly.
-- [ ] Apply the migration against the remote Supabase project (`supabase db push` or dashboard). Re-run `pnpm db:gen-types` after apply to refresh `src/lib/database.types.ts` from the real schema (currently hand-edited to match).
+- [x] Apply the migration against the remote Supabase project (`supabase db push` or dashboard). Re-run `pnpm db:gen-types` after apply to refresh `src/lib/database.types.ts` from the real schema.
 
 **Discovery rewrite (`scripts/discover-osm.ts`):** ✅
 - [x] Replace `winery_registry.upsert` with direct writes to `wineries`. Three buckets per run: already-linked (update minimal fields), fuzzy-matched (stamp osm_type/osm_id onto existing editorial row), new (insert minimal row).
@@ -195,16 +195,15 @@ No association scraping, no LLM-generated editorial, no multi-source merging. OS
 
 Remove retired code that's no longer needed:
 
-- [ ] Delete `scripts/enrich-wineries.ts` — LLM editorial generation replaced by manual editing in admin. **⚠ Deferred: still subprocess-spawned by `scripts/run-pipeline.ts` (the orchestrator). Deleting it without touching the orchestrator would leave `pnpm pipeline:run` broken at runtime when it hits the enrich stage. Two ways to clean up:**
-  - **(a) Surgical removal:** in `scripts/run-pipeline.ts`, drop `'enrich'` from the `StageName` union (~line 40), the `STAGES` array entry (~lines 76-83), the `valid` set in `splitStageList` (~line 137), and the doc comments at the top (~lines 6, 16, 19, 20). Then delete the two enrich files. ~20-line edit + 2 deletions.
-  - **(b) Pair with the bigger rewrite below:** do this as part of "Simplify `scripts/run-pipeline.ts`" since that task already involves rewriting the stage list. Cleaner if you're going to rewrite that file anyway.
-- [ ] Delete `src/lib/pipeline/enrich.ts` — enrichment library (473 lines). Same dependency note as above — only imported by `scripts/enrich-wineries.ts`, so it goes in the same commit.
+- [x] Delete `scripts/enrich-wineries.ts` — LLM editorial generation replaced by manual editing in admin.
+- [x] Delete `src/lib/pipeline/enrich.ts` — enrichment library (473 lines).
+- [x] Remove `'enrich'` from `scripts/run-pipeline.ts` (`StageName` union, `STAGES` array, `splitStageList` valid set, doc comments). Also removed unused `EnrichmentDraftProposal` import from `src/lib/pipeline/publish.ts` and simplified the now-dead `classifyProposal` helper.
 - [x] Delete `scripts/discover-associations.ts` — association HTML scraping (368 lines)
 - [x] Delete `src/lib/pipeline/associations.ts` — association parsing library (198 lines)
 - [x] Delete `src/lib/pipeline/associations.test.ts` — association tests (203 lines)
 - [x] Delete `scripts/merge-discoveries.ts` — multi-source merge, not needed with OSM only (154 lines)
 - [x] Delete `scripts/validate-coordinates.ts` — one-time utility, already served its purpose (457 lines)
-- [ ] Simplify `scripts/run-pipeline.ts` — replace 336-line subprocess spawner with a simple script that runs: discover → crawl → extract → publish. **Pair this with the enrich deletion above (option b).**
+- [ ] Simplify `scripts/run-pipeline.ts` — the subprocess-spawning orchestrator works but is ~330 lines. Lower priority now that the enrich stage is gone; revisit if it gets in the way.
 - [x] Remove npm scripts from `package.json`: `pipeline:enrich`, `pipeline:enrich:dry`, `discover:associations`, `discover:associations:dry`, `discover:merge`, `discover:merge:promote`
 
 ### What Stays
