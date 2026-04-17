@@ -5,20 +5,20 @@ exports[`golden tests — real Supabase data > allDefaults > slug ordering snaps
   {
     "rank": 1,
     "relaxed": [],
-    "score": 57,
+    "score": 59,
     "slug": "wilson-winery",
   },
   {
     "rank": 2,
     "relaxed": [],
-    "score": 55,
-    "slug": "roth-estate",
+    "score": 59,
+    "slug": "sebastiani",
   },
   {
     "rank": 3,
     "relaxed": [],
-    "score": 55,
-    "slug": "sebastiani",
+    "score": 58,
+    "slug": "dry-creek-vineyard",
   },
 ]
 `;
@@ -31,8 +31,8 @@ exports[`golden tests — real Supabase data > casualCouple > slug ordering snap
       "region",
       "mustHaves",
     ],
-    "score": 75,
-    "slug": "landmark-hop-kiln",
+    "score": 77,
+    "slug": "iron-horse-vineyards",
   },
   {
     "rank": 2,
@@ -40,8 +40,8 @@ exports[`golden tests — real Supabase data > casualCouple > slug ordering snap
       "region",
       "mustHaves",
     ],
-    "score": 72,
-    "slug": "sebastiani",
+    "score": 76,
+    "slug": "gloria-ferrer",
   },
   {
     "rank": 3,
@@ -49,8 +49,8 @@ exports[`golden tests — real Supabase data > casualCouple > slug ordering snap
       "region",
       "mustHaves",
     ],
-    "score": 70,
-    "slug": "iron-horse-vineyards",
+    "score": 75,
+    "slug": "landmark-hop-kiln",
   },
 ]
 `;
@@ -60,13 +60,13 @@ exports[`golden tests — real Supabase data > familyTrip > slug ordering snapsh
   {
     "rank": 1,
     "relaxed": [],
-    "score": 72,
+    "score": 76,
     "slug": "gundlach-bundschu",
   },
   {
     "rank": 2,
     "relaxed": [],
-    "score": 71,
+    "score": 75,
     "slug": "imagery-estate",
   },
 ]
@@ -78,19 +78,19 @@ exports[`golden tests — real Supabase data > luxuryGroup > slug ordering snaps
     "rank": 1,
     "relaxed": [],
     "score": 81,
-    "slug": "iron-horse-vineyards",
+    "slug": "seghesio-family-vineyards",
   },
   {
     "rank": 2,
     "relaxed": [],
     "score": 81,
-    "slug": "seghesio-family-vineyards",
+    "slug": "rodney-strong",
   },
   {
     "rank": 3,
     "relaxed": [],
-    "score": 81,
-    "slug": "rodney-strong",
+    "score": 80,
+    "slug": "iron-horse-vineyards",
   },
   {
     "rank": 4,
@@ -105,27 +105,21 @@ exports[`golden tests — real Supabase data > singleRegionBudget > slug orderin
 [
   {
     "rank": 1,
-    "relaxed": [
-      "region",
-    ],
-    "score": 75,
-    "slug": "sebastiani",
+    "relaxed": [],
+    "score": 71,
+    "slug": "gundlach-bundschu",
   },
   {
     "rank": 2,
-    "relaxed": [
-      "region",
-    ],
-    "score": 71,
-    "slug": "dry-creek-vineyard",
+    "relaxed": [],
+    "score": 64,
+    "slug": "buena-vista-winery",
   },
   {
     "rank": 3,
-    "relaxed": [
-      "region",
-    ],
-    "score": 66,
-    "slug": "landmark-hop-kiln",
+    "relaxed": [],
+    "score": 57,
+    "slug": "schug-carneros",
   },
 ]
 `;
@@ -137,7 +131,7 @@ exports[`golden tests — real Supabase data > veryRestrictive > slug ordering s
     "relaxed": [
       "region",
     ],
-    "score": 79,
+    "score": 78,
     "slug": "rodney-strong",
   },
   {
@@ -145,7 +139,7 @@ exports[`golden tests — real Supabase data > veryRestrictive > slug ordering s
     "relaxed": [
       "region",
     ],
-    "score": 76,
+    "score": 75,
     "slug": "wilson-winery",
   },
   {
@@ -153,7 +147,7 @@ exports[`golden tests — real Supabase data > veryRestrictive > slug ordering s
     "relaxed": [
       "region",
     ],
-    "score": 68,
+    "score": 67,
     "slug": "francis-ford-coppola",
   },
 ]
@@ -164,13 +158,13 @@ exports[`golden tests — real Supabase data > wideOpen > slug ordering snapshot
   {
     "rank": 1,
     "relaxed": [],
-    "score": 60,
+    "score": 59,
     "slug": "fort-ross-vineyard",
   },
   {
     "rank": 2,
     "relaxed": [],
-    "score": 57,
+    "score": 56,
     "slug": "bella-winery",
   },
   {
@@ -183,13 +177,13 @@ exports[`golden tests — real Supabase data > wideOpen > slug ordering snapshot
     "rank": 4,
     "relaxed": [],
     "score": 54,
-    "slug": "gary-farrell-winery",
+    "slug": "medlock-ames",
   },
   {
     "rank": 5,
     "relaxed": [],
     "score": 54,
-    "slug": "medlock-ames",
+    "slug": "benziger-family-winery",
   },
 ]
 `;

@@ -18,10 +18,6 @@
     "discover:osm:dry": "npx tsx scripts/discover-osm.ts --dry-run",
     "pipeline:crawl": "npx tsx scripts/crawl-wineries.ts",
     "pipeline:crawl:dry": "npx tsx scripts/crawl-wineries.ts --dry-run",
-    "pipeline:extract": "npx tsx scripts/extract-wineries.ts",
-    "pipeline:extract:dry": "npx tsx scripts/extract-wineries.ts --dry-run",
-    "pipeline:publish": "npx tsx scripts/publish-wineries.ts",
-    "pipeline:publish:dry": "npx tsx scripts/publish-wineries.ts --dry-run",
     "pipeline:run": "npx tsx scripts/run-pipeline.ts",
     "pipeline:run:dry": "npx tsx scripts/run-pipeline.ts --dry-run",
     "test": "vitest run",
@@ -29,7 +25,6 @@
     "test:golden": "vitest run src/lib/matching/__tests__/golden.test.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.87.0",
     "@base-ui/react": "^1.3.0",
     "@supabase/ssr": "^0.10.0",
     "@supabase/supabase-js": "^2.101.1",

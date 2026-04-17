@@ -48,6 +48,37 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 
 ## Up Next
 
+### Simplified Pipeline — Scrape → Manual Review → Publish
+
+The pipeline no longer uses Claude for extraction or the `content_drafts` staging table. Admin curates everything manually after reading scraped markdown.
+
+**Final shape:**
+
+```
+Discover (OSM)     → wineries (content_status='draft')
+Crawl (Firecrawl)  → winery_scrapes (raw markdown)
+Places (Google)    → direct write to wineries.rating_google / review_count_total (future)
+Admin UI           → reads scrapes, edits winery row, flips content_status to 'published'
+```
+
+**Done (on branch `pipeline-dry-run`):**
+- [x] Backfill: 74 existing `data_source='osm_auto'` rows flipped from `'published'` to `'draft'`. Pristine editorial set of 68 remains `'published'`.
+- [x] `scripts/discover-osm.ts` now inserts new rows with `content_status: 'draft'`.
+- [x] User-facing data accessors filter to `content_status='published'`: `getWineriesForMatching`, `getWineryBySlug`, `getAllWinerySlugs`, `getAllWineriesForBrowse`, `getWineryLookup`.
+- [x] **Retired Claude extraction + content_drafts:** deleted `scripts/extract-wineries.ts`, `scripts/publish-wineries.ts`, `src/lib/pipeline/{extract,publish,publish.test,diff,diff.test}.ts`, removed `@anthropic-ai/sdk` dep, removed `extract`/`publish` stages from `run-pipeline.ts`, removed npm scripts (`pipeline:extract*`, `pipeline:publish*`), dropped `ANTHROPIC_API_KEY` from env schema.
+- [x] **Migration `20260416000001_retire_content_drafts.sql`:** drops `content_drafts` table, drops `content_draft_status` enum, flips `wineries.content_status` default to `'draft'`.
+
+**Still to do (admin UI work):**
+- [ ] **Admin data accessor** — new helper (e.g. `getAllWineriesForAdmin` in `src/lib/data/wineries.ts`) that returns *all* wineries including drafts.
+- [ ] **Admin winery editor** — `/admin/wineries/[id]/edit` with form for every winery field + side panel showing latest `winery_scrapes` markdown for reference.
+- [ ] **Admin "publish" action** — server action that flips `content_status` from `'draft'` to `'published'`. Gate behind required-field checks (at minimum `ava_primary` not null).
+- [ ] **Admin winery list** — surface `content_status` with a "Needs Review" filter; show discovery run log at top so admin can triage the newest batch.
+- [ ] **Places stage (future)** — `scripts/places-sync.ts` fetches Google ratings and writes directly to `wineries.rating_google` / `review_count_total` (no draft staging; Google is authoritative).
+
+**Pre-existing test failures (not caused by this cleanup):**
+- 7 golden snapshot mismatches: snapshots last regenerated at commit `7502693`, broken by commit `03625d6` ("Fix 5 scoring/matching bugs"). Run `pnpm test:golden -u` to refresh when ready.
+- 3 `src/lib/actions/quiz.test.ts` failures: `headers()` called outside a request scope — test infra issue with Next.js server actions in vitest.
+
 ### Pipeline Simplification — Discovery Writes Directly to Wineries
 
 Move from "editorial CSV import + OSM shadow registry" to a single pipeline that dynamically discovers, crawls, enriches, and publishes — all writing directly to `wineries`. Admin UI handles delete + manual fill-in for fields OSM/Firecrawl/Places can't supply (flights, varietals, style scores, editorial content, AVA assignment).

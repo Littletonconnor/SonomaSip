@@ -14,66 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      content_drafts: {
-        Row: {
-          confidence: number | null
-          created_at: string
-          current_value: string | null
-          extraction_id: number | null
-          field_name: string
-          id: number
-          proposed_value: string
-          reviewed_at: string | null
-          reviewed_by: string | null
-          source_quote: string | null
-          status: Database["public"]["Enums"]["content_draft_status"]
-          winery_id: string
-        }
-        Insert: {
-          confidence?: number | null
-          created_at?: string
-          current_value?: string | null
-          extraction_id?: number | null
-          field_name: string
-          id?: never
-          proposed_value: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          source_quote?: string | null
-          status?: Database["public"]["Enums"]["content_draft_status"]
-          winery_id: string
-        }
-        Update: {
-          confidence?: number | null
-          created_at?: string
-          current_value?: string | null
-          extraction_id?: number | null
-          field_name?: string
-          id?: never
-          proposed_value?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          source_quote?: string | null
-          status?: Database["public"]["Enums"]["content_draft_status"]
-          winery_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "content_drafts_extraction_id_fkey"
-            columns: ["extraction_id"]
-            isOneToOne: false
-            referencedRelation: "winery_extractions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "content_drafts_winery_id_fkey"
-            columns: ["winery_id"]
-            isOneToOne: false
-            referencedRelation: "wineries"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       data_health_checks: {
         Row: {
           check_type: Database["public"]["Enums"]["check_type"]
@@ -827,11 +767,6 @@ export type Database = {
         | "rating_drift"
         | "missing_data"
         | "user_report"
-      content_draft_status:
-        | "pending"
-        | "approved"
-        | "rejected"
-        | "auto_approved"
       content_status: "draft" | "review" | "published"
       coverage_tier: "editorial" | "verified" | "discovered"
       flight_format:
@@ -1004,12 +939,6 @@ export const Constants = {
         "rating_drift",
         "missing_data",
         "user_report",
-      ],
-      content_draft_status: [
-        "pending",
-        "approved",
-        "rejected",
-        "auto_approved",
       ],
       content_status: ["draft", "review", "published"],
       coverage_tier: ["editorial", "verified", "discovered"],
