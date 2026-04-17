@@ -11,7 +11,6 @@ const serverSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   // RESEND_API_KEY: z.string().startsWith('re_'),
   FIRECRAWL_API_KEY: z.string().min(1).optional(),
-  ANTHROPIC_API_KEY: z.string().min(1).optional(),
 });
 
 const merged = z.object({

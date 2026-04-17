@@ -18,7 +18,8 @@ export async function getWineryLookup(): Promise<Map<string, Winery>> {
   const { data, error } = await supabase
     .from('wineries')
     .select('*, flights(*), winery_varietals(*)')
-    .eq('is_active', true);
+    .eq('is_active', true)
+    .eq('content_status', 'published');
 
   if (error) throw new Error(error.message);
 

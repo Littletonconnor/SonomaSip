@@ -17,7 +17,8 @@ export async function getWineriesForMatching(): Promise<WineryForMatching[]> {
 
   const { data, error } = await supabase
     .from('wineries')
-    .select('*, flights(*), winery_varietals(*)');
+    .select('*, flights(*), winery_varietals(*)')
+    .eq('content_status', 'published');
 
   if (error) throw new Error(error.message);
 
@@ -34,6 +35,7 @@ export async function getWineryBySlug(slug: string): Promise<WineryForDisplay | 
     .select('*, flights(*), winery_varietals(*)')
     .eq('slug', slug)
     .eq('is_active', true)
+    .eq('content_status', 'published')
     .single();
 
   if (error) {
@@ -54,6 +56,7 @@ export async function getAllWinerySlugs(): Promise<string[]> {
     .from('wineries')
     .select('slug')
     .eq('is_active', true)
+    .eq('content_status', 'published')
     .order('name');
 
   if (error) throw new Error(error.message);
@@ -67,6 +70,7 @@ export async function getAllWineriesForBrowse(): Promise<WineryForDisplay[]> {
   const { data, error } = await supabase
     .from('wineries')
     .select('*, flights(*), winery_varietals(*)')
+    .eq('content_status', 'published')
     .order('name');
 
   if (error) throw new Error(error.message);

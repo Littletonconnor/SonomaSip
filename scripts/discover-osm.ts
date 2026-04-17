@@ -343,6 +343,7 @@ async function run() {
       osm_type: d.osm_type,
       osm_id: d.osm_id,
       data_source: 'osm_auto',
+      content_status: 'draft',
       is_active: true,
     });
     if (error) {
