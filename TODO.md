@@ -49,6 +49,52 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 
 ---
 
+## Phone vs. Desktop Work Split
+
+Most development happens on phone. This section is an at-a-glance index so you don't open a task on mobile only to realize it needs a browser.
+
+**Phone-friendly** = backend logic, SQL migrations, server actions, scripts, env/config, text content, metadata/SEO, API routes, type changes, docs, validation rules.
+
+**Desktop-required** = anything needing visual verification in a browser: new components, responsive layouts, Mapbox styling, animations, ui.sh picker workflows, print/email HTML, snapshot diff viewers, PDF layout.
+
+Tag convention on new items: `(phone)`, `(desktop)`, `(mixed — phone for X, desktop for Y)`.
+
+### Phone-Friendly Backlog (do these on mobile)
+
+- [ ] **Admin login server action + session middleware** (Admin Panel §1) — scrypt verify against `admin_users`, signed cookie, middleware gating `/admin/*`.
+- [ ] **Publish server action** (Admin Panel §3) — validates required fields, snapshots, flips `content_status`. No UI decisions — just the action handler.
+- [ ] **Delete cascade server action** (Admin Panel §3) — deletes from `wineries`, `flights`, `winery_varietals`, `winery_scrapes`, `winery_snapshots`.
+- [ ] **URL health check script** (Data Integrity §3) — `scripts/url-health-check.ts` writes to `url_health_checks` + opens `data_health_checks` rows on failures.
+- [ ] **Places sync script** (Hours & Ratings) — `scripts/places-sync.ts`, writes `rating_google` / `review_count_total` / `last_verified_at` directly.
+- [ ] **Stale-winery report script** (Data Integrity §3) — queries rows with `last_verified_at < now() - 90 days`, emails admin a list.
+- [ ] **Pipeline scheduling** (Data Pipeline) — Vercel cron config: discovery monthly, URL health weekly, places sync monthly per-winery.
+- [ ] **Booking click tracking server action** (Enterprise §1) — new `booking_events` table + server action fired on winery website/reservation CTA clicks.
+- [ ] **Email list capture backend** (Enterprise §2) — `newsletter_signups` table + server action on share flow + Resend/Mailchimp API call.
+- [ ] **API v1 skeleton** (Enterprise §4) — `/api/v1/wineries`, `/api/v1/quiz` routes with API-key auth + per-key rate limits.
+- [ ] **Field-change audit table** (Data Integrity §2) — migration for `field_changes` (winery_id, field_name, old/new, admin_id, changed_at, reason). Wire into publish action.
+- [ ] **Premium tier gate in matching engine** (Enterprise §3) — accept `includeDiscoveredTier` flag; gate in `src/lib/matching/filters.ts`.
+- [ ] **Supabase dev env provisioning docs + env scoping** (existing `## Supabase Development Environment` section).
+- [ ] **Rate limiter: switch in-memory → Upstash Redis or Supabase-backed** — in-memory token bucket resets on every Vercel cold start, so the 10/hr and 5/hr limits don't hold in practice.
+- [ ] **Sentry wiring** (Future) — `@sentry/nextjs` for app + instrumentation for pipeline scripts. All config, no UI.
+- [ ] **Analytics events** (Analytics) — Plausible snippet + event hooks (quiz_started, share_created, booking_clicked).
+
+### Desktop-Required Backlog (save for laptop)
+
+- [ ] **Mobile navigation overhaul** (UI — Mobile Fixes) — ui.sh picker workflow, multiple variants, pick in-browser.
+- [ ] **Admin winery editor form** (Admin Panel §3) — full-field form with grouping, validation UX, responsive layout. Use ui.sh.
+- [ ] **Scrape viewer side panel** (Admin Panel §3) — markdown renderer in a resizable side panel. Visual layout + overflow handling.
+- [ ] **Snapshot timeline + diff viewer** (Admin Panel §7) — visual diff of two JSONB snapshots with highlighting.
+- [ ] **Admin dashboard layout** (Admin Panel §2) — stats cards, pipeline-run feed, coverage chart.
+- [ ] **Pipeline runs UI** (Admin Panel §4) — table + drill-down + manual trigger buttons.
+- [ ] **Data health UI** (Admin Panel §6) — tabbed views for missing fields / stale / broken URLs.
+- [ ] **Email share template** (Future) — Resend HTML template; visual preview + mobile client testing.
+- [ ] **Winery self-service dashboard** (Enterprise §5) — booking stats page for winery partners.
+- [ ] **White-label tour-company view** (Enterprise §6) — themeable shell + bulk-itinerary UX.
+- [ ] **Sponsored placement badge design** (Enterprise §7) — needs to read as transparent/trustworthy, not scammy.
+- [ ] **PDF plan layout** (Future) — `@react-pdf/renderer` or print CSS; visual proofing required.
+
+---
+
 ## Up Next
 
 ### Simplified Pipeline — Scrape → Manual Review → Publish
@@ -198,6 +244,89 @@ When sharing the home page, the OG preview looks good. But sharing a plan page (
 
 ---
 
+## Data Integrity & Content Updates
+
+_A candid audit of how content flows from source → site today, and what's missing before we can trust this without babysitting it._
+
+### Current Approach (what actually runs)
+
+1. **Discover** (`scripts/discover-osm.ts`) — OSM Overpass query upserts into `wineries` with `content_status='draft'`. Dedup in `src/lib/pipeline/dedup.ts`. Idempotent via `uidx_wineries_osm_identity`.
+2. **Crawl** (`scripts/crawl-wineries.ts`) — Firecrawl fetches up to 5 pages per winery, stores markdown in `winery_scrapes`. Honors `--skip-if-scraped-within-days=30` unless `--force`.
+3. **Curate** (admin UI, not yet built) — admin reads scrape markdown in a side panel, types values into the edit form, clicks Publish.
+4. **Publish** — server action (not yet built) snapshots current row into `winery_snapshots`, flips `content_status` to `'published'`, validates `ava_primary NOT NULL`.
+5. **Read path** — every user-facing accessor in `src/lib/data/wineries.ts` filters to `content_status='published'` + `is_active=true`. Drafts are invisible to the public.
+
+### What's Working
+
+- **Draft/published separation is enforced at the data layer**, not in UI. Anon key + RLS means drafts can't leak even if a component forgets to filter. (`src/lib/data/wineries.ts:15-81`)
+- **Snapshot table exists** (`winery_snapshots`, migration `20260406000001` line 155) — we can roll back any row to any past state.
+- **Audit run history** — `pipeline_runs` records every discovery/crawl attempt with bucket counts, duration, errors.
+- **Partial unique index on OSM identity** — rediscovery can't create duplicates even if dedup logic bugs out.
+
+### Gaps — Why It Still Feels Iffy
+
+| Gap | Evidence | Impact |
+| --- | --- | --- |
+| **Nothing writes to `url_health_checks`** | Table exists (migration `20260406000001:139`) but no script populates it. | Broken booking URLs go unnoticed until a user reports it (or doesn't). |
+| **Nothing writes to `data_health_checks`** | Table + `check_type` enum exist (migration `20260404000007:4`) but no producer. | No centralized "things to fix" queue for admin. |
+| **`field_overrides` is dead code** | Table exists (migration `20260404000007:20`) but no admin action writes to it. | When admin hand-edits a scraped field, we lose the "what did the scrape say vs. what did we type" trail. |
+| **`last_verified_at` never updated automatically** | Column exists; only touched during initial CSV import. | A winery published April 2026 with the wrong hours will still say those hours in April 2027. |
+| **Publish validation is minimal** | TODO gates on `ava_primary` only. | Nothing stops publishing a winery with no flights, no varietals, broken lat/lon, or an expired booking URL. |
+| **No scheduled jobs** | All scripts run manually. | Drift accumulates. The longer between crawls, the more out-of-date the site. |
+| **Editorial 68 never re-verified** | Seeded Oct 2025 from a CSV; no automatic freshness signal. | Hours and pricing on the site today are a year old. |
+| **No change-log per winery** | Snapshots capture whole-row JSONB but nothing surfaces a "what changed and why" view. | Hard to answer "why does Ridge say different hours than last week?" |
+
+### Proposed Improvements (ordered; mostly phone-friendly)
+
+#### 1. Scheduled URL health (phone)
+
+- [ ] **`scripts/url-health-check.ts`** — HEAD request against every `website_url` and `reservation_url`. Write status_code, redirect_url, response_time_ms into `url_health_checks`. Open a `data_health_checks` row (type `broken_url`) for 4xx/5xx/timeout.
+- [ ] **Weekly Vercel cron** hitting the script via a signed internal route.
+- [ ] **Admin alert** — the health dashboard (Admin Panel §6) reads open `data_health_checks`.
+
+#### 2. Per-field change audit (phone)
+
+- [ ] **Migration: `field_changes`** — `(id, winery_id, field_name, old_value_json, new_value_json, admin_user_id, reason, source_scrape_id, created_at)`. `source_scrape_id` nullable, lets us mark "typed from scrape X" vs "manual correction."
+- [ ] **Wire into publish server action** — diff incoming payload against current row, write one `field_changes` row per changed field.
+- [ ] **Repurpose `field_overrides`** — either drop it or redefine as "values the admin overrode that should stick across future pipeline overwrites." Today it's orphaned.
+- [ ] **Admin winery history tab** (desktop) — chronological list of field changes for one winery.
+
+#### 3. Publish-time validation gate (phone)
+
+Required to publish (block):
+- [ ] `ava_primary` not null (already tracked)
+- [ ] `latitude` / `longitude` present and within Sonoma County bounding box
+- [ ] `website_url` resolves (HEAD 200–399 at publish time)
+- [ ] `name` non-empty
+
+Warn but allow (surface in UI):
+- [ ] `flights` has at least one row
+- [ ] `winery_varietals` has at least one row
+- [ ] `reservation_type` set
+- [ ] At least one `style_*` score not default 3
+
+#### 4. Freshness signals (phone)
+
+- [ ] **`wineries.last_verified_at`** — already exists. Every publish action stamps it. Every places-sync touch stamps it. Every successful crawl stamps `last_scraped_at`.
+- [ ] **Stale report cron** — weekly script emails admin a list of N oldest `last_verified_at` wineries. Target: every winery re-verified at least once per quarter.
+- [ ] **UI freshness badge** on `/wineries/[slug]` — small "Verified Apr 2026" line near the hours/price block. Builds user trust and internal accountability.
+
+#### 5. Places sync (phone — deferred from Hours & Ratings section above)
+
+- [ ] Referenced there. Once built, ratings go directly to `wineries.rating_google` with `last_verified_at` stamp. Google is authoritative; no staging.
+
+#### 6. Snapshot rollback UX (desktop)
+
+- [ ] Already in Admin Panel §7. Listed here so we remember rollback is the safety net for everything above — if a publish introduces bad data, one click reverts.
+
+### Decision Points
+
+- **Are we okay showing editorial 68 wineries with unverified hours for now?** Today, yes. Once "Verified <date>" badges ship, we need a meaningful answer. Either manually re-verify before the badge launches, or accept that rows will show "Verified Oct 2025" until the places/crawl pipelines touch them.
+- **Should discovered wineries be publicly visible at all before admin curation?** Current answer: no — `content_status='draft'` keeps them invisible. Revisit if we go to a premium "explore all Sonoma" tier (Enterprise §3), which could expose a lighter, clearly-labeled "auto-discovered, not editorially reviewed" surface.
+- **Do we want a public-facing "report an issue" form?** Cheap to add (writes to `data_health_checks` with type `user_report`). Turns every user into a drift detector. Spam is the risk — gate behind a simple hCaptcha or honeypot.
+
+---
+
 ## Data Pipeline
 
 ### The Plan
@@ -285,6 +414,114 @@ Direct editing — for reading scraped markdown, filling in fields, and publishi
 - [ ] **Snapshot timeline** per winery from `winery_snapshots`
 - [ ] **Snapshot diff** — compare any snapshot to current data
 - [ ] **Revert** — restore a snapshot to the `wineries` row (creates its own snapshot first so you can undo)
+
+---
+
+## Enterprise & Revenue
+
+_How this becomes an actual business. Ordered by effort-to-first-dollar, not total revenue potential._
+
+### Guiding Principles
+
+- **Trust is the moat.** "No winery pays to be listed or ranked higher" is core to the product. Any revenue stream must be compatible with that or clearly labeled when it isn't.
+- **No account for the core flow.** The quiz → results → share loop should never require signup. Accounts are optional add-ons for power users and partners.
+- **Build on what's already there.** The backend has `shared_itineraries`, `admin_users`, `rate-limit`, RLS — most revenue features are glue code on top.
+
+### 1. Affiliate / Referral Tracking (phone — highest ROI first)
+
+Wineries publish their own booking URLs. Several platforms (Tock, Resy, WineDirect) offer referral/affiliate programs. Even without formal programs we can demonstrate attribution and negotiate per-partner commissions.
+
+- [ ] **Migration: `booking_events`** — `(id, winery_id, plan_id nullable, session_id, clicked_at, destination_url, utm_source, utm_medium, user_agent_hash, ip_hash)`. Hashes, not raw — privacy-safe.
+- [ ] **Server action + `navigator.sendBeacon`** on every "Book a Tasting" / "Visit Website" CTA on `/wineries/[slug]` and `/plan/[id]`.
+- [ ] **Outbound URL rewriter** — append `?utm_source=sonomasip&utm_medium=referral&utm_campaign=<plan_id or slug>` to outbound links.
+- [ ] **Weekly CSV export** for manual reconciliation with winery partners (`scripts/booking-events-export.ts`).
+- [ ] **Admin attribution view** (desktop) — clicks per winery, conversion if partner confirms.
+- [ ] **Partner outreach template** — one-pager explaining how attribution works and proposing a per-confirmed-booking rate.
+
+**Time to first dollar:** 2–4 weeks. **Revenue ceiling:** modest but clean; scales with traffic.
+
+### 2. Email Capture + Newsletter (phone)
+
+Today a user takes the quiz, sees results, shares a plan, and leaves. No way to re-engage. An email list monetizes indirectly (affiliate drops, premium upsells later) and is the cheapest retention lever.
+
+- [ ] **Migration: `newsletter_signups`** — `(id, email, source, plan_id nullable, signed_up_at, unsubscribed_at, confirmed_at)`. Double-opt-in.
+- [ ] **Optional email field on the share flow** — "Get seasonal Sonoma picks? (optional)" checkbox.
+- [ ] **Resend transactional email** for confirmation link + monthly newsletter.
+- [ ] **Unsubscribe route** — `/unsubscribe/[token]` flips `unsubscribed_at`.
+- [ ] **Admin export** — CSV of confirmed signups for manual campaign send (or wire directly to Mailchimp/Buttondown/ConvertKit).
+
+### 3. Premium Subscription — "Explore All of Sonoma" (phone core, desktop polish)
+
+Free tier: 68 editorially-curated wineries. Premium tier: access the full auto-discovered catalog (200+ once OSM discovery completes a full run), with clear "not yet editorially reviewed" labels per §Decision Points above.
+
+- [ ] **Migration: `subscriptions`** — `(id, user_id nullable, email, stripe_customer_id, status, current_period_end, tier)`. `user_id` nullable to support email-only subs.
+- [ ] **Stripe Checkout** — single-price monthly + annual. Webhook handler at `/api/webhooks/stripe` updates `subscriptions.status`.
+- [ ] **Gate in matching engine** — `includeDiscoveredTier` flag on `getWineriesForMatching`, defaulted by session subscription lookup.
+- [ ] **Discovered-tier visual treatment** (desktop) — different card styling + "Auto-discovered, not yet editorially reviewed" badge.
+- [ ] **Account shell** — `/account` with subscription status + cancel link (Stripe customer portal handles the rest).
+
+**Price:** $5/month or $40/year. Low enough to be impulse; high enough to justify the Stripe overhead.
+
+### 4. Public API (phone)
+
+Travel blogs, AI assistants, hotel concierge tools want structured winery data. A clean API is the easiest B2B revenue because it sells against existing Google Maps / Yelp data with better Sonoma-specific curation.
+
+- [ ] **Migration: `api_keys`** — `(id, key_hash, owner_email, tier, rate_limit_per_day, created_at, revoked_at)`.
+- [ ] **`/api/v1/wineries`** — paginated catalog. Query params: `region`, `varietal`, `reservation_type`, `min_rating`.
+- [ ] **`/api/v1/wineries/[slug]`** — single winery detail.
+- [ ] **`/api/v1/match`** — POST quiz answers, return scored results + explanations. Reuses `src/lib/matching/orchestrator.ts`.
+- [ ] **API key auth middleware** — hash check + per-key rate limit (extend `src/lib/rate-limit.ts`).
+- [ ] **Public docs page** — `/developers` with OpenAPI schema + examples.
+- [ ] **Tiers:** Free (100 req/day, read-only catalog). Pro ($49/mo, 10k req/day, matching engine, style scores). Enterprise (custom, webhooks, SLAs).
+
+### 5. Winery Self-Service Dashboard (mixed — phone for data, desktop for UI)
+
+Once affiliate tracking (§1) has a few weeks of data, wineries will ask "can I see my numbers?" That's the hook into B2B.
+
+- [ ] **Invite flow** — admin generates a one-time signup link per winery; winery staff sets a password → row in `winery_users` (new table) linked to `winery_id`.
+- [ ] **`/winery-admin/dashboard`** — shows: clicks from SonomaSip this month, plans that included you, top search terms (quiz preferences) that matched you, suggested profile improvements.
+- [ ] **Profile claim / edit** — winery can edit a constrained subset of fields (photos, description, flights pricing) with changes staged as drafts for admin approval.
+- [ ] **Listing upgrade SKU** — free default listing vs $29/mo "enhanced" listing (extra photos, featured in AVA region page, priority in ties, **not** in ranking — transparency).
+
+### 6. White-Label for Tour Operators (desktop-heavy)
+
+Local tour operators, hotel concierges, and wine-tour apps need branded planning tools. License the engine.
+
+- [ ] **Tenant model** — `tenants` table, every `shared_itineraries` row gets a `tenant_id`.
+- [ ] **Subdomain routing** — `partner.sonomasip.com` serves a themed shell (logo, colors, copy overrides).
+- [ ] **Config-driven branding** — `tenants.config_json` (logo_url, primary_color, hero_copy).
+- [ ] **Contract:** $500–$2000/mo depending on volume + custom domain + support.
+- [ ] **Lead magnet:** public marketing page `/for-partners` explaining the offer.
+
+### 7. Sponsored / Featured Placement (desktop for UI trust signals)
+
+Controversial — only worth doing if clearly labeled. Some wineries will pay to be featured in a "Today's Featured Winery" slot without affecting matching ranking.
+
+- [ ] **Migration:** `wineries.sponsor_status` enum + `sponsor_period_end`. Featured ≠ ranked higher.
+- [ ] **Dedicated surface** — a "Featured This Week" card on `/` and `/wineries` that is **always** labeled as sponsored. Never blends into matching results.
+- [ ] **Admin flow** — manually flip sponsor_status; expiry handled by a cron.
+- [ ] **Explicit disclosure on `/about`** — "Featured slots are paid placements. Our matching engine and recommendations are unaffected."
+
+### 8. Seasonal / Event Partnerships (mixed)
+
+Sonoma has harvest season, wine auctions, sommelier dinners. Curated seasonal plans are an affiliate goldmine if done well.
+
+- [ ] **Migration: `seasonal_plans`** — `(id, slug, title, subtitle, season, winery_ids, active_from, active_to, hero_image_url, sponsor)`.
+- [ ] **Admin editor** (desktop) — compose a featured plan: pick wineries, write copy, set dates.
+- [ ] **Public route** — `/seasonal/[slug]` renders like a shared plan but with rich editorial intro + sponsor disclosure if applicable.
+- [ ] **Email newsletter hook** (§2) — feature the current seasonal plan in every send.
+
+### Priority Order — What to Build First
+
+If optimizing for fastest revenue validation:
+
+1. **Affiliate tracking (§1)** — 2–4 weeks, proves partner-facing value.
+2. **Email capture (§2)** — 1 week, compounds over time.
+3. **Seasonal plans (§8)** — 2–3 weeks, content-driven traffic + affiliate lift.
+4. **API v1 (§4)** — 3–4 weeks, decoupled revenue stream with no UX churn.
+5. **Premium subscription (§3)** — 2–3 weeks, but needs meaningful discovered-tier catalog first.
+6. **Winery dashboard (§5)** — wait until §1 has 4+ weeks of data to show.
+7. **White-label (§6)** / **sponsored placements (§7)** — build once pipeline + admin + §1 are solid.
 
 ---
 
