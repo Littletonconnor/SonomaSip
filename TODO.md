@@ -17,6 +17,7 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 **Status:** `src/app/plan/[id]/opengraph-image.tsx` already exists and uses Next.js's App Router convention — Next auto-picks it up as `og:image`. But the `generateMetadata` in `src/app/plan/[id]/page.tsx` explicitly sets `openGraph` **without** an `images` key, which **may override** the convention file.
 
 **Plan:**
+
 - [x] Open `src/app/plan/[id]/page.tsx` and find `generateMetadata` (around line 64).
 - [x] Explicitly reference the convention image route (`/plan/${id}/opengraph-image`) in both `openGraph.images` and `twitter.images` so the image is guaranteed to be attached regardless of Next's auto-merge behavior.
 - [x] Test: run `pnpm dev`, open a plan URL, paste into [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/). You should see the generated image.
@@ -28,6 +29,7 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 **Files to edit:** `src/app/wineries/[slug]/page.tsx`
 
 **Plan:**
+
 - [x] Line 277: price-per-flight line — removed `text-center` so it defaults to left.
 - [x] Line 280: disclaimer line — removed `text-center` so it defaults to left.
 - [x] Chose left-aligned everywhere (not `sm:text-center`) to match the surrounding left-aligned sidebar content (name, tagline, star rating).
@@ -38,6 +40,7 @@ Pick these off one at a time. Each is scoped to 1-2 file touches and should be d
 **Goal:** The bottom corners of the results card/container render flat on mobile. Needs an `overflow` + `border-radius` fix.
 
 **Plan:**
+
 - [x] Traced the clipping to `src/components/map/map-section.tsx`: the mobile path wraps `SonomaMap` in a `motion.div` with `overflow-hidden` (for the height animation) but no `rounded-*`. `SonomaMap` has `rounded-2xl` on its root, so the parent's overflow-hidden was clipping the child's rounded corners to flat.
 - [x] Added `rounded-2xl` to the `motion.div`'s className so the clipping shape matches the child's rounding.
 - [x] Verify at 375px and 768px.
@@ -62,6 +65,7 @@ Admin UI           → reads scrapes, edits winery row, flips content_status to 
 ```
 
 **Done (on branch `pipeline-dry-run`):**
+
 - [x] Backfill: 74 existing `data_source='osm_auto'` rows flipped from `'published'` to `'draft'`. Pristine editorial set of 68 remains `'published'`.
 - [x] `scripts/discover-osm.ts` now inserts new rows with `content_status: 'draft'`.
 - [x] User-facing data accessors filter to `content_status='published'`: `getWineriesForMatching`, `getWineryBySlug`, `getAllWinerySlugs`, `getAllWineriesForBrowse`, `getWineryLookup`.
@@ -69,13 +73,15 @@ Admin UI           → reads scrapes, edits winery row, flips content_status to 
 - [x] **Migration `20260416000001_retire_content_drafts.sql`:** drops `content_drafts` table, drops `content_draft_status` enum, flips `wineries.content_status` default to `'draft'`.
 
 **Still to do (admin UI work):**
-- [ ] **Admin data accessor** — new helper (e.g. `getAllWineriesForAdmin` in `src/lib/data/wineries.ts`) that returns *all* wineries including drafts.
+
+- [x] **Admin data accessor** — `getAllWineriesForAdmin` in `src/lib/data/wineries.ts` returns all wineries (drafts first, then published, alphabetical within each group).
 - [ ] **Admin winery editor** — `/admin/wineries/[id]/edit` with form for every winery field + side panel showing latest `winery_scrapes` markdown for reference.
 - [ ] **Admin "publish" action** — server action that flips `content_status` from `'draft'` to `'published'`. Gate behind required-field checks (at minimum `ava_primary` not null).
 - [ ] **Admin winery list** — surface `content_status` with a "Needs Review" filter; show discovery run log at top so admin can triage the newest batch.
 - [ ] **Places stage (future)** — `scripts/places-sync.ts` fetches Google ratings and writes directly to `wineries.rating_google` / `review_count_total` (no draft staging; Google is authoritative).
 
 **Pre-existing test failures (not caused by this cleanup):**
+
 - 7 golden snapshot mismatches: snapshots last regenerated at commit `7502693`, broken by commit `03625d6` ("Fix 5 scoring/matching bugs"). Run `pnpm test:golden -u` to refresh when ready.
 - 3 `src/lib/actions/quiz.test.ts` failures: `headers()` called outside a request scope — test infra issue with Next.js server actions in vitest.
 
@@ -84,12 +90,14 @@ Admin UI           → reads scrapes, edits winery row, flips content_status to 
 Move from "editorial CSV import + OSM shadow registry" to a single pipeline that dynamically discovers, crawls, enriches, and publishes — all writing directly to `wineries`. Admin UI handles delete + manual fill-in for fields OSM/Firecrawl/Places can't supply (flights, varietals, style scores, editorial content, AVA assignment).
 
 **Scope decisions locked in:**
+
 - Matching engine + all scoring columns stay. Mapper at `src/lib/mappers.ts:57-65` already defaults null `style_*` to 3, and `scoreRating` handles null quality/popularity/rating gracefully — so sparse discovery rows rank middle-of-the-pack until admin fills them in.
 - **Keep the existing 68 wineries.** Discovery upserts new OSM rows alongside them; editorial data is preserved.
 - **Make currently-NOT-NULL editorial columns nullable** so OSM can insert minimal rows. Admin assigns the rest via the editor.
 - **No auto-extraction of flights or varietals.** Admin enters those manually for new discoveries; the 68 editorial rows keep their existing flight/varietal data.
 
 **Schema changes:** (migration `20260415000001_pipeline_simplification.sql`)
+
 - [x] Migration: drop `NOT NULL` on `wineries.ava_primary`, `wineries.reservation_type`. Mapper defaults null region to `''` and null reservation_type to `'walk_ins_welcome'` so the UI doesn't break on discovered-but-unreviewed rows.
 - [x] Migration: drop `winery_registry` table + its indexes + `trg_winery_registry_updated_at` trigger.
 - [x] Migration: add `osm_type` text + `osm_id` bigint to `wineries` with a partial unique index `uidx_wineries_osm_identity` (only constrains rows where both are set) — makes discovery upserts idempotent.
@@ -97,18 +105,21 @@ Move from "editorial CSV import + OSM shadow registry" to a single pipeline that
 - [x] Apply the migration against the remote Supabase project (`supabase db push` or dashboard). Re-run `pnpm db:gen-types` after apply to refresh `src/lib/database.types.ts` from the real schema.
 
 **Discovery rewrite (`scripts/discover-osm.ts`):** ✅
+
 - [x] Replace `winery_registry.upsert` with direct writes to `wineries`. Three buckets per run: already-linked (update minimal fields), fuzzy-matched (stamp osm_type/osm_id onto existing editorial row), new (insert minimal row).
 - [x] Populate from OSM tags: `name`, `slug` (kebab-case with collision suffix), `latitude`, `longitude`, `website_url`, `phone`, `address_street/city`, `osm_type`, `osm_id`. Leave editorial fields null.
 - [x] Keep the dedup logic from `src/lib/pipeline/dedup.ts`.
 - [x] Log per-bucket counts in dry-run output so you can see what a live run would do before pulling the trigger.
 
 **CSV import retirement:**
+
 - [x] Delete `scripts/import-wineries.ts`. (Also deleted the now-dead helpers in `scripts/lib/`: `parse-csv.ts`, `transforms.ts`, `validate.ts`.)
 - [x] Delete `docs/csv/*.csv` (8 files) and `docs/sonoma-winery-database-complete.xlsx`.
 - [x] Remove the `db:import` / `db:import:dry` npm scripts from `package.json`. Also removed `db:reset` since it chained into `db:import`.
 - [x] The existing 68 `wineries` rows stay in the DB — no data wiped.
 
 **Admin UI — manual fill-in layer:**
+
 - [ ] **Delete action** on `/admin/wineries/[id]` — confirmation modal, cascades to `flights`, `winery_varietals`, `winery_scrapes`, `winery_snapshots`.
 - [ ] **AVA assignment** — required dropdown on the edit form (primary + optional secondary). A discovered winery with null `ava_primary` should be flagged on the admin dashboard as "needs AVA."
 - [ ] **Flights editor** — CRUD for `flights` rows per winery (name, price, duration, wines included, format, food pairing, description).
@@ -124,10 +135,12 @@ Move from "editorial CSV import + OSM shadow registry" to a single pipeline that
 All 68 wineries currently show hours and ratings from the one-time editorial CSV import. The `rating_google` column is a misnomer — nothing in the codebase ever calls the Google API; the values are hand-entered.
 
 **Hours — manual entry via scrape viewer:**
+
 - [ ] Admin reads `winery_scrapes` markdown (shown in the scrape viewer panel of the edit form) and types hours into the winery row directly. No auto-extraction.
 
 **Ratings — future `places` stage:**
-- [ ] **Add `google_place_id` column** via migration (`supabase/migrations/`).
+
+- [x] **Add `google_place_id` column** via migration (`supabase/migrations/20260418000001_add_google_place_id.sql`). Nullable + partial unique index.
 - [ ] **New stage: `scripts/places-sync.ts` + lib `src/lib/pipeline/places.ts`.** For each winery: resolve `place_id` via Places `findPlaceFromText` using `name + address_city` (cache to the new column), then fetch Place Details for `rating` + `user_ratings_total`. Write directly to `wineries.rating_google` / `wineries.review_count_total` — Google is authoritative, no draft staging needed.
 - [ ] **Wire the new stage into `scripts/run-pipeline.ts`** so a single `pnpm pipeline:run` covers discover → crawl → places.
 - [ ] **Stamp `last_verified_at`** on every winery the places stage touches so the UI can surface freshness.
@@ -136,18 +149,14 @@ All 68 wineries currently show hours and ratings from the one-time editorial CSV
 
 ### Supabase Development Environment
 
-Set up a safe local/dev workflow so we can develop, create itineraries, tweak data, and experiment without touching production. Options to evaluate:
+**Decision: Option A — separate `sonoma-sip-dev` Supabase project.** Works from any machine (including mobile via Vercel), no Docker required, matches the existing hosted workflow, and keeps Vercel Preview deploys pointing at a non-prod DB automatically.
 
-- [ ] **Option A — Separate Supabase project:** Create a second Supabase project (e.g. `sonoma-sip-dev`) with its own database, auth, and API keys. Seed it with production data via `pg_dump` / `pg_restore` or the import pipeline. Vercel preview deployments and local dev use the dev project's keys; production uses the prod project's keys.
-- [ ] **Option B — Supabase branching:** Use [Supabase Branching](https://supabase.com/docs/guides/deployment/branching) (if available on the plan) to get ephemeral database branches tied to Git branches. Migrations and seed data apply automatically per branch.
-- [ ] **Option C — Local Supabase (Docker):** Run `supabase start` locally for a fully local Postgres + Auth + API stack. No risk to production at all. Requires Docker. Good for schema iteration but won't test Supabase-hosted features (edge functions, storage CDN, etc.).
-
-**Regardless of option chosen:**
-- [ ] Document the chosen approach in this file and `CLAUDE.md`
-- [ ] Update `.env.example` with dev vs. prod variable guidance
-- [ ] Ensure `vercel env` has separate values for preview vs. production environments
-- [ ] Add seed/import script that populates the dev database with representative data
-- [ ] Verify local `pnpm dev` works against the dev database end-to-end (quiz → results → plan creation)
+- [x] **Document the chosen approach** — see `CLAUDE.md` → "Supabase Environments".
+- [ ] **Provision the dev project** in the Supabase dashboard (name `sonoma-sip-dev`, same region us-east-2).
+- [ ] **Seed from prod** — `pg_dump` prod, `pg_restore` into dev. One-time operation; iterate freely after.
+- [ ] **Apply migrations to dev first** — run `supabase db push` against the dev project ref. Prod migrations only after dev smoke-test.
+- [ ] **Vercel env scoping** — set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` separately for `Production` (prod ref) vs `Preview` + `Development` (dev ref).
+- [ ] **Verify end-to-end** — `pnpm dev` against dev credentials: quiz → results → plan creation all work.
 
 ### UI — Mobile Fixes
 
@@ -162,10 +171,12 @@ Set up a safe local/dev workflow so we can develop, create itineraries, tweak da
 The "Nearby Wineries" section on `/wineries/[slug]` currently filters by same AVA region and takes the first 3. We already have `latitude` and `longitude` for all 68 wineries — use them for real proximity.
 
 **Heuristic:**
+
 - **≤ 5 miles = "nearby."** In Sonoma, most AVAs are compact (Dry Creek Valley ~8 mi long, Russian River Valley ~12 mi). A 5-mile radius captures wineries along the same road/corridor — roughly a 10-minute drive on two-lane wine country roads. Beyond 5 miles you're typically crossing into a different area and it stops feeling close.
 - **Fallback:** If fewer than 3 wineries fall within 5 miles, backfill with same-region wineries so the section is never empty.
 
 **Implementation:**
+
 - [x] **Add a `haversineDistance(lat1, lng1, lat2, lng2)` utility** in `src/lib/` that returns distance in miles between two coordinates. (`src/lib/geo.ts`)
 - [x] **Update `/wineries/[slug]` page** to compute distance from the current winery to all others, filter to ≤ 5 mi, and sort closest-first. Fall back to same-region if fewer than 3 results. (Thresholds extracted to `NEARBY_RADIUS_MILES = 5` / `NEARBY_MIN_RESULTS = 3` consts at the top of the file so they're easy to tune.)
 - [x] **Show distance in the UI** — display something like "2.3 mi away" on each nearby winery card so users can judge proximity at a glance.
@@ -209,17 +220,17 @@ All retired code has been removed:
 
 ### What Stays
 
-| Stage | Script | Library | What it does |
-|-------|--------|---------|-------------|
-| Discover | `scripts/discover-osm.ts` | `src/lib/pipeline/dedup.ts` | Query OSM Overpass API for wineries in Sonoma County. Writes minimal rows to `wineries` with `content_status='draft'`. |
-| Crawl | `scripts/crawl-wineries.ts` | `src/lib/pipeline/crawl.ts` | Firecrawl scrapes up to 5 pages per winery website. Stores markdown in `winery_scrapes`. |
-| Support | — | `src/lib/pipeline/tracking.ts` | Audit trail: records each pipeline run (stage, status, duration, errors) in `pipeline_runs`. |
+| Stage    | Script                      | Library                        | What it does                                                                                                           |
+| -------- | --------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Discover | `scripts/discover-osm.ts`   | `src/lib/pipeline/dedup.ts`    | Query OSM Overpass API for wineries in Sonoma County. Writes minimal rows to `wineries` with `content_status='draft'`. |
+| Crawl    | `scripts/crawl-wineries.ts` | `src/lib/pipeline/crawl.ts`    | Firecrawl scrapes up to 5 pages per winery website. Stores markdown in `winery_scrapes`.                               |
+| Support  | —                           | `src/lib/pipeline/tracking.ts` | Audit trail: records each pipeline run (stage, status, duration, errors) in `pipeline_runs`.                           |
 
 All scripts support `--dry-run`, `--winery=slug`, `--tier=`, `--force` (where applicable).
 
 ### Pipeline Improvements
 
-- [ ] **Maximize OSM coverage** — review the Overpass query to ensure we're catching all winery types (`amenity=winery`, `craft=winery`, `tourism=wine_cellar`, `shop=wine`). Goal: discover as many Sonoma County wineries as possible from this single source.
+- [x] **Maximize OSM coverage** — Overpass query in `scripts/discover-osm.ts` now covers `craft=winery`, `amenity=winery`, `tourism=wine_cellar`, `industrial=winery`, `building=winery`, `shop=wine` across node/way/relation types. `shop=wine` is noisy (retail wine shops aren't wineries) but admin can delete false positives from the draft queue.
 - [ ] **Scheduling** — set up Vercel cron or GitHub Actions: discovery monthly, crawl weekly for editorial tier, monthly for others
 - [ ] **URL health checks** — weekly HEAD request to every `website_url` and `booking_url`, store in `url_health_checks` table (already exists in schema)
 
@@ -231,9 +242,12 @@ _The primary interface for managing winery data. This is where all the quality w
 
 ### 1. Auth & Shell
 
-- [ ] Password-protected `/admin/*` route group — env var `ADMIN_PASSWORD`, cookie-based session
-- [ ] Login page at `/admin` — single password field, no user accounts needed
-- [ ] Admin layout with sidebar nav: Dashboard, Wineries, Pipeline, Health
+- [x] **`admin_users` table** — migration `20260418000002_create_admin_users.sql` (username + scrypt `password_hash` + timestamps, RLS on, no policies → service-role only).
+- [x] **Password hashing helper** — `src/lib/auth/password.ts` uses Node's built-in `crypto.scrypt` (no new dep). Stored format: `scrypt$N$r$p$salt_hex$hash_hex`. `verifyPassword` uses `timingSafeEqual`.
+- [x] **Seeder** — `pnpm seed:admins` reads `ADMIN_USER_{1,2}_USERNAME/PASSWORD` from env, hashes, upserts. `--dry-run` validates without DB writes. Rotating a password = re-run.
+- [ ] Password-protected `/admin/*` route group — server action checks `username` + `password` against `admin_users` via `verifyPassword`, issues signed session cookie.
+- [ ] Login page at `/admin/login` — username + password form, posts to the server action above.
+- [ ] Admin layout with sidebar nav: Dashboard, Wineries, Pipeline, Health.
 
 ### 2. Dashboard (`/admin`)
 
@@ -384,25 +398,30 @@ Share the Vercel URL. Ask them to:
 _After admin panel and core pipeline are solid._
 
 ### Observability (Sentry)
+
 - [ ] `@sentry/nextjs` for client + server error tracking
 - [ ] `@sentry/node` for pipeline script instrumentation
 - [ ] Alerts on pipeline failures and error spikes
 
 ### Click Attribution
+
 - [ ] Track "Book a Tasting" clicks via `navigator.sendBeacon`
 - [ ] Append `?ref=sonomasip` to outbound booking URLs
 - [ ] Click analytics in admin panel
 
 ### Kill Switches (env vars)
+
 - [ ] `NEXT_PUBLIC_DISABLE_MAP=true` — static image instead of Mapbox GL
 - [ ] `DISABLE_EMAIL=true` — disable email share
 - [ ] `MAINTENANCE_MODE=true` — disable all writes, site stays browsable
 
 ### Bot Protection
+
 - [ ] `navigator.webdriver` check before mounting map; bots get static placeholder
 - [ ] Honeypot fields on quiz and email forms
 
 ### Geographic Expansion
+
 - [ ] Add Napa Valley AVA regions to `ava_region` enum
 - [ ] Update app copy from "Sonoma" to "Sonoma & Napa"
 
@@ -442,48 +461,56 @@ _After admin panel and core pipeline are solid._
 <summary><strong>Phase 0 — Spec & Design</strong> ✅</summary>
 
 Repo, tooling, Prettier/ESLint, `.env.example`, route list, legal copy (terms, privacy, disclaimers on every data page), design system (fonts, color tokens, WCAG AA), shadcn/ui installed with full Sonoma palette mapped to semantic tokens.
+
 </details>
 
 <details>
 <summary><strong>Phase 3 — Next.js Foundation</strong> ✅</summary>
 
 App Router bootstrap, absolute imports, Tailwind, root layout, `env.ts` with Zod validation, dynamic favicon/OG images, PWA manifest, route-level loading skeletons.
+
 </details>
 
 <details>
 <summary><strong>Phase 3.5 — UI Prototype</strong> ✅</summary>
 
 All screens built and polished with real data: landing page (hero, how it works, features grid, featured wineries, CTA), quiz (4-step flow with progress bar, session persistence, animations), results (score rings, map with fly-to, share/print/email actions, empty/error states), winery detail (two-column layout, flights, hours, amenities, nearby wineries), browse/directory (filter sidebar, sort, 3-column grid), shared plan (itinerary with numbered stops, map, disclaimer), Mapbox (custom "Dawn Wine Country" style, lazy-loaded, interactive markers/popups).
+
 </details>
 
 <details>
 <summary><strong>Phase D1–D5 — Schema, Data Quality, Import Pipeline</strong> ✅</summary>
 
 Schema: 7 migrations applied (enums, wineries, flights, varietals, shared_itineraries, health checks, field overrides). RLS on all tables. Import pipeline: `scripts/import-wineries.ts` parses 8 CSV sheets, validates, upserts. 68 wineries, 118 flights, 344 varietals. Types generated from Supabase + mapper layer. Coordinates validated for all 68 wineries.
+
 </details>
 
 <details>
 <summary><strong>Phase D6 — Matching Engine</strong> ✅</summary>
 
 Filters, scoring, explanations, orchestrator, progressive filter relaxation, 44 unit tests, 7 golden file profiles (55 assertions against real Supabase data). `pnpm test:golden` to run.
+
 </details>
 
 <details>
 <summary><strong>Phase D7 — Wire Up (Mock → Real Data)</strong> ✅</summary>
 
 All pages wired to Supabase: quiz submit → server action → matching engine → results. Winery detail/browse pages use real data. Share flow saves to `shared_itineraries` table. ISR caching on winery pages (hourly revalidation).
+
 </details>
 
 <details>
 <summary><strong>Rate Limiting</strong> ✅</summary>
 
 In-memory token bucket (`src/lib/rate-limit.ts`), applied to quiz submit (10/hr) and plan create (5/hr), 429 + Retry-After responses, global middleware 60 req/min per IP (`src/middleware.ts`).
+
 </details>
 
 <details>
 <summary><strong>Data Pipeline — CLI & Engine</strong> ✅</summary>
 
 Full ETL pipeline built as CLI scripts with library modules. Discovery (OSM Overpass API), crawl (Firecrawl, 5 pages/winery), extract (Claude Haiku with confidence scores), publish (auto-approve + manual review + snapshots). Orchestrator runs all stages. 7 pipeline DB tables with RLS. 3 test suites. All scripts support `--dry-run` and common filters.
+
 </details>
 
 <details>

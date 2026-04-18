@@ -76,6 +76,20 @@ This applies to: landing pages, page sections, component creation, layout change
 - **Matching logic:** `docs/SCORING.md` — filters, weights, scoring formula
 - **Editorial data:** 68 curated wineries live in Supabase (`wineries` table). The original seed workbook has been retired — edit wineries via the admin panel.
 
+### Supabase Environments
+
+Two separate Supabase projects — **never point local dev at prod**.
+
+- **Production:** ref `rxihebhphpbhzanijfuv`. Used by the deployed Vercel app (Production env). Never run migrations or pipeline scripts against this unless the change has shipped to the dev project first.
+- **Dev:** a second Supabase project (to be provisioned). Used by `pnpm dev` and all Vercel Preview deploys. Seed with a `pg_dump` of prod, then iterate freely.
+
+Vercel env var mapping:
+
+- `Production` scope → prod Supabase URL/keys.
+- `Preview` + `Development` scope → dev Supabase URL/keys.
+
+`.env.local` points at the dev project. Migrations land in the dev project first; apply to prod only after smoke-testing.
+
 ### Code Standards
 
 - TypeScript strict mode

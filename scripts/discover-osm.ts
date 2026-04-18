@@ -53,15 +53,22 @@ interface OverpassResponse {
 }
 
 async function queryOverpass(): Promise<OverpassElement[]> {
+  const bbox = `${BBOX.south},${BBOX.west},${BBOX.north},${BBOX.east}`;
+  const tagFilters = [
+    '["craft"="winery"]',
+    '["amenity"="winery"]',
+    '["tourism"="wine_cellar"]',
+    '["industrial"="winery"]',
+    '["building"="winery"]',
+    '["shop"="wine"]',
+  ];
+  const clauses = tagFilters
+    .flatMap((tag) => [`node${tag}(${bbox});`, `way${tag}(${bbox});`, `relation${tag}(${bbox});`])
+    .join('\n      ');
   const query = `
     [out:json][timeout:60];
     (
-      node["amenity"="winery"](${BBOX.south},${BBOX.west},${BBOX.north},${BBOX.east});
-      way["amenity"="winery"](${BBOX.south},${BBOX.west},${BBOX.north},${BBOX.east});
-      node["craft"="winery"](${BBOX.south},${BBOX.west},${BBOX.north},${BBOX.east});
-      way["craft"="winery"](${BBOX.south},${BBOX.west},${BBOX.north},${BBOX.east});
-      node["tourism"="wine_cellar"](${BBOX.south},${BBOX.west},${BBOX.north},${BBOX.east});
-      way["tourism"="wine_cellar"](${BBOX.south},${BBOX.west},${BBOX.north},${BBOX.east});
+      ${clauses}
     );
     out center;
   `;
