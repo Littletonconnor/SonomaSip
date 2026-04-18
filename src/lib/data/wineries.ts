@@ -79,3 +79,22 @@ export async function getAllWineriesForBrowse(): Promise<WineryForDisplay[]> {
     .filter((row) => row.is_active)
     .map((row) => toWineryForDisplay(row, row.flights, row.winery_varietals));
 }
+
+export type AdminWineryRow = WineryRow & {
+  flights: FlightRow[];
+  winery_varietals: VarietalRow[];
+};
+
+export async function getAllWineriesForAdmin(): Promise<AdminWineryRow[]> {
+  const supabase = createServerSupabase();
+
+  const { data, error } = await supabase
+    .from('wineries')
+    .select('*, flights(*), winery_varietals(*)')
+    .order('content_status', { ascending: true })
+    .order('name', { ascending: true });
+
+  if (error) throw new Error(error.message);
+
+  return (data ?? []) as AdminWineryRow[];
+}
