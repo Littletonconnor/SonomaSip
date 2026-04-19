@@ -2,31 +2,21 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Star,
-  Clock,
   Users,
   Dog,
   Baby,
-  Accessibility,
   UtensilsCrossed,
   TreePine,
   Eye,
-  Car,
-  Volume2,
   ExternalLink,
   ChevronRight,
-  Wine,
   Calendar,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedSection } from '@/components/ui/animated-section';
-import { getWineryBySlug, getAllWinerySlugs, getAllWineriesForBrowse } from '@/lib/data/wineries';
-import type { Flight } from '@/lib/types';
+import { getWineryBySlug, getAllWinerySlugs } from '@/lib/data/wineries';
+import { formatScaleAndRegion } from '@/lib/types';
 import { env } from '@/lib/env';
-import { haversineDistance } from '@/lib/geo';
-
-const NEARBY_RADIUS_MILES = 5;
-const NEARBY_MIN_RESULTS = 3;
 
 export const revalidate = 3600;
 
@@ -76,25 +66,6 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
   const winery = await getWineryBySlug(slug);
   if (!winery) notFound();
 
-  const allWineries = await getAllWineriesForBrowse();
-  const otherWineries = allWineries
-    .filter((w) => w.id !== winery.id)
-    .map((w) => ({
-      winery: w,
-      distance: haversineDistance(winery.latitude, winery.longitude, w.latitude, w.longitude),
-    }))
-    .sort((a, b) => a.distance - b.distance);
-
-  const withinRadius = otherWineries.filter((x) => x.distance <= NEARBY_RADIUS_MILES);
-  const sameRegionBackfill = otherWineries.filter(
-    (x) => x.distance > NEARBY_RADIUS_MILES && x.winery.region === winery.region,
-  );
-  const relatedWineries = (
-    withinRadius.length >= NEARBY_MIN_RESULTS
-      ? withinRadius.slice(0, NEARBY_MIN_RESULTS)
-      : [...withinRadius, ...sameRegionBackfill.slice(0, NEARBY_MIN_RESULTS - withinRadius.length)]
-  ).slice(0, NEARBY_MIN_RESULTS);
-
   const dayNames = [
     'monday',
     'tuesday',
@@ -140,36 +111,12 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
     },
     openingHoursSpecification: openingHours.length > 0 ? openingHours : undefined,
     priceRange: `$${winery.minFlightPrice}–$${winery.maxFlightPrice}`,
-    ...(winery.averageRating &&
-      winery.ratingsCount && {
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: winery.averageRating,
-          ratingCount: winery.ratingsCount,
-          bestRating: 5,
-          worstRating: 1,
-        },
-      }),
-    hasOfferCatalog: {
-      '@type': 'OfferCatalog',
-      name: 'Tasting Flights',
-      itemListElement: winery.flights.map((flight) => ({
-        '@type': 'Offer',
-        name: flight.name,
-        description: flight.description,
-        price: flight.price,
-        priceCurrency: 'USD',
-      })),
-    },
     amenityFeature: [
       ...(winery.isDogFriendly
         ? [{ '@type': 'LocationFeatureSpecification', name: 'Dog-friendly', value: true }]
         : []),
       ...(winery.kidWelcome
         ? [{ '@type': 'LocationFeatureSpecification', name: 'Kid-friendly', value: true }]
-        : []),
-      ...(winery.isWheelchairAccessible
-        ? [{ '@type': 'LocationFeatureSpecification', name: 'Wheelchair accessible', value: true }]
         : []),
       ...(winery.hasFoodPairing
         ? [{ '@type': 'LocationFeatureSpecification', name: 'Food pairing', value: true }]
@@ -184,16 +131,10 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
   };
 
   const featureItems = [
-    { icon: Car, label: 'Parking', value: winery.parking },
     {
       icon: Users,
       label: 'Group size',
       value: winery.groupCapacity ? `Up to ${winery.groupCapacity}` : 'No limit',
-    },
-    {
-      icon: Volume2,
-      label: 'Noise level',
-      value: winery.noiseLevel.charAt(0).toUpperCase() + winery.noiseLevel.slice(1),
     },
     {
       icon: Calendar,
@@ -210,7 +151,6 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
   const amenities = [
     { icon: Dog, label: 'Dog-friendly', active: winery.isDogFriendly },
     { icon: Baby, label: 'Kid-friendly', active: winery.kidWelcome },
-    { icon: Accessibility, label: 'Wheelchair accessible', active: winery.isWheelchairAccessible },
     { icon: UtensilsCrossed, label: 'Food pairing', active: winery.hasFoodPairing },
     { icon: TreePine, label: 'Outdoor seating', active: winery.hasOutdoorSeating },
     { icon: Eye, label: 'Scenic views', active: winery.hasViews },
@@ -263,7 +203,7 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
             <AnimatedSection>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="bg-wine/10 text-wine ring-wine/20 rounded-full px-3 py-1 text-xs font-medium ring-1">
-                  {winery.region}
+                  {formatScaleAndRegion(winery.wineryScale, winery.region)}
                 </span>
                 <span className="text-stone text-sm">{winery.city}</span>
               </div>
@@ -272,22 +212,6 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
                 {winery.name}
               </h1>
               <p className="text-stone mt-2 text-pretty">{winery.tagline}</p>
-
-              {winery.averageRating && (
-                <div className="mt-4 flex items-center gap-2">
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`size-4 ${i < Math.round(winery.averageRating!) ? 'fill-gold text-gold' : 'text-fog'}`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-stone text-sm tabular-nums">
-                    {winery.averageRating} ({winery.ratingsCount})
-                  </span>
-                </div>
-              )}
 
               <div className="mt-6 flex flex-col gap-3">
                 <Button size="lg" className="w-full gap-2 rounded-full" asChild>
@@ -347,19 +271,6 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
               </div>
             </AnimatedSection>
 
-            <AnimatedSection delay={0.1}>
-              <div className="mt-12 border-t border-black/5 pt-12">
-                <h2 className="font-heading text-bark text-2xl font-medium tracking-tight">
-                  Tasting Experiences
-                </h2>
-                <div className="mt-6 flex flex-col gap-4">
-                  {winery.flights.map((flight) => (
-                    <FlightCard key={flight.id} flight={flight} />
-                  ))}
-                </div>
-              </div>
-            </AnimatedSection>
-
             <AnimatedSection delay={0.2}>
               <div className="mt-12 border-t border-black/5 pt-12">
                 <h2 className="font-heading text-bark text-2xl font-medium tracking-tight">
@@ -386,73 +297,6 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
             </AnimatedSection>
           </div>
         </div>
-      </div>
-
-      {relatedWineries.length > 0 && (
-        <div className="bg-card border-t border-black/5 py-16 md:py-20">
-          <div className="mx-auto max-w-5xl px-6">
-            <AnimatedSection>
-              <h2 className="font-heading text-bark text-2xl font-medium tracking-tight">
-                Nearby Wineries
-              </h2>
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                {relatedWineries.map(({ winery: w, distance }) => (
-                  <Link
-                    key={w.slug}
-                    href={`/wineries/${w.slug}`}
-                    className="group hover:shadow-warm rounded-xl p-5 ring-1 ring-black/5 transition-shadow"
-                  >
-                    <p className="font-heading text-bark group-hover:text-wine text-lg font-medium">
-                      {w.name}
-                    </p>
-                    <p className="text-stone mt-1 text-sm">{w.tagline}</p>
-                    <div className="text-stone mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                      <span>{w.region}</span>
-                      <span className="tabular-nums">
-                        ${w.minFlightPrice}&ndash;{w.maxFlightPrice}
-                      </span>
-                      <span className="tabular-nums">{distance.toFixed(1)} mi away</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </AnimatedSection>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function FlightCard({ flight }: { flight: Flight }) {
-  return (
-    <div className="bg-linen/60 flex items-start justify-between gap-6 rounded-xl p-5 ring-1 ring-black/5 sm:p-6">
-      <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-heading text-bark text-lg font-medium">{flight.name}</h3>
-          {flight.hasFoodPairing && (
-            <span className="bg-sage/15 text-sage flex items-center gap-1 rounded-full py-0.5 pr-2 pl-1.5 text-xs font-medium">
-              <UtensilsCrossed className="size-3" />
-              Paired
-            </span>
-          )}
-        </div>
-        <p className="text-stone mt-1 text-sm text-pretty">{flight.description}</p>
-        <div className="text-stone mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-          <span className="flex items-center gap-1">
-            <Wine className="size-3.5" />
-            {flight.winesIncluded} wines
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="size-3.5" />
-            {flight.durationMinutes} min
-          </span>
-          <span className="capitalize">{flight.format}</span>
-        </div>
-      </div>
-      <div className="shrink-0 text-right">
-        <p className="font-heading text-bark text-2xl font-medium tabular-nums">${flight.price}</p>
-        <p className="text-stone text-xs">per person</p>
       </div>
     </div>
   );

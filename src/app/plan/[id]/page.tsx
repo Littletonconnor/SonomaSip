@@ -10,6 +10,7 @@ import { PlanWineryStop } from './plan-winery-stop';
 import { getPlan } from '@/lib/plan';
 import type { MapItem } from '@/components/map/types';
 import type { MatchResult, QuizAnswers, MustHaves } from '@/lib/types';
+import { formatScaleAndRegion } from '@/lib/types';
 
 const MUST_HAVE_LABELS: Record<keyof MustHaves, string> = {
   views: 'Views',
@@ -206,7 +207,7 @@ function WineryStop({ result, showBorder }: { result: MatchResult; showBorder: b
             >
               {winery.name}
             </Link>
-            <span className="text-stone text-sm">{winery.region}</span>
+            <span className="text-stone text-sm">{formatScaleAndRegion(winery.wineryScale, winery.region)}</span>
           </div>
 
           <div className="text-stone mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">

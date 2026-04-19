@@ -4,6 +4,7 @@ import { Grape, MapPin, DollarSign, Users, Map, Info, Share2 } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import { mockWineries } from '@/lib/mock-data';
+import { formatScaleAndRegion } from '@/lib/types';
 
 export default function Home() {
   return (
@@ -116,12 +117,12 @@ export default function Home() {
       </section>
 
       {/* ── Social Proof / Stats Bar ── */}
-      <section className="border-gold/20 border-y py-5">
+      <section className="border-gold/20 hidden border-y py-5 md:block">
         <div className="mx-auto max-w-5xl px-6">
           <AnimatedSection>
             <p className="text-stone text-center font-mono text-xs tracking-widest">
-              Curated wineries &middot; Every Sonoma AVA region &middot; Personalized matching
-              &middot; Always free
+              Personalized itineraries &middot; Maps &amp; printable guides &middot; Across Sonoma
+              County &middot; Independent &amp; free
             </p>
           </AnimatedSection>
         </div>
@@ -273,7 +274,7 @@ export default function Home() {
                   </div>
                   <div className="hidden shrink-0 items-center gap-3 sm:flex">
                     <span className="bg-linen text-oak rounded-full px-3 py-1 text-xs font-medium ring-1 ring-black/5">
-                      {winery.region}
+                      {formatScaleAndRegion(winery.wineryScale, winery.region)}
                     </span>
                     <span className="text-stone text-sm tabular-nums">
                       ${winery.minFlightPrice}&ndash;{winery.maxFlightPrice}

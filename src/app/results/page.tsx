@@ -14,6 +14,7 @@ import { submitQuiz } from '@/lib/actions/quiz';
 import { createPlan } from '@/lib/actions/plan';
 import type { MapItem } from '@/components/map/types';
 import type { QuizAnswers, MatchResult, MustHaves } from '@/lib/types';
+import { formatScaleAndRegion } from '@/lib/types';
 
 const defaultAnswers: QuizAnswers = {
   archetype: null,
@@ -345,7 +346,7 @@ function ResultCard({
           {winery.name}
         </h2>
         <div className="text-stone mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm">
-          <span>{winery.region}</span>
+          <span>{formatScaleAndRegion(winery.wineryScale, winery.region)}</span>
           <span className="tabular-nums">
             ${winery.minFlightPrice}&ndash;{winery.maxFlightPrice}
           </span>
