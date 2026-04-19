@@ -168,6 +168,7 @@ export function toWineryForDisplay(
     hasViews: row.has_sunset_views,
     hasPicnic: row.has_picnic_area,
     isMembersOnly: row.is_members_only,
+    wineryScale: mapWineryScale(row.winery_scale),
   };
 }
 
@@ -185,7 +186,6 @@ export function toWinery(
     qualityScore: row.quality_score,
     popularityScore: row.popularity_score,
     ratingGoogle: row.rating_google,
-    wineryScale: mapWineryScale(row.winery_scale),
     archetypeScores: mapArchetypeScores(row.archetype_scores),
   };
 }

@@ -303,6 +303,7 @@ export type WineryForDisplay = {
   hasViews: boolean;
   hasPicnic: boolean;
   isMembersOnly: boolean;
+  wineryScale: WineryScale | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -328,6 +329,21 @@ export const AVA_TO_DISPLAY: Record<AvaRegion, Region> = {
 export const DISPLAY_TO_AVA: Record<string, AvaRegion> = Object.fromEntries(
   Object.entries(AVA_TO_DISPLAY).map(([k, v]) => [v, k as AvaRegion]),
 ) as Record<string, AvaRegion>;
+
+// ---------------------------------------------------------------------------
+// Winery scale display helpers.
+// ---------------------------------------------------------------------------
+
+export const WINERY_SCALE_LABEL: Record<WineryScale, string> = {
+  boutique: 'Boutique',
+  family_estate: 'Family estate',
+  destination: 'Destination',
+};
+
+export function formatScaleAndRegion(scale: WineryScale | null, region: Region): string {
+  if (!scale || !region) return region;
+  return `${WINERY_SCALE_LABEL[scale]} · ${region}`;
+}
 
 // ---------------------------------------------------------------------------
 // Reservation type mapping — CSV value to DB enum.

@@ -6,6 +6,7 @@ import { Star, Dog, Baby, UtensilsCrossed, Eye, SlidersHorizontal, X } from 'luc
 import { Button } from '@/components/ui/button';
 import { AnimatedSection, StaggerChildren, StaggerItem } from '@/components/ui/animated-section';
 import type { WineryForDisplay, Region } from '@/lib/types';
+import { formatScaleAndRegion } from '@/lib/types';
 
 const ALL_REGIONS: Region[] = [
   'Russian River Valley',
@@ -334,7 +335,7 @@ function WineryCard({ winery }: { winery: WineryForDisplay }) {
       </div>
       <p className="text-stone mt-1 text-sm">{winery.tagline}</p>
       <div className="text-stone mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 text-sm">
-        <span>{winery.region}</span>
+        <span>{formatScaleAndRegion(winery.wineryScale, winery.region)}</span>
         <span className="tabular-nums">
           ${winery.minFlightPrice}&ndash;{winery.maxFlightPrice}
         </span>

@@ -52,21 +52,14 @@ Replace the current 4-step flow. Step state lives in `src/app/quiz/page.tsx` and
 
 `src/app/wineries/[slug]/page.tsx`. Intent: only high-signal fields that help a user decide to visit. Cut filler, add trust signals.
 
-- [ ] **Remove parking** from the detail page. The `parking` field on `Winery` can stay in the DB for now; just don't render it.
-- [ ] **Remove noise level** from the detail page rendering. Keep the column in DB (used internally by matcher tie-break). Do not surface.
-- [ ] **Remove "Tasting experiences" block** as currently rendered — only lists one, goes stale. Replace with a plain "View tasting menu →" link out to the winery's own URL, or drop entirely until we have a sustainable refresh mechanism.
-- [ ] **Remove "Nearby Wineries" section** at the bottom of the page. The recently-added haversine-based version is inaccurate enough (and not the site's focus) that it's net-negative. Delete the component + its imports; keep `src/lib/geo.ts` — it'll be useful for the itinerary map.
-- [ ] **Remove the Wheelchair accessible tag** from the amenities list. Replaced by a site-wide disclaimer (see Accessibility).
-- [ ] **Add review source attribution** — when the star rating renders, show "4.7 (1,000 Google reviews)" or similar instead of a bare star. Without attribution users may think Sonoma Sip is rating wineries itself (credibility + liability risk). Reads from `rating_google` / `review_count_total`.
+- [x] **Remove parking** from the detail page. `parking` column stays on `Winery`, just unrendered.
+- [x] **Remove noise level** from the detail page. Column stays in DB (matcher still reads it for group-fit tie-break).
+- [x] **Remove "Tasting experiences" block** — dropped entirely (not even a menu-link replacement). Booking CTA at top of sidebar already covers "visit their site." Flights data stays in DB for future use.
+- [x] **Remove "Nearby Wineries" section** + haversine computation + unused imports. `src/lib/geo.ts` kept for future itinerary map use.
+- [x] **Remove Wheelchair accessible** amenity chip from the detail page.
+- [ ] **Review source attribution — DEFERRED.** Star row + `aggregateRating` JSON-LD are hidden until Google Places sync ships (`rating_google` values are editorial, not live Google data — see Hours & Ratings section). Un-hide per the `[ ] Un-hide the star row` step in the Places setup guide.
 - [ ] **Add per-winery map** (lower priority) — small Mapbox map on the detail page showing the winery's location in AVA context. Lift the existing `SonomaMap` into a reusable component or use a lighter static Mapbox image for the detail page. Defer if effort > a few hours.
-- [ ] **Keep** price range, group size, reservation policy, tagline, Book a Tasting CTA, disclaimer line. These are working.
-
-### 5. Accessibility policy (phone — copy only)
-
-Wheelchair-accessible was removed as a user-facing filter because the data can't be maintained reliably across 68 wineries, many of which are in historic barns. A boolean tag without verified data was appearing on every card and eroding credibility.
-
-- [ ] **Delete wheelchair from `MustHaves` type, quiz UI, filter logic, and winery detail amenities.**
-- [ ] **Add site-wide accessibility note** — short copy block in the footer and FAQ: _"For accessibility information, please contact wineries directly before visiting — accommodations vary by location."_ (Exact copy per spec §3b.)
+- [x] **Kept** price range, group size, reservation policy, tagline, Book a Tasting CTA, disclaimer line.
 
 ### 6. Homepage copy update (phone)
 
@@ -79,9 +72,9 @@ Wheelchair-accessible was removed as a user-facing filter because the data can't
 
 Per spec §Deferred: don't add a fifth quiz question for this — 80% of users would answer "no preference." Handle as an algorithmic variety rule in v2 (or a card tag in v1.5), not a filter.
 
-- [ ] **Migration adds `winery_scale` column** — covered in §1 above.
-- [ ] **Backfill all 68 wineries** with editorial judgment calls. Editorial note: Ridge Lytton Springs is large-scale in production but feels like a family estate on-site — that's the editorial call. Consistency across the collection matters more than perfect objective accuracy.
-- [ ] **Path #1 for launch — display as a tag** on winery cards and the detail page ("Boutique · Dry Creek Valley"). No algorithm changes.
+- [x] **Migration adds `winery_scale` column** — covered in §1 (column pre-existed as `text`, just typed as `WineryScale` union).
+- [x] **Backfill all 68 wineries** — done in `scripts/backfill-archetype-scores.ts`. Distribution: 5 boutique / 41 family_estate / 22 destination. Ridge Lytton Springs explicitly overridden to `family_estate`.
+- [x] **Path #1 — display as a tag** on winery cards, top-match, detail, results, plan. Added `formatScaleAndRegion()` helper + `WINERY_SCALE_LABEL` map in `types.ts`; `wineryScale` now surfaces on `WineryForDisplay` so both `Winery` and `WineryForDisplay` consumers can read it.
 - [ ] **Revisit path #2 (opt-in toggle) or #3 (silent anti-redundancy rule) in v2** based on how users interact with the itinerary (do they swap stops? do they regenerate?).
 
 ### 8. Pre-launch testing (spec §Testing priorities)
@@ -274,20 +267,58 @@ Move from "editorial CSV import + OSM shadow registry" to a single pipeline that
 
 ### Hours & Ratings — Manual Entry from Scrape + Future Places Sync
 
-All 68 wineries currently show hours and ratings from the one-time editorial CSV import. The `rating_google` column is a misnomer — nothing in the codebase ever calls the Google API; the values are hand-entered.
+> ⚠️ **Launch blocker for review attribution.** The star rating and review count
+> on winery detail + card components are **currently hidden** (see §4) because
+> the data is editorial-CSV values, not live Google ratings — displaying them
+> with Google attribution would be inaccurate. Once the Places sync below runs,
+> un-hide the star row and add attribution.
+
+All 68 wineries' hours + `rating_google` + `review_count_total` came from the
+one-time editorial CSV import. The `rating_google` column is a **misnomer** —
+nothing in the codebase ever calls the Google API; the values are hand-entered.
 
 **Hours — manual entry via scrape viewer:**
 
 - [ ] Admin reads `winery_scrapes` markdown (shown in the scrape viewer panel of the edit form) and types hours into the winery row directly. No auto-extraction.
 
-**Ratings — future `places` stage:**
+**Ratings — how to set up live Google Places sync (end-to-end):**
 
-- [x] **Add `google_place_id` column** via migration (`supabase/migrations/20260418000001_add_google_place_id.sql`). Nullable + partial unique index.
-- [ ] **New stage: `scripts/places-sync.ts` + lib `src/lib/pipeline/places.ts`.** For each winery: resolve `place_id` via Places `findPlaceFromText` using `name + address_city` (cache to the new column), then fetch Place Details for `rating` + `user_ratings_total`. Write directly to `wineries.rating_google` / `wineries.review_count_total` — Google is authoritative, no draft staging needed.
-- [ ] **Wire the new stage into `scripts/run-pipeline.ts`** so a single `pnpm pipeline:run` covers discover → crawl → places.
-- [ ] **Stamp `last_verified_at`** on every winery the places stage touches so the UI can surface freshness.
-- [ ] **Env + ToS:** add `GOOGLE_PLACES_API_KEY` to `.env.example` + Vercel envs; attribute "Google" in the UI near the star display; don't store raw review text; refresh no more than every ~30 days per winery.
-- [ ] Either hide the star row in `src/app/wineries/[slug]/page.tsx:276-290` until the first places-sync run lands, or accept that the editorial values stand in until then. Decision point for before we share more widely.
+This is the critical path to showing accurate, attributable ratings on the site.
+Do steps in order — each builds on the last.
+
+1. **[x] `google_place_id` column** (already landed — `supabase/migrations/20260418000001_add_google_place_id.sql`). Nullable + partial unique index so we only resolve once per winery.
+
+2. **[ ] Provision a Google Places API key.**
+   - Enable the **Places API (New)** in Google Cloud Console on the project billing is attached to.
+   - Restrict the key by API (Places only) and by IP/referrer in production.
+   - Add `GOOGLE_PLACES_API_KEY` to `.env.example` (commented), `.env.local`, and Vercel envs (all three scopes: Production, Preview, Development).
+
+3. **[ ] Build `src/lib/pipeline/places.ts`** with two exported functions:
+   - `resolvePlaceId(winery)` — calls `findPlaceFromText` with `name + address_city + "winery"`. Cache the result on `wineries.google_place_id`. Skip wineries that already have a cached id. Handle ambiguous matches (>1 candidate with similar score) by logging + skipping — admin resolves manually.
+   - `fetchPlaceDetails(place_id)` — calls Place Details API requesting fields `rating,userRatingCount` only (keeps cost low). Returns `{ rating, reviewCount }`.
+
+4. **[ ] Build `scripts/places-sync.ts`** that orchestrates for each published winery:
+   - Resolve `place_id` if missing.
+   - Fetch details.
+   - Update `wineries.rating_google`, `wineries.review_count_total`, `wineries.last_verified_at = now()`.
+   - Stamp `last_places_sync_at` on the row (column already exists).
+   - Skip wineries whose `last_places_sync_at` is within 30 days (rate-friendly + ToS-friendly).
+   - `--dry-run` flag that prints proposed updates without writing.
+   - `--force` flag to override the 30-day skip.
+
+5. **[ ] Wire into `scripts/run-pipeline.ts`** as a new `places` stage so a single `pnpm pipeline:run` covers discover → crawl → places.
+
+6. **[ ] Schedule as a Vercel cron** — monthly is enough given how slowly ratings drift.
+
+7. **[ ] Un-hide the star row** in `src/app/wineries/[slug]/page.tsx` (and winery cards if we hid them there too). Render as **"4.7 (1,240 Google reviews)"** with the word "Google" visible so attribution is explicit. Pull from `rating_google` + `review_count_total`.
+
+8. **[ ] Add a `last_verified_at` freshness badge** near the star row ("Verified Apr 2026") once ≥1 sync has run. Builds trust.
+
+**ToS + cost notes:**
+- Never store raw review text, only aggregate rating + count.
+- Attribute "Google" in the UI anywhere these values surface.
+- Place Details calls cost ~$17/1000 — at 68 wineries/month that's ~$1.16/month. Negligible.
+- The 30-day refresh is conservative and keeps us safely within rate limits.
 
 ### Supabase Development Environment
 
