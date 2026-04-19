@@ -7,46 +7,85 @@ import { motion, AnimatePresence, type Variants } from 'motion/react';
 import {
   Dog,
   Baby,
-  Accessibility,
   UtensilsCrossed,
   TreePine,
   Eye,
   MapPin,
   ArrowRight,
   ArrowLeft,
-  Grape,
-  Sun,
-  PartyPopper,
   Compass,
-  Music,
+  BookOpen,
+  GraduationCap,
+  PartyPopper,
+  Heart,
+  UsersRound,
+  Users,
+  User as UserIcon,
+  Grape,
   Wine,
+  Sun,
   Sparkles,
   Cherry,
   Citrus,
   Flower2,
   Droplets,
+  Leaf,
+  DoorOpen,
   type LucideIcon,
 } from 'lucide-react';
-import type { Varietal, Vibe, BudgetBand, Region, MustHaves, QuizAnswers } from '@/lib/types';
+import type {
+  Archetype,
+  BudgetBand,
+  GroupComposition,
+  MustHaves,
+  QuizAnswers,
+  Region,
+  Varietal,
+} from '@/lib/types';
 
-const VARIETALS: { value: Varietal; Icon: LucideIcon }[] = [
-  { value: 'Pinot Noir', Icon: Wine },
-  { value: 'Chardonnay', Icon: Sun },
-  { value: 'Cabernet Sauvignon', Icon: Grape },
-  { value: 'Zinfandel', Icon: Cherry },
-  { value: 'Sparkling', Icon: Sparkles },
-  { value: 'Rosé', Icon: Flower2 },
-  { value: 'Sauvignon Blanc', Icon: Citrus },
-  { value: 'Merlot', Icon: Droplets },
-  { value: 'Syrah', Icon: Grape },
+const ARCHETYPES: { value: Archetype; title: string; description: string; Icon: LucideIcon }[] = [
+  {
+    value: 'explorer',
+    title: 'Explorer',
+    description: 'Hidden gems, new varietals, off the beaten path',
+    Icon: Compass,
+  },
+  {
+    value: 'collector',
+    title: 'Collector',
+    description: 'Library releases, winemaker chats, serious wines',
+    Icon: BookOpen,
+  },
+  {
+    value: 'student',
+    title: 'Student',
+    description: 'Learn how wine is made — barrels, blending, soil',
+    Icon: GraduationCap,
+  },
+  {
+    value: 'socializer',
+    title: 'Socializer',
+    description: 'Lively rooms, live music, group-friendly energy',
+    Icon: PartyPopper,
+  },
+  {
+    value: 'romantic',
+    title: 'Romantic',
+    description: 'Scenic, intimate, unforgettable',
+    Icon: Heart,
+  },
 ];
 
-const VIBES: { value: Vibe; description: string; Icon: typeof Sun }[] = [
-  { value: 'Relaxed & Scenic', description: 'Beautiful views, slow pace', Icon: Sun },
-  { value: 'Educational', description: 'Learn about winemaking', Icon: Grape },
-  { value: 'Celebratory', description: 'Special occasion energy', Icon: PartyPopper },
-  { value: 'Adventurous', description: 'Hidden gems, off the beaten path', Icon: Compass },
-  { value: 'Social & Lively', description: 'Upbeat, group-friendly', Icon: Music },
+const GROUP_COMPOSITIONS: {
+  value: GroupComposition;
+  title: string;
+  subtitle: string;
+  Icon: LucideIcon;
+}[] = [
+  { value: 'solo', title: 'Just me', subtitle: 'Flying solo', Icon: UserIcon },
+  { value: 'couple', title: 'Me and my partner', subtitle: 'Two of us', Icon: Users },
+  { value: 'small_group', title: 'Small group', subtitle: '3–5 people', Icon: UsersRound },
+  { value: 'big_group', title: 'Big group', subtitle: '6+ people', Icon: UsersRound },
 ];
 
 const BUDGETS: { value: BudgetBand; label: string; range: string }[] = [
@@ -56,13 +95,26 @@ const BUDGETS: { value: BudgetBand; label: string; range: string }[] = [
   { value: '$$$$', label: 'Luxury', range: '$100+' },
 ];
 
-const MUST_HAVE_OPTIONS: { key: keyof MustHaves; label: string; Icon: typeof Eye }[] = [
+const MUST_HAVE_OPTIONS: { key: keyof MustHaves; label: string; Icon: LucideIcon }[] = [
   { key: 'views', label: 'Scenic views', Icon: Eye },
-  { key: 'foodPairing', label: 'Food pairing', Icon: UtensilsCrossed },
   { key: 'outdoorSeating', label: 'Outdoor seating', Icon: TreePine },
+  { key: 'foodPairing', label: 'Food available', Icon: UtensilsCrossed },
   { key: 'dogFriendly', label: 'Dog-friendly', Icon: Dog },
   { key: 'kidFriendly', label: 'Kid-friendly', Icon: Baby },
-  { key: 'wheelchairAccessible', label: 'Wheelchair accessible', Icon: Accessibility },
+  { key: 'picnic', label: 'Picnic-friendly', Icon: Leaf },
+  { key: 'walkInsWelcome', label: 'Walk-ins welcome', Icon: DoorOpen },
+];
+
+const SKIP_VARIETALS: { value: Varietal; Icon: LucideIcon }[] = [
+  { value: 'Pinot Noir', Icon: Wine },
+  { value: 'Chardonnay', Icon: Sun },
+  { value: 'Cabernet Sauvignon', Icon: Grape },
+  { value: 'Zinfandel', Icon: Cherry },
+  { value: 'Sparkling', Icon: Sparkles },
+  { value: 'Rosé', Icon: Flower2 },
+  { value: 'Sauvignon Blanc', Icon: Citrus },
+  { value: 'Merlot', Icon: Droplets },
+  { value: 'Syrah', Icon: Grape },
 ];
 
 const REGIONS: { value: Region; area: string }[] = [
@@ -77,17 +129,23 @@ const STOP_OPTIONS = [2, 3, 4, 5] as const;
 
 const STEPS = [
   {
-    title: 'What do you love to drink?',
-    subtitle: 'Pick as many as you like — or skip to stay open.',
+    title: 'Which one sounds like you?',
+    subtitle: 'This helps us match the experience to you.',
   },
-  { title: "What's your vibe?", subtitle: 'Choose the mood and set your budget.' },
-  { title: 'What matters most?', subtitle: 'The practical stuff — group needs, must-haves.' },
+  {
+    title: "Who's coming along?",
+    subtitle: 'So we can match group size, noise level, and vibe.',
+  },
+  {
+    title: 'The practical stuff',
+    subtitle: 'Budget, must-haves, and anything to avoid.',
+  },
   { title: 'Where & how many?', subtitle: 'Pick your regions and how many stops you want.' },
 ] as const;
 
 const defaultAnswers: QuizAnswers = {
-  selectedVarietals: [],
-  selectedVibes: [],
+  archetype: null,
+  groupComposition: null,
   budgetBand: null,
   mustHaves: {
     views: false,
@@ -95,12 +153,12 @@ const defaultAnswers: QuizAnswers = {
     outdoorSeating: false,
     dogFriendly: false,
     kidFriendly: false,
-    wheelchairAccessible: false,
+    picnic: false,
+    walkInsWelcome: false,
   },
+  skipVarietals: [],
   preferredRegions: [],
   numStops: 3,
-  includeMembersOnly: false,
-  groupSize: null,
 };
 
 const fadeUpVariants: Variants = {
@@ -113,40 +171,41 @@ export default function QuizPage() {
   const router = useRouter();
   const [rawStep, setStep, { hydrated: stepHydrated }] = useSessionStorage('quiz-step', 0);
   const step = Math.min(Math.max(rawStep, 0), STEPS.length - 1);
-  const [answers, setAnswers, { hydrated: answersHydrated, remove: clearAnswers }] =
-    useSessionStorage<QuizAnswers>('quiz-answers', defaultAnswers);
+  const [answers, setAnswers, { hydrated: answersHydrated }] = useSessionStorage<QuizAnswers>(
+    'quiz-answers',
+    defaultAnswers,
+  );
   const [direction, setDirection] = useState(1);
   const hydrated = stepHydrated && answersHydrated;
 
-  const toggleVarietal = useCallback((v: Varietal) => {
-    setAnswers((prev) => ({
-      ...prev,
-      selectedVarietals: prev.selectedVarietals.includes(v)
-        ? prev.selectedVarietals.filter((x) => x !== v)
-        : [...prev.selectedVarietals, v],
-    }));
+  const setArchetype = useCallback((value: Archetype) => {
+    setAnswers((prev) => ({ ...prev, archetype: prev.archetype === value ? null : value }));
   }, []);
 
-  const toggleVibe = useCallback((v: Vibe) => {
+  const setGroupComposition = useCallback((value: GroupComposition) => {
     setAnswers((prev) => ({
       ...prev,
-      selectedVibes: prev.selectedVibes.includes(v)
-        ? prev.selectedVibes.filter((x) => x !== v)
-        : [...prev.selectedVibes, v],
+      groupComposition: prev.groupComposition === value ? null : value,
     }));
   }, []);
 
   const setBudget = useCallback((b: BudgetBand) => {
-    setAnswers((prev) => ({
-      ...prev,
-      budgetBand: prev.budgetBand === b ? null : b,
-    }));
+    setAnswers((prev) => ({ ...prev, budgetBand: prev.budgetBand === b ? null : b }));
   }, []);
 
   const toggleMustHave = useCallback((key: keyof MustHaves) => {
     setAnswers((prev) => ({
       ...prev,
       mustHaves: { ...prev.mustHaves, [key]: !prev.mustHaves[key] },
+    }));
+  }, []);
+
+  const toggleSkipVarietal = useCallback((v: Varietal) => {
+    setAnswers((prev) => ({
+      ...prev,
+      skipVarietals: prev.skipVarietals.includes(v)
+        ? prev.skipVarietals.filter((x) => x !== v)
+        : [...prev.skipVarietals, v],
     }));
   }, []);
 
@@ -163,16 +222,8 @@ export default function QuizPage() {
     setAnswers((prev) => ({ ...prev, numStops: n }));
   }, []);
 
-  const setGroupSize = useCallback((n: number | null) => {
-    setAnswers((prev) => ({ ...prev, groupSize: n }));
-  }, []);
-
-  const toggleMembersOnly = useCallback(() => {
-    setAnswers((prev) => ({ ...prev, includeMembersOnly: !prev.includeMembersOnly }));
-  }, []);
-
   const next = useCallback(() => {
-    if (step < 3) {
+    if (step < STEPS.length - 1) {
       setDirection(1);
       setStep((s) => s + 1);
     }
@@ -190,8 +241,8 @@ export default function QuizPage() {
     router.push('/results');
   }, [router, setStep]);
 
-  const isLast = step === 3;
-  const progress = ((step + 1) / 4) * 100;
+  const isLast = step === STEPS.length - 1;
+  const progress = ((step + 1) / STEPS.length) * 100;
 
   if (!hydrated) {
     return <div className="min-h-[calc(100dvh-3.5rem)]" />;
@@ -220,7 +271,7 @@ export default function QuizPage() {
             transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <span className="bg-wine/10 text-wine ring-wine/20 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium tracking-wide ring-1">
-              {step + 1} / 4
+              {step + 1} / {STEPS.length}
             </span>
 
             <h1 className="font-heading text-bark mt-6 max-w-[20ch] text-4xl font-medium tracking-tight text-balance md:text-5xl">
@@ -232,24 +283,22 @@ export default function QuizPage() {
 
             <div className="mt-12">
               {step === 0 && (
-                <VarietalsStep selected={answers.selectedVarietals} onToggle={toggleVarietal} />
+                <ArchetypeStep selected={answers.archetype} onSelect={setArchetype} />
               )}
               {step === 1 && (
-                <VibeBudgetStep
-                  selectedVibes={answers.selectedVibes}
-                  budgetBand={answers.budgetBand}
-                  onToggleVibe={toggleVibe}
-                  onSetBudget={setBudget}
+                <GroupCompositionStep
+                  selected={answers.groupComposition}
+                  onSelect={setGroupComposition}
                 />
               )}
               {step === 2 && (
-                <MustHavesStep
+                <BudgetMustHavesStep
+                  budgetBand={answers.budgetBand}
                   mustHaves={answers.mustHaves}
-                  groupSize={answers.groupSize}
-                  includeMembersOnly={answers.includeMembersOnly}
+                  skipVarietals={answers.skipVarietals}
+                  onSetBudget={setBudget}
                   onToggleMustHave={toggleMustHave}
-                  onSetGroupSize={setGroupSize}
-                  onToggleMembersOnly={toggleMembersOnly}
+                  onToggleSkipVarietal={toggleSkipVarietal}
                 />
               )}
               {step === 3 && (
@@ -289,30 +338,33 @@ export default function QuizPage() {
   );
 }
 
-function VarietalsStep({
+function ArchetypeStep({
   selected,
-  onToggle,
+  onSelect,
 }: {
-  selected: Varietal[];
-  onToggle: (v: Varietal) => void;
+  selected: Archetype | null;
+  onSelect: (value: Archetype) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-2.5">
-      {VARIETALS.map((v) => {
-        const active = selected.includes(v.value);
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {ARCHETYPES.map((a) => {
+        const active = selected === a.value;
         return (
           <button
-            key={v.value}
+            key={a.value}
             type="button"
-            onClick={() => onToggle(v.value)}
-            className={`focus-visible:outline-wine flex items-center gap-2 rounded-full px-5 py-3 text-base font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 ${
+            onClick={() => onSelect(a.value)}
+            className={`focus-visible:outline-wine flex flex-col items-start gap-3 rounded-2xl p-6 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 ${
               active
-                ? 'bg-wine text-cream shadow-warm'
-                : 'bg-linen text-bark hover:bg-fog ring-1 ring-black/5'
+                ? 'bg-wine/10 ring-wine ring-2'
+                : 'bg-linen ring-1 ring-black/5 hover:ring-black/10'
             }`}
           >
-            <v.Icon className={`size-5 ${active ? 'text-cream' : 'text-oak'}`} />
-            {v.value}
+            <a.Icon className={`size-6 ${active ? 'text-wine' : 'text-oak'}`} />
+            <div>
+              <p className={`font-medium ${active ? 'text-wine' : 'text-bark'}`}>{a.title}</p>
+              <p className="text-stone mt-1 text-sm">{a.description}</p>
+            </div>
           </button>
         );
       })}
@@ -320,46 +372,57 @@ function VarietalsStep({
   );
 }
 
-function VibeBudgetStep({
-  selectedVibes,
-  budgetBand,
-  onToggleVibe,
-  onSetBudget,
+function GroupCompositionStep({
+  selected,
+  onSelect,
 }: {
-  selectedVibes: Vibe[];
+  selected: GroupComposition | null;
+  onSelect: (value: GroupComposition) => void;
+}) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      {GROUP_COMPOSITIONS.map((g) => {
+        const active = selected === g.value;
+        return (
+          <button
+            key={g.value}
+            type="button"
+            onClick={() => onSelect(g.value)}
+            className={`focus-visible:outline-wine flex items-center gap-4 rounded-2xl p-6 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 ${
+              active
+                ? 'bg-wine/10 ring-wine ring-2'
+                : 'bg-linen ring-1 ring-black/5 hover:ring-black/10'
+            }`}
+          >
+            <g.Icon className={`size-6 shrink-0 ${active ? 'text-wine' : 'text-oak'}`} />
+            <div>
+              <p className={`font-medium ${active ? 'text-wine' : 'text-bark'}`}>{g.title}</p>
+              <p className="text-stone mt-1 text-sm">{g.subtitle}</p>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function BudgetMustHavesStep({
+  budgetBand,
+  mustHaves,
+  skipVarietals,
+  onSetBudget,
+  onToggleMustHave,
+  onToggleSkipVarietal,
+}: {
   budgetBand: BudgetBand | null;
-  onToggleVibe: (v: Vibe) => void;
+  mustHaves: MustHaves;
+  skipVarietals: Varietal[];
   onSetBudget: (b: BudgetBand) => void;
+  onToggleMustHave: (key: keyof MustHaves) => void;
+  onToggleSkipVarietal: (v: Varietal) => void;
 }) {
   return (
     <div className="space-y-14">
-      <div>
-        <h3 className="font-heading text-bark text-xl font-medium">Pick your vibe</h3>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {VIBES.map((v) => {
-            const active = selectedVibes.includes(v.value);
-            return (
-              <button
-                key={v.value}
-                type="button"
-                onClick={() => onToggleVibe(v.value)}
-                className={`focus-visible:outline-wine flex flex-col items-start gap-3 rounded-2xl p-6 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                  active
-                    ? 'bg-wine/10 ring-wine ring-2'
-                    : 'bg-linen ring-1 ring-black/5 hover:ring-black/10'
-                }`}
-              >
-                <v.Icon className={`size-6 ${active ? 'text-wine' : 'text-oak'}`} />
-                <div>
-                  <p className={`font-medium ${active ? 'text-wine' : 'text-bark'}`}>{v.value}</p>
-                  <p className="text-stone mt-1 text-sm">{v.description}</p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       <div>
         <h3 className="font-heading text-bark text-xl font-medium">Set your budget</h3>
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -388,29 +451,9 @@ function VibeBudgetStep({
           })}
         </div>
       </div>
-    </div>
-  );
-}
 
-function MustHavesStep({
-  mustHaves,
-  groupSize,
-  includeMembersOnly,
-  onToggleMustHave,
-  onSetGroupSize,
-  onToggleMembersOnly,
-}: {
-  mustHaves: MustHaves;
-  groupSize: number | null;
-  includeMembersOnly: boolean;
-  onToggleMustHave: (key: keyof MustHaves) => void;
-  onSetGroupSize: (n: number | null) => void;
-  onToggleMembersOnly: () => void;
-}) {
-  return (
-    <div className="space-y-14">
       <div>
-        <h3 className="font-heading text-bark text-xl font-medium">Must-haves</h3>
+        <h3 className="font-heading text-bark text-xl font-medium">Must-haves (optional)</h3>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {MUST_HAVE_OPTIONS.map((opt) => {
             const active = mustHaves[opt.key];
@@ -435,37 +478,30 @@ function MustHavesStep({
         </div>
       </div>
 
-      <div className="grid gap-10 sm:grid-cols-2">
-        <div>
-          <h3 className="font-heading text-bark text-xl font-medium">Group size</h3>
-          <div className="mt-4 flex flex-wrap gap-3">
-            {[null, 2, 4, 6, 8].map((n) => (
+      <div>
+        <h3 className="font-heading text-bark text-xl font-medium">Any dealbreakers? (optional)</h3>
+        <p className="text-stone mt-2 text-sm">
+          Skip wineries that specialize in these varietals.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-2.5">
+          {SKIP_VARIETALS.map((v) => {
+            const active = skipVarietals.includes(v.value);
+            return (
               <button
-                key={n ?? 'any'}
+                key={v.value}
                 type="button"
-                onClick={() => onSetGroupSize(n)}
-                className={`focus-visible:outline-wine flex h-12 min-w-12 items-center justify-center rounded-xl px-4 text-sm font-medium tabular-nums transition-all focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                  groupSize === n
+                onClick={() => onToggleSkipVarietal(v.value)}
+                className={`focus-visible:outline-wine flex items-center gap-2 rounded-full px-5 py-3 text-base font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                  active
                     ? 'bg-wine text-cream shadow-warm'
                     : 'bg-linen text-bark hover:bg-fog ring-1 ring-black/5'
                 }`}
               >
-                {n === null ? 'Any' : `${n}+`}
+                <v.Icon className={`size-5 ${active ? 'text-cream' : 'text-oak'}`} />
+                {v.value}
               </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="font-heading text-bark text-xl font-medium">Members-only</h3>
-          <button
-            type="button"
-            onClick={onToggleMembersOnly}
-            className="mt-4 flex items-center gap-4"
-          >
-            <ToggleSwitch checked={includeMembersOnly} />
-            <span className="text-stone">Include members-only wineries</span>
-          </button>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -532,22 +568,6 @@ function RegionStopsStep({
           ))}
         </div>
       </div>
-    </div>
-  );
-}
-
-function ToggleSwitch({ checked }: { checked: boolean }) {
-  return (
-    <div
-      className={`relative inline-flex w-11 shrink-0 rounded-full p-0.5 transition-colors duration-200 ease-in-out sm:w-9 ${
-        checked ? 'bg-wine' : 'bg-fog'
-      }`}
-    >
-      <span
-        className={`aspect-square w-1/2 rounded-full bg-white shadow-sm ring-1 ring-black/5 transition-transform duration-200 ease-in-out ${
-          checked ? 'translate-x-full' : ''
-        }`}
-      />
     </div>
   );
 }

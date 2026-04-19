@@ -58,8 +58,8 @@ Each selected vibe maps to a weight vector across the 5 style dimensions stored 
 | null (any) | No adjustment                                                                            |
 | 2          | +0.1 bonus to `styleRelaxed`, +0.1 to `styleCelebratory`                                 |
 | 4          | No adjustment                                                                            |
-| 6+         | +0.1 bonus to `styleSocial`; prioritize higher `groupSizeMax`                            |
-| 8+         | +0.2 bonus to `styleSocial`; hard-filter wineries where `groupSizeMax < 8` (unless null) |
+| 6+         | +0.1 bonus to `styleSocial`; prioritize higher `groupCapacity`                            |
+| 8+         | +0.2 bonus to `styleSocial`; hard-filter wineries where `groupCapacity < 8` (unless null) |
 
 ---
 
@@ -100,7 +100,7 @@ Each must-have flag in `QuizAnswers.mustHaves` is a hard filter when `true`:
 | `foodPairing`          | `hasFoodPairing`         |
 | `outdoorSeating`       | `hasOutdoorSeating`      |
 | `dogFriendly`          | `isDogFriendly`          |
-| `kidFriendly`          | `isKidFriendly`          |
+| `kidFriendly`          | `kidWelcome`          |
 | `wheelchairAccessible` | `isWheelchairAccessible` |
 
 **NULL handling:** If the winery field is `null`, the winery **fails** the filter (assume not available).
@@ -119,8 +119,8 @@ The quiz does **not** have an explicit "walk-ins only" hard filter in the curren
 ### 3.7 Group size filter
 
 - **Trigger:** `groupSize >= 8`
-- **Rule:** Exclude wineries where `groupSizeMax` is not null AND `groupSizeMax < groupSize`.
-- **NULL handling:** If `groupSizeMax` is null, the winery passes (assume no limit).
+- **Rule:** Exclude wineries where `groupCapacity` is not null AND `groupCapacity < groupSize`.
+- **NULL handling:** If `groupCapacity` is null, the winery passes (assume no limit).
 
 ---
 
@@ -238,14 +238,14 @@ Each match result includes 2–5 human-readable reasons. Generate them by checki
 | budgetScore > 0.8                             | "Excellent value at {price} per tasting"                  |
 | selectedVarietals matched                     | "Known for {varietal}, one of your favorites"             |
 | isDogFriendly && mustHaves.dogFriendly        | "Dog-friendly — bring your four-legged friend"            |
-| isKidFriendly && mustHaves.kidFriendly        | "Family-friendly with activities for kids"                |
+| kidWelcome && mustHaves.kidFriendly        | "Family-friendly with activities for kids"                |
 | hasViews && mustHaves.views                   | "Stunning views of {region}"                              |
 | hasFoodPairing && mustHaves.foodPairing       | "Offers food pairings with tastings"                      |
 | hasOutdoorSeating && mustHaves.outdoorSeating | "Beautiful outdoor seating area"                          |
 | isWheelchairAccessible                        | "Wheelchair accessible facilities"                        |
 | reservationType === 'walk_ins_welcome'        | "Walk-ins welcome — no reservation needed"                |
 | ratingGoogle ≥ 4.5                            | "Highly rated by visitors ({rating}★)"                    |
-| groupSizeMax ≥ groupSize                      | "Accommodates groups of {groupSize}+"                     |
+| groupCapacity ≥ groupSize                      | "Accommodates groups of {groupSize}+"                     |
 
 **Selection:** Pick the top 3–5 reasons by relevance (prioritize must-have matches, then style, then budget, then ratings).
 

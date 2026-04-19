@@ -1,5 +1,7 @@
 import type { Tables } from './database.types';
 import type {
+  Archetype,
+  ArchetypeScores,
   Flight,
   FlightFormat,
   NoiseLevel,
@@ -11,6 +13,7 @@ import type {
   WeeklyHours,
   WineryForDisplay,
   WineryForMatching,
+  WineryScale,
 } from './types';
 import { AVA_TO_DISPLAY } from './types';
 
@@ -75,6 +78,31 @@ function mapSignatureVarietals(rows: VarietalRow[]): Varietal[] {
     .filter((v): v is Varietal => v != null);
 }
 
+function mapHouseSpecialty(raw: string[] | null | undefined): Varietal[] {
+  if (!raw) return [];
+  return raw.map((key) => VARIETAL_DISPLAY[key]).filter((v): v is Varietal => v != null);
+}
+
+const WINERY_SCALES = new Set<WineryScale>(['boutique', 'family_estate', 'destination']);
+
+function mapWineryScale(raw: string | null | undefined): WineryScale | null {
+  if (!raw) return null;
+  return WINERY_SCALES.has(raw as WineryScale) ? (raw as WineryScale) : null;
+}
+
+const ARCHETYPE_KEYS: Archetype[] = ['explorer', 'collector', 'student', 'socializer', 'romantic'];
+
+function mapArchetypeScores(raw: unknown): ArchetypeScores {
+  if (!raw || typeof raw !== 'object') return {};
+  const obj = raw as Record<string, unknown>;
+  const scores: ArchetypeScores = {};
+  for (const key of ARCHETYPE_KEYS) {
+    const value = obj[key];
+    if (typeof value === 'number' && Number.isFinite(value)) scores[key] = value;
+  }
+  return scores;
+}
+
 function mapParking(row: WineryRow): string {
   if (row.parking_type && row.parking_notes) {
     return `${capitalize(row.parking_type)} — ${row.parking_notes}`;
@@ -122,7 +150,7 @@ export function toWineryForDisplay(
     hours: parseHours(row.hours),
     reservationType: (row.reservation_type ?? 'walk_ins_welcome') as ReservationType,
     bookingUrl: row.reservation_url || row.website_url || '',
-    groupSizeMax: row.max_group_size,
+    groupCapacity: row.group_capacity,
     parking: mapParking(row),
     noiseLevel: (row.noise_level ?? 'moderate') as NoiseLevel,
     varietals: mapVarietals(varietalRows),
@@ -133,11 +161,12 @@ export function toWineryForDisplay(
     averageRating: row.rating_google,
     ratingsCount: row.review_count_total,
     isDogFriendly: row.is_dog_friendly,
-    isKidFriendly: row.is_kid_friendly,
+    kidWelcome: row.kid_welcome,
     isWheelchairAccessible: row.is_wheelchair_accessible,
     hasFoodPairing: row.has_food_pairing,
     hasOutdoorSeating: ((row as Record<string, unknown>).has_outdoor_seating as boolean) ?? false,
     hasViews: row.has_sunset_views,
+    hasPicnic: row.has_picnic_area,
     isMembersOnly: row.is_members_only,
   };
 }
@@ -150,11 +179,14 @@ export function toWinery(
   const display = toWineryForDisplay(row, flightRows, varietalRows);
   return {
     ...display,
+    houseSpecialty: mapHouseSpecialty(row.house_specialty),
     vibes: [],
     styleScores: mapStyleScores(row),
     qualityScore: row.quality_score,
     popularityScore: row.popularity_score,
     ratingGoogle: row.rating_google,
+    wineryScale: mapWineryScale(row.winery_scale),
+    archetypeScores: mapArchetypeScores(row.archetype_scores),
   };
 }
 
@@ -176,16 +208,20 @@ export function toWineryForMatching(
       : null,
     reservationType: (row.reservation_type ?? 'walk_ins_welcome') as ReservationType,
     isMembersOnly: row.is_members_only,
-    groupSizeMax: row.max_group_size,
+    groupCapacity: row.group_capacity,
     varietals: mapVarietals(varietalRows),
+    houseSpecialty: mapHouseSpecialty(row.house_specialty),
     minFlightPrice: minPrice,
     isDogFriendly: row.is_dog_friendly,
-    isKidFriendly: row.is_kid_friendly,
+    kidWelcome: row.kid_welcome,
     isWheelchairAccessible: row.is_wheelchair_accessible,
     hasFoodPairing: row.has_food_pairing,
     hasOutdoorSeating: ((row as Record<string, unknown>).has_outdoor_seating as boolean) ?? false,
     hasViews: row.has_sunset_views,
+    hasPicnic: row.has_picnic_area,
     styleScores: mapStyleScores(row),
+    archetypeScores: mapArchetypeScores(row.archetype_scores),
+    noiseLevel: (row.noise_level ?? 'moderate') as NoiseLevel,
     qualityScore: row.quality_score,
     popularityScore: row.popularity_score,
     ratingGoogle: row.rating_google,

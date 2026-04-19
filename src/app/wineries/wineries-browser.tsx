@@ -88,7 +88,7 @@ export function WineriesBrowser({ wineries }: { wineries: WineryForDisplay[] }) 
       results = results.filter((w) => filters.regions.includes(w.region));
     }
     if (filters.features.dogFriendly) results = results.filter((w) => w.isDogFriendly);
-    if (filters.features.kidFriendly) results = results.filter((w) => w.isKidFriendly);
+    if (filters.features.kidFriendly) results = results.filter((w) => w.kidWelcome);
     if (filters.features.foodPairing) results = results.filter((w) => w.hasFoodPairing);
     if (filters.features.views) results = results.filter((w) => w.hasViews);
     if (filters.features.walkIn)

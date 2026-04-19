@@ -17,20 +17,35 @@ const MUST_HAVE_LABELS: Record<keyof MustHaves, string> = {
   outdoorSeating: 'Outdoor Seating',
   dogFriendly: 'Dog Friendly',
   kidFriendly: 'Kid Friendly',
-  wheelchairAccessible: 'Accessible',
+  picnic: 'Picnic',
+  walkInsWelcome: 'Walk-ins',
+};
+
+const ARCHETYPE_LABELS: Record<NonNullable<QuizAnswers['archetype']>, string> = {
+  explorer: 'Explorer',
+  collector: 'Collector',
+  student: 'Student',
+  socializer: 'Socializer',
+  romantic: 'Romantic',
+};
+
+const GROUP_LABELS: Record<NonNullable<QuizAnswers['groupComposition']>, string> = {
+  solo: 'Solo',
+  couple: 'Couple',
+  small_group: 'Small group',
+  big_group: 'Big group',
 };
 
 function derivePreferenceBadges(answers: QuizAnswers): string[] {
   const badges: string[] = [];
-  answers.selectedVarietals.forEach((v) => badges.push(v));
-  answers.selectedVibes.forEach((v) => badges.push(v));
+  if (answers.archetype) badges.push(ARCHETYPE_LABELS[answers.archetype]);
+  if (answers.groupComposition) badges.push(GROUP_LABELS[answers.groupComposition]);
   if (answers.budgetBand) badges.push(answers.budgetBand);
   answers.preferredRegions.forEach((r) => badges.push(r));
   Object.entries(answers.mustHaves).forEach(([key, val]) => {
     if (val) badges.push(MUST_HAVE_LABELS[key as keyof MustHaves]);
   });
-  if (answers.groupSize) badges.push(`${answers.groupSize}+ guests`);
-  if (answers.includeMembersOnly) badges.push('Members-only OK');
+  answers.skipVarietals.forEach((v) => badges.push(`No ${v}`));
   return badges;
 }
 

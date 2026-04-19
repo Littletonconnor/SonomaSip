@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          last_login_at: string | null
+          password_hash: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_login_at?: string | null
+          password_hash: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_login_at?: string | null
+          password_hash?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
       data_health_checks: {
         Row: {
           check_type: Database["public"]["Enums"]["check_type"]
@@ -284,6 +311,7 @@ export type Database = {
           address_street: string | null
           address_zip: string | null
           annual_cases: number | null
+          archetype_scores: Json
           ava_primary: Database["public"]["Enums"]["ava_region"] | null
           ava_secondary: Database["public"]["Enums"]["ava_region"] | null
           awards: string | null
@@ -297,6 +325,8 @@ export type Database = {
           dog_notes: string | null
           good_for_mix_grand: boolean
           good_for_mix_intimate: boolean
+          google_place_id: string | null
+          group_capacity: number | null
           has_barrel_tasting: boolean
           has_bike_parking: boolean
           has_blending_session: boolean
@@ -309,18 +339,19 @@ export type Database = {
           has_sunset_views: boolean
           has_vineyard_walk: boolean
           hours: Json
+          house_specialty: string[]
           id: string
           is_active: boolean
           is_bike_friendly: boolean
           is_dog_friendly: boolean
           is_hidden_gem: boolean
-          is_kid_friendly: boolean
           is_local_favorite: boolean
           is_members_only: boolean
           is_must_visit: boolean
           is_rideshare_friendly: boolean
           is_wheelchair_accessible: boolean
           kid_activities: string | null
+          kid_welcome: boolean
           large_group_friendly: boolean
           last_places_sync_at: string | null
           last_scraped_at: string | null
@@ -329,7 +360,6 @@ export type Database = {
           latitude: number
           live_music_schedule: string | null
           longitude: number
-          max_group_size: number | null
           name: string
           nearby_wineries: string | null
           nearest_town: string | null
@@ -381,6 +411,7 @@ export type Database = {
           address_street?: string | null
           address_zip?: string | null
           annual_cases?: number | null
+          archetype_scores?: Json
           ava_primary?: Database["public"]["Enums"]["ava_region"] | null
           ava_secondary?: Database["public"]["Enums"]["ava_region"] | null
           awards?: string | null
@@ -394,6 +425,8 @@ export type Database = {
           dog_notes?: string | null
           good_for_mix_grand?: boolean
           good_for_mix_intimate?: boolean
+          google_place_id?: string | null
+          group_capacity?: number | null
           has_barrel_tasting?: boolean
           has_bike_parking?: boolean
           has_blending_session?: boolean
@@ -406,18 +439,19 @@ export type Database = {
           has_sunset_views?: boolean
           has_vineyard_walk?: boolean
           hours?: Json
+          house_specialty?: string[]
           id: string
           is_active?: boolean
           is_bike_friendly?: boolean
           is_dog_friendly?: boolean
           is_hidden_gem?: boolean
-          is_kid_friendly?: boolean
           is_local_favorite?: boolean
           is_members_only?: boolean
           is_must_visit?: boolean
           is_rideshare_friendly?: boolean
           is_wheelchair_accessible?: boolean
           kid_activities?: string | null
+          kid_welcome?: boolean
           large_group_friendly?: boolean
           last_places_sync_at?: string | null
           last_scraped_at?: string | null
@@ -426,7 +460,6 @@ export type Database = {
           latitude: number
           live_music_schedule?: string | null
           longitude: number
-          max_group_size?: number | null
           name: string
           nearby_wineries?: string | null
           nearest_town?: string | null
@@ -478,6 +511,7 @@ export type Database = {
           address_street?: string | null
           address_zip?: string | null
           annual_cases?: number | null
+          archetype_scores?: Json
           ava_primary?: Database["public"]["Enums"]["ava_region"] | null
           ava_secondary?: Database["public"]["Enums"]["ava_region"] | null
           awards?: string | null
@@ -491,6 +525,8 @@ export type Database = {
           dog_notes?: string | null
           good_for_mix_grand?: boolean
           good_for_mix_intimate?: boolean
+          google_place_id?: string | null
+          group_capacity?: number | null
           has_barrel_tasting?: boolean
           has_bike_parking?: boolean
           has_blending_session?: boolean
@@ -503,18 +539,19 @@ export type Database = {
           has_sunset_views?: boolean
           has_vineyard_walk?: boolean
           hours?: Json
+          house_specialty?: string[]
           id?: string
           is_active?: boolean
           is_bike_friendly?: boolean
           is_dog_friendly?: boolean
           is_hidden_gem?: boolean
-          is_kid_friendly?: boolean
           is_local_favorite?: boolean
           is_members_only?: boolean
           is_must_visit?: boolean
           is_rideshare_friendly?: boolean
           is_wheelchair_accessible?: boolean
           kid_activities?: string | null
+          kid_welcome?: boolean
           large_group_friendly?: boolean
           last_places_sync_at?: string | null
           last_scraped_at?: string | null
@@ -523,7 +560,6 @@ export type Database = {
           latitude?: number
           live_music_schedule?: string | null
           longitude?: number
-          max_group_size?: number | null
           name?: string
           nearby_wineries?: string | null
           nearest_town?: string | null
