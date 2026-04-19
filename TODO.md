@@ -369,6 +369,35 @@ When sharing the home page, the OG preview looks good. But sharing a plan page (
   - `/results` — `robots: { index: false }` and shows session-local data, so shared links aren't meaningful anyway. Inherits root OG for the rare case someone does share. ✓
   - Manual validation with Facebook Sharing Debugger / Twitter Card Validator confirmed against the deployed URL. ✓
 
+### OG Image Redesign (Professional Visual Treatment)
+
+The current OG images (`src/app/opengraph-image.tsx`, `src/app/wineries/[slug]/opengraph-image.tsx`, `src/app/plan/[id]/opengraph-image.tsx`) ship, but they look generic and unprofessional — a flat maroon gradient with a monochrome wine-glass SVG and `Georgia, serif` body text. They don't match the homepage's editorial feel (vineyard photography + Cormorant Garamond heading + warm Sonoma palette). When someone pastes a `sonomasip.com` link into iMessage / Slack / Twitter, the preview card is our top-of-funnel ad — it should look curated, not templated.
+
+**Goal:** redesign all three OG images so they feel like a polished magazine cover — warm vineyard imagery, the site's real heading font (Cormorant Garamond), and the Sonoma palette tokens (`--wine`, `--bark`, `--oak`, `--gold`, `--fog`).
+
+**Design direction:**
+
+- **Photography.** Use a real wine/vineyard photo as the backdrop — pull from `public/hero/` (`grapes-vine.jpg`, `vineyard-rolling.jpg`, `vineyard-rows.jpg`, `wine-tasting.jpg`) so it matches the homepage hero collage. Apply a dark gradient overlay (bark → transparent, left-to-right or bottom-up) so foreground text stays legible across any photo. Consider a subtle warm duotone so all three images feel like one set.
+- **Typography.** Swap `Georgia, serif` for **Cormorant Garamond** (the site's `font-heading`). `ImageResponse` supports custom fonts via the `fonts` option — load the TTF/WOFF2 from a Google Fonts CDN or self-host it in `public/fonts/` and `fetch()` it inside the route. Use Inter (or a clean sans) for the subhead/metadata line so the pairing mirrors the site.
+- **Layout.** Move away from centered-stack-of-text. Go editorial: title bottom-left, subhead below it, a small "Sonoma Sip" wordmark top-left, and a thin hairline divider in `--gold` or `--oak`. Leave the right third of the image for photography to breathe.
+- **Palette.** Drop the pure maroon gradient for the site's actual tokens (sampled from `src/app/globals.css`): deep bark `#2A1810`-ish for text, wine `#722F37` as the brand accent, gold `#B8935A` for the hairline, fog `#F7F2EC` for body text on dark overlays. Don't introduce new colors — use what's already in the design system.
+
+**Per-route content:**
+
+- **Root (`src/app/opengraph-image.tsx`)** — "Sonoma Sip" wordmark + "Your personalized guide to Sonoma County wineries" + the "Take the Quiz · Get Matched · Plan Your Day" rail, but laid out over a vineyard photo instead of floating on a gradient.
+- **Winery (`src/app/wineries/[slug]/opengraph-image.tsx`)** — keep the existing data (name, region + city, tagline, price range, signature varietals) but re-style to match. The winery name should be the hero element set in Cormorant Garamond, not buried in a column of chips.
+- **Plan (`src/app/plan/[id]/opengraph-image.tsx`)** — plan title as hero, number of stops + region summary as the subhead, winery names as the supporting rail. Consider a small itinerary ribbon ("Stop 1 · Stop 2 · Stop 3") in the gold hairline style.
+
+**Plan:**
+
+- [ ] **Sketch variants with `/ui` + the ui-picker workflow** before coding. This is visual/brand work — generate 3–4 layout directions (photo-left, photo-bleed, photo-right with text card, full-bleed with bottom gradient) and let the user pick.
+- [ ] **Load Cormorant Garamond inside `ImageResponse`.** Either fetch the TTF from Google Fonts at build-time or commit the font file to `public/fonts/`. Pass it via `fonts: [{ name, data, style, weight }]` to `ImageResponse`. Test render locally via `/opengraph-image` — font loading silently falls back to system fonts when it fails, so always eyeball the output PNG.
+- [ ] **Wire up a hero photo.** `@vercel/og` can render `<img>` with absolute URLs or base64 data. Easiest path: reference `https://${VERCEL_URL}/hero/grapes-vine.jpg` in prod, fall back to a localhost URL in dev (check how other OG routes read the origin — there may already be a helper). Watch out for CORS and image size — keep the source under ~1 MB or Next will complain about cold-start time.
+- [ ] **Rebuild the root OG image** (`src/app/opengraph-image.tsx`) first — it's the template for the other two. Land + eyeball on the deployed preview URL via Facebook Sharing Debugger.
+- [ ] **Port the new treatment** to `src/app/wineries/[slug]/opengraph-image.tsx` and `src/app/plan/[id]/opengraph-image.tsx`, preserving each route's dynamic data but sharing the layout / typography / palette primitives. Consider extracting a shared `OgShell` helper so the three routes don't drift.
+- [ ] **Re-validate** with Facebook Sharing Debugger + Twitter Card Validator + iMessage preview on a real device (iMessage caches aggressively — append a cache-bust query like `?v=2` when testing).
+- [ ] **Consider a shared caption or tagline** across all three so the set reads as one brand ("Sonoma Sip · Personalized winery itineraries" in small caps along the bottom).
+
 ---
 
 ## Data Integrity & Content Updates
