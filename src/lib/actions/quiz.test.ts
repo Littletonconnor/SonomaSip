@@ -1,23 +1,25 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import type { QuizAnswers, WineryForMatching, Winery } from '../types';
+import type { MustHaves, QuizAnswers, WineryForMatching, Winery } from '../types';
+
+const NO_MUST_HAVES: MustHaves = {
+  views: false,
+  foodPairing: false,
+  outdoorSeating: false,
+  dogFriendly: false,
+  kidFriendly: false,
+  picnic: false,
+  walkInsWelcome: false,
+};
 
 function makeAnswers(overrides: Partial<QuizAnswers> = {}): QuizAnswers {
   return {
-    selectedVarietals: ['Pinot Noir'],
-    selectedVibes: ['Relaxed & Scenic'],
+    archetype: 'romantic',
+    groupComposition: 'couple',
     budgetBand: '$$',
-    mustHaves: {
-      views: false,
-      foodPairing: false,
-      outdoorSeating: false,
-      dogFriendly: false,
-      kidFriendly: false,
-      wheelchairAccessible: false,
-    },
+    mustHaves: NO_MUST_HAVES,
+    skipVarietals: [],
     preferredRegions: [],
     numStops: 3,
-    includeMembersOnly: false,
-    groupSize: null,
     ...overrides,
   };
 }
@@ -30,15 +32,17 @@ function makeWineryForMatching(overrides: Partial<WineryForMatching> = {}): Wine
     regionSecondary: null,
     reservationType: 'reservations_recommended',
     isMembersOnly: false,
-    groupSizeMax: null,
+    groupCapacity: null,
     varietals: ['Pinot Noir'],
+    houseSpecialty: [],
     minFlightPrice: 40,
     isDogFriendly: true,
-    isKidFriendly: false,
+    kidWelcome: false,
     isWheelchairAccessible: true,
     hasFoodPairing: true,
     hasOutdoorSeating: true,
     hasViews: true,
+    hasPicnic: false,
     styleScores: {
       styleRelaxed: 4,
       styleAdventurous: 2,
@@ -46,6 +50,8 @@ function makeWineryForMatching(overrides: Partial<WineryForMatching> = {}): Wine
       styleCelebratory: 2,
       styleSocial: 3,
     },
+    archetypeScores: {},
+    noiseLevel: 'moderate',
     qualityScore: 4,
     popularityScore: 3,
     ratingGoogle: 4.5,
@@ -76,10 +82,11 @@ function makeWinery(overrides: Partial<Winery> = {}): Winery {
     },
     reservationType: 'reservations_recommended',
     bookingUrl: 'https://example.com/book',
-    groupSizeMax: 12,
+    groupCapacity: 12,
     parking: 'Lot — Free parking',
     varietals: ['Pinot Noir'],
     signatureVarietals: ['Pinot Noir'],
+    houseSpecialty: [],
     vibes: [],
     noiseLevel: 'moderate',
     styleScores: {
@@ -93,17 +100,20 @@ function makeWinery(overrides: Partial<Winery> = {}): Winery {
     maxFlightPrice: 60,
     flights: [],
     isDogFriendly: true,
-    isKidFriendly: false,
+    kidWelcome: false,
     isWheelchairAccessible: true,
     hasFoodPairing: true,
     hasOutdoorSeating: true,
     hasViews: true,
+    hasPicnic: false,
     isMembersOnly: false,
     averageRating: 4.5,
     ratingsCount: 200,
     qualityScore: 4,
     popularityScore: 3,
     ratingGoogle: 4.5,
+    wineryScale: null,
+    archetypeScores: {},
     ...overrides,
   };
 }
@@ -167,7 +177,7 @@ describe('submitQuiz server action', () => {
 
     const { submitQuiz } = await import('./quiz');
     const answers = makeAnswers({
-      selectedVarietals: ['Chardonnay'],
+      skipVarietals: [],
       budgetBand: '$',
     });
     const results = await submitQuiz(answers);

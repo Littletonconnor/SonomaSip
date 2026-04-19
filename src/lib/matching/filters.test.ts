@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import type { QuizAnswers, WineryForMatching } from '../types';
+import type { MustHaves, QuizAnswers, WineryForMatching } from '../types';
 import { applyHardFilters, getBudgetCeiling } from './filters';
+
+const NO_MUST_HAVES: MustHaves = {
+  views: false,
+  foodPairing: false,
+  outdoorSeating: false,
+  dogFriendly: false,
+  kidFriendly: false,
+  picnic: false,
+  walkInsWelcome: false,
+};
 
 function makeWinery(overrides: Partial<WineryForMatching> = {}): WineryForMatching {
   return {
@@ -10,15 +20,17 @@ function makeWinery(overrides: Partial<WineryForMatching> = {}): WineryForMatchi
     regionSecondary: null,
     reservationType: 'walk_ins_welcome',
     isMembersOnly: false,
-    groupSizeMax: null,
+    groupCapacity: null,
     varietals: ['Pinot Noir', 'Chardonnay'],
+    houseSpecialty: [],
     minFlightPrice: 40,
     isDogFriendly: true,
-    isKidFriendly: true,
+    kidWelcome: true,
     isWheelchairAccessible: false,
     hasFoodPairing: true,
     hasOutdoorSeating: true,
     hasViews: true,
+    hasPicnic: false,
     styleScores: {
       styleRelaxed: 4,
       styleAdventurous: 2,
@@ -26,6 +38,8 @@ function makeWinery(overrides: Partial<WineryForMatching> = {}): WineryForMatchi
       styleCelebratory: 2,
       styleSocial: 3,
     },
+    archetypeScores: {},
+    noiseLevel: 'moderate',
     qualityScore: 4,
     popularityScore: 3,
     ratingGoogle: 4.5,
@@ -35,21 +49,13 @@ function makeWinery(overrides: Partial<WineryForMatching> = {}): WineryForMatchi
 
 function makeAnswers(overrides: Partial<QuizAnswers> = {}): QuizAnswers {
   return {
-    selectedVarietals: [],
-    selectedVibes: [],
+    archetype: null,
+    groupComposition: null,
     budgetBand: null,
-    mustHaves: {
-      views: false,
-      foodPairing: false,
-      outdoorSeating: false,
-      dogFriendly: false,
-      kidFriendly: false,
-      wheelchairAccessible: false,
-    },
+    mustHaves: NO_MUST_HAVES,
+    skipVarietals: [],
     preferredRegions: [],
     numStops: 3,
-    includeMembersOnly: false,
-    groupSize: null,
     ...overrides,
   };
 }
@@ -74,27 +80,27 @@ describe('applyHardFilters', () => {
     expect(result).toHaveLength(2);
   });
 
-  describe('varietal filter', () => {
-    it('keeps wineries with matching varietal', () => {
+  describe('dealbreaker filter', () => {
+    it('excludes wineries whose house_specialty intersects skipVarietals', () => {
       const result = applyHardFilters(
-        [makeWinery({ varietals: ['Pinot Noir'] })],
-        makeAnswers({ selectedVarietals: ['Pinot Noir'] }),
-      );
-      expect(result).toHaveLength(1);
-    });
-
-    it('removes wineries with no matching varietal', () => {
-      const result = applyHardFilters(
-        [makeWinery({ varietals: ['Zinfandel'] })],
-        makeAnswers({ selectedVarietals: ['Pinot Noir'] }),
+        [makeWinery({ houseSpecialty: ['Zinfandel'] })],
+        makeAnswers({ skipVarietals: ['Zinfandel'] }),
       );
       expect(result).toHaveLength(0);
     });
 
-    it('uses OR logic — any match passes', () => {
+    it('keeps wineries whose house_specialty does not intersect skipVarietals', () => {
       const result = applyHardFilters(
-        [makeWinery({ varietals: ['Zinfandel', 'Merlot'] })],
-        makeAnswers({ selectedVarietals: ['Pinot Noir', 'Merlot'] }),
+        [makeWinery({ houseSpecialty: ['Pinot Noir'] })],
+        makeAnswers({ skipVarietals: ['Zinfandel'] }),
+      );
+      expect(result).toHaveLength(1);
+    });
+
+    it('does not consult winery.varietals — only houseSpecialty', () => {
+      const result = applyHardFilters(
+        [makeWinery({ houseSpecialty: [], varietals: ['Zinfandel'] })],
+        makeAnswers({ skipVarietals: ['Zinfandel'] }),
       );
       expect(result).toHaveLength(1);
     });
@@ -152,35 +158,11 @@ describe('applyHardFilters', () => {
     });
   });
 
-  describe('members-only filter', () => {
-    it('excludes members-only wineries by default', () => {
-      const result = applyHardFilters([makeWinery({ isMembersOnly: true })], makeAnswers());
-      expect(result).toHaveLength(0);
-    });
-
-    it('includes members-only wineries when opted in', () => {
-      const result = applyHardFilters(
-        [makeWinery({ isMembersOnly: true })],
-        makeAnswers({ includeMembersOnly: true }),
-      );
-      expect(result).toHaveLength(1);
-    });
-  });
-
   describe('must-have filters', () => {
-    it('removes wineries missing required must-haves', () => {
+    it('removes wineries missing a required must-have', () => {
       const result = applyHardFilters(
-        [makeWinery({ isWheelchairAccessible: false })],
-        makeAnswers({
-          mustHaves: {
-            views: false,
-            foodPairing: false,
-            outdoorSeating: false,
-            dogFriendly: false,
-            kidFriendly: false,
-            wheelchairAccessible: true,
-          },
-        }),
+        [makeWinery({ hasPicnic: false })],
+        makeAnswers({ mustHaves: { ...NO_MUST_HAVES, picnic: true } }),
       );
       expect(result).toHaveLength(0);
     });
@@ -188,77 +170,75 @@ describe('applyHardFilters', () => {
     it('keeps wineries that have all required must-haves', () => {
       const result = applyHardFilters(
         [makeWinery({ hasViews: true, hasFoodPairing: true })],
-        makeAnswers({
-          mustHaves: {
-            views: true,
-            foodPairing: true,
-            outdoorSeating: false,
-            dogFriendly: false,
-            kidFriendly: false,
-            wheelchairAccessible: false,
-          },
-        }),
+        makeAnswers({ mustHaves: { ...NO_MUST_HAVES, views: true, foodPairing: true } }),
       );
       expect(result).toHaveLength(1);
     });
+
+    it('walkInsWelcome checks reservationType', () => {
+      const excluded = applyHardFilters(
+        [makeWinery({ reservationType: 'reservations_recommended' })],
+        makeAnswers({ mustHaves: { ...NO_MUST_HAVES, walkInsWelcome: true } }),
+      );
+      expect(excluded).toHaveLength(0);
+
+      const included = applyHardFilters(
+        [makeWinery({ reservationType: 'walk_ins_welcome' })],
+        makeAnswers({ mustHaves: { ...NO_MUST_HAVES, walkInsWelcome: true } }),
+      );
+      expect(included).toHaveLength(1);
+    });
   });
 
-  describe('group size filter', () => {
-    it('excludes wineries with low groupSizeMax when group is 8+', () => {
+  describe('group composition filter', () => {
+    it('excludes wineries with capacity < 6 for big_group', () => {
       const result = applyHardFilters(
-        [makeWinery({ groupSizeMax: 6 })],
-        makeAnswers({ groupSize: 8 }),
+        [makeWinery({ groupCapacity: 4 })],
+        makeAnswers({ groupComposition: 'big_group' }),
       );
       expect(result).toHaveLength(0);
     });
 
-    it('passes wineries with null groupSizeMax (no limit)', () => {
+    it('passes wineries with null capacity (unknown)', () => {
       const result = applyHardFilters(
-        [makeWinery({ groupSizeMax: null })],
-        makeAnswers({ groupSize: 10 }),
+        [makeWinery({ groupCapacity: null })],
+        makeAnswers({ groupComposition: 'big_group' }),
       );
       expect(result).toHaveLength(1);
     });
 
-    it('does not filter when group < 8', () => {
+    it('solo always passes regardless of capacity', () => {
       const result = applyHardFilters(
-        [makeWinery({ groupSizeMax: 4 })],
-        makeAnswers({ groupSize: 6 }),
+        [makeWinery({ groupCapacity: 2 })],
+        makeAnswers({ groupComposition: 'solo' }),
       );
       expect(result).toHaveLength(1);
+    });
+
+    it('couple requires capacity >= 2', () => {
+      const result = applyHardFilters(
+        [makeWinery({ groupCapacity: 1 })],
+        makeAnswers({ groupComposition: 'couple' }),
+      );
+      expect(result).toHaveLength(0);
     });
   });
 
   describe('combined filters', () => {
     it('applies all filters together', () => {
       const wineries = [
-        makeWinery({
-          id: 'a',
-          varietals: ['Pinot Noir'],
-          minFlightPrice: 30,
-          region: 'Russian River Valley',
-        }),
+        makeWinery({ id: 'a', minFlightPrice: 30, region: 'Russian River Valley' }),
         makeWinery({
           id: 'b',
-          varietals: ['Zinfandel'],
+          houseSpecialty: ['Zinfandel'],
           minFlightPrice: 30,
           region: 'Russian River Valley',
         }),
-        makeWinery({
-          id: 'c',
-          varietals: ['Pinot Noir'],
-          minFlightPrice: 80,
-          region: 'Russian River Valley',
-        }),
-        makeWinery({
-          id: 'd',
-          varietals: ['Pinot Noir'],
-          minFlightPrice: 30,
-          region: 'Dry Creek Valley',
-        }),
+        makeWinery({ id: 'c', minFlightPrice: 80, region: 'Russian River Valley' }),
+        makeWinery({ id: 'd', minFlightPrice: 30, region: 'Dry Creek Valley' }),
       ];
       const answers = makeAnswers({
-        selectedVarietals: ['Pinot Noir'],
+        skipVarietals: ['Zinfandel'],
         budgetBand: '$$',
         preferredRegions: ['Russian River Valley'],
       });

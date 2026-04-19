@@ -6,6 +6,102 @@
 
 ---
 
+## Quiz Spec v1.0 — Archetype Redesign (source: `docs/sonoma-sip-quiz-spec.md`)
+
+The quiz is being re-architected around **archetype (ranking) + hard filters (group / budget / must-haves / dealbreakers / region)**. The current quiz uses `Vibe` multi-select + `Varietal` multi-select, which is being replaced. Keep ranking signal and filtering signal cleanly separated in code so each can be tuned independently.
+
+**Architectural guardrail:** archetype → ranking only. Must-haves / budget / dealbreakers / regions → filtering only. **Number of stops → output constraint only** (determines itinerary length; never affects filter or rank). Do not let these three categories bleed into each other — mirror the split in `src/lib/matching/filters.ts` (filtering), `src/lib/matching/score.ts` (ranking), and `src/lib/matching/orchestrator.ts` or a downstream itinerary builder (stop count).
+
+**Existing hard filters to preserve:** `min_flight_price` (budget), `has_views`, `has_food_pairing`, `is_dog_friendly`, `has_outdoor_seating`, `reservation_type = walk_ins_welcome`, `ava_primary` / `ava_secondary`. The rewrite does not remove any of these — it only adds `group_capacity`, `kid_welcome`, `house_specialty`-based dealbreakers, and (new) a `picnic_friendly` field.
+
+### 1. Data model additions (phone — migration + types)
+
+New fields on `wineries` to back the rewritten matcher. Do this first — UI and matcher both depend on it.
+
+- [x] **Migration: add `archetype_scores`** — `jsonb not null default '{}'::jsonb` on `wineries`. Shape `{ explorer, collector, student, socializer, romantic }` each 0-10. Matcher treats missing keys as 0. (`20260419000001_add_archetype_scores.sql`)
+- [x] **Rename `max_group_size` → `group_capacity`** — kept existing `smallint` type (functionally identical to `integer` for group sizes; avoids table rewrite). Updated 13 app files. (`20260419000002_rename_max_group_size_to_group_capacity.sql`)
+- [x] **Migration: add `house_specialty`** — `text[] not null default '{}'` (reusing the existing `text`-backed varietal convention from `winery_varietals`; no Postgres enum). 1-3 cap enforced in admin UI. (`20260419000003_add_house_specialty.sql`)
+- [ ] **Admin UI hint — editorial rule for `house_specialty`** — surface this rule on the edit form next to the field so editors apply it consistently: _"A winery is a [varietal] house if that varietal is 40%+ of production OR is what they're regionally known for."_ Cap the field at 3 values in the UI. Without this, `house_specialty` will drift toward "every varietal they pour" and break the dealbreaker filter.
+- [x] **Rename `is_kid_friendly` → `kid_welcome`** — flipped default to `true`. Existing 68 rows kept their prior `false` values; backfill script flipped all to `true`. Updated 15 app files (kept `mustHaves.kidFriendly` user-preference field untouched). (`20260419000004_rename_is_kid_friendly_to_kid_welcome.sql`)
+- [x] **`winery_scale` — no migration needed.** The column already exists as `text` on `wineries` (original table). Added `WineryScale` union (`boutique | family_estate | destination`) in `types.ts`, mapped through `Winery` in `mappers.ts`.
+- [x] **Regenerate types** — ran `pnpm db:gen-types`; `src/lib/database.types.ts` reflects all new columns. Mapper surfaces `archetype_scores` (read path TBD), `houseSpecialty`, `groupCapacity`, `kidWelcome`, `wineryScale` on `Winery` / `WineryForMatching` as appropriate.
+- [x] **Backfill for the 68 editorial wineries** — `scripts/backfill-archetype-scores.ts` populates `archetype_scores` (heuristic from style_* / quality_score / is_members_only / settings), `house_specialty` (from `winery_varietals` signature rows, fallback to first 3), `kid_welcome` (true unless 21+ keywords in `tasting_room_vibe`/`accessibility_notes`), `winery_scale` (by `annual_cases` bands + Ridge Lytton Springs override → `family_estate`). Ran successfully against prod: 68/68 updated. Distribution: 5 boutique / 41 family_estate / 22 destination. Refine editorially via admin UI.
+
+### 2. Quiz rewrite (mixed — phone for logic, desktop for `/ui` variants)
+
+Replace the current 4-step flow. Step state lives in `src/app/quiz/page.tsx` and `src/hooks/use-session-storage.ts`; `QuizAnswers` lives in `src/lib/types.ts`.
+
+- [x] **Rewrote `QuizAnswers`** — dropped `selectedVarietals`, `selectedVibes`, `mustHaves.wheelchairAccessible`, `includeMembersOnly`, `groupSize`; added `archetype`, `groupComposition`, `skipVarietals`. New enums live in `types.ts`. `MustHaves` gained `picnic` + `walkInsWelcome`, lost `wheelchairAccessible`.
+- [x] **Step 1 — archetype** — 5-card single-select with Compass/BookOpen/GraduationCap/PartyPopper/Heart icons. Intro copy: _"This helps us match the experience to you."_
+- [x] **Step 2 — group composition** — 4-card single-select with UserIcon/Users/UsersRound icons. Intro copy: _"So we can match group size, noise level, and vibe."_
+- [x] **Step 3 — budget + must-haves + dealbreakers** — one screen, three sections. Budget 4 tiers; must-haves 7 options (added picnic via `has_picnic_area`, added walk-ins via `reservation_type='walk_ins_welcome'`); dealbreakers as inline chip list. Dealbreakers not collapsed-by-default — deferred as a minor UX polish.
+- [x] **Step 4 — regions + stops** — kept 5-AVA list + stops. Expandable sub-AVA dropdown deferred (UX nice-to-have).
+- [ ] **Expand `AvaRegion` enum + `AVA_TO_DISPLAY`** for sub-AVAs (Knights Valley, Moon Mountain District, Fountaingrove District, Pine Mountain-Cloverdale Peak, West Sonoma Coast) — deferred with the expandable dropdown above.
+
+### 3. Matching engine rewrite (phone) ✅
+
+`src/lib/matching/` now runs archetype-first ranking + explicit hard filter layer.
+
+- [x] **`filters.ts`** — group composition filter (solo/couple/small/big → min capacities 0/2/5/6), new must-haves filter (adds picnic + walkInsWelcome, drops wheelchair), `passesDealbreakerFilter` reads `houseSpecialty` only (never `winery_varietals`), budget + region unchanged. Dropped `passesMembersOnlyFilter` — `includeMembersOnly` no longer exists.
+- [x] **`score.ts`** — `scoreArchetype` = `archetypeScores[userArchetype] / 10`. Kept budget + experience + rating scoring; added `scoreGroupFit` (noise level preference: quiet for solo/couple, moderate for small, lively for big). Weights: 40 archetype / 20 budget / 20 experience / 15 rating / 5 groupFit. Removed `computeUserWeights` and vibe logic.
+- [x] **`explain.ts`** — archetype-based reasons ("A Collector's pick — library releases + winemaker chats"). Added picnic + walk-ins reasons. Drop wheelchair + varietal-overlap reasons.
+- [x] **Golden fixtures refresh** — `__fixtures__/quiz-profiles.ts` rewrites all 7 profiles to new shape. Snapshots regenerated (`pnpm test:golden -u`).
+- [x] **Archetype differentiation test** — added to `matching/index.test.ts`: asserts Explorer picks `hidden-gem` (archetype_scores.explorer=10) while Student picks `classroom` (archetype_scores.student=10).
+
+### 4. Winery detail page changes (mixed)
+
+`src/app/wineries/[slug]/page.tsx`. Intent: only high-signal fields that help a user decide to visit. Cut filler, add trust signals.
+
+- [ ] **Remove parking** from the detail page. The `parking` field on `Winery` can stay in the DB for now; just don't render it.
+- [ ] **Remove noise level** from the detail page rendering. Keep the column in DB (used internally by matcher tie-break). Do not surface.
+- [ ] **Remove "Tasting experiences" block** as currently rendered — only lists one, goes stale. Replace with a plain "View tasting menu →" link out to the winery's own URL, or drop entirely until we have a sustainable refresh mechanism.
+- [ ] **Remove "Nearby Wineries" section** at the bottom of the page. The recently-added haversine-based version is inaccurate enough (and not the site's focus) that it's net-negative. Delete the component + its imports; keep `src/lib/geo.ts` — it'll be useful for the itinerary map.
+- [ ] **Remove the Wheelchair accessible tag** from the amenities list. Replaced by a site-wide disclaimer (see Accessibility).
+- [ ] **Add review source attribution** — when the star rating renders, show "4.7 (1,000 Google reviews)" or similar instead of a bare star. Without attribution users may think Sonoma Sip is rating wineries itself (credibility + liability risk). Reads from `rating_google` / `review_count_total`.
+- [ ] **Add per-winery map** (lower priority) — small Mapbox map on the detail page showing the winery's location in AVA context. Lift the existing `SonomaMap` into a reusable component or use a lighter static Mapbox image for the detail page. Defer if effort > a few hours.
+- [ ] **Keep** price range, group size, reservation policy, tagline, Book a Tasting CTA, disclaimer line. These are working.
+
+### 5. Accessibility policy (phone — copy only)
+
+Wheelchair-accessible was removed as a user-facing filter because the data can't be maintained reliably across 68 wineries, many of which are in historic barns. A boolean tag without verified data was appearing on every card and eroding credibility.
+
+- [ ] **Delete wheelchair from `MustHaves` type, quiz UI, filter logic, and winery detail amenities.**
+- [ ] **Add site-wide accessibility note** — short copy block in the footer and FAQ: _"For accessibility information, please contact wineries directly before visiting — accommodations vary by location."_ (Exact copy per spec §3b.)
+
+### 6. Homepage copy update (phone)
+
+`src/app/page.tsx:123`.
+
+- [ ] **Replace subhead** "Curated wineries · Every Sonoma AVA region · Personalized matching · Always free" with **"Personalized itineraries · Maps & printable guides · Across Sonoma County · Independent & free"**. Rationale in spec §Homepage copy: leads with deliverable, surfaces print/share/email value, doesn't overclaim AVA coverage, reframes "free" as editorial integrity.
+- [ ] **Fix copy inconsistency** — quiz Step 2 intro currently says "Choose the mood and set your budget" while cards say "Pick your vibe." Standardize on **"vibe"** throughout. (Will naturally land when the quiz rewrite above replaces that step anyway — but if the rewrite ships in phases, fix the string first.)
+
+### 7. Deferred: Winery Scale (data only in v1)
+
+Per spec §Deferred: don't add a fifth quiz question for this — 80% of users would answer "no preference." Handle as an algorithmic variety rule in v2 (or a card tag in v1.5), not a filter.
+
+- [ ] **Migration adds `winery_scale` column** — covered in §1 above.
+- [ ] **Backfill all 68 wineries** with editorial judgment calls. Editorial note: Ridge Lytton Springs is large-scale in production but feels like a family estate on-site — that's the editorial call. Consistency across the collection matters more than perfect objective accuracy.
+- [ ] **Path #1 for launch — display as a tag** on winery cards and the detail page ("Boutique · Dry Creek Valley"). No algorithm changes.
+- [ ] **Revisit path #2 (opt-in toggle) or #3 (silent anti-redundancy rule) in v2** based on how users interact with the itinerary (do they swap stops? do they regenerate?).
+
+### 8. Pre-launch testing (spec §Testing priorities)
+
+- [ ] **Watch 3–5 real users take the quiz without coaching.** Note which archetype labels cause hesitation — that's where copy needs work.
+- [ ] **Sanity-check archetype differentiation** — if Explorer and Student get the same top 5, archetype isn't doing real work. (Golden test covers this; also verify qualitatively.)
+- [ ] **Dealbreaker edge case test** — user selects "skip Zinfandel" + "Dry Creek Valley" should still get results (just not Zin-specialist houses). Automate as a fixture test.
+- [ ] **"No preference" on regions** — should return matches across all AVAs, ranked purely by archetype + must-haves fit.
+
+### Rollout order (recommended)
+
+1. Migration + type regen + mapper updates (§1) — unblocks everything else.
+2. Backfill editorial data for the 68 wineries (§1).
+3. Matcher rewrite (§3) behind a feature flag / alternate entrypoint so the current quiz keeps working.
+4. Quiz UI rewrite (§2) + cut detail-page fields (§4) + homepage copy (§6) + accessibility note (§5) — ship together; they're interdependent copy-wise.
+5. Winery scale tags (§7) — lowest priority; ship after everything else lands.
+6. User testing (§8) before public launch.
+
+---
+
 ## Next Up (quick wins — phone-friendly)
 
 Pick these off one at a time. Each is scoped to 1-2 file touches and should be doable in under 15 minutes.

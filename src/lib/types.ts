@@ -47,6 +47,14 @@ export type AvaRegion =
 
 export type Setting = 'vineyard' | 'estate' | 'downtown' | 'hilltop' | 'cave';
 
+export type WineryScale = 'boutique' | 'family_estate' | 'destination';
+
+export type Archetype = 'explorer' | 'collector' | 'student' | 'socializer' | 'romantic';
+
+export type GroupComposition = 'solo' | 'couple' | 'small_group' | 'big_group';
+
+export type ArchetypeScores = Partial<Record<Archetype, number>>;
+
 /**
  * Display-friendly region name. Derived from AVA_TO_DISPLAY values.
  * Use AvaRegion for DB/filtering; use Region for UI display.
@@ -162,10 +170,11 @@ export type Winery = {
   hours: WeeklyHours;
   reservationType: ReservationType;
   bookingUrl: string;
-  groupSizeMax: number | null;
+  groupCapacity: number | null;
   parking: string;
   varietals: Varietal[];
   signatureVarietals: Varietal[];
+  houseSpecialty: Varietal[];
   vibes: Vibe[];
   noiseLevel: NoiseLevel;
   styleScores: StyleScores;
@@ -173,17 +182,20 @@ export type Winery = {
   maxFlightPrice: number;
   flights: Flight[];
   isDogFriendly: boolean;
-  isKidFriendly: boolean;
+  kidWelcome: boolean;
   isWheelchairAccessible: boolean;
   hasFoodPairing: boolean;
   hasOutdoorSeating: boolean;
   hasViews: boolean;
+  hasPicnic: boolean;
   isMembersOnly: boolean;
   averageRating: number | null;
   ratingsCount: number | null;
   qualityScore: number | null;
   popularityScore: number | null;
   ratingGoogle: number | null;
+  wineryScale: WineryScale | null;
+  archetypeScores: ArchetypeScores;
 };
 
 // ---------------------------------------------------------------------------
@@ -196,18 +208,18 @@ export type MustHaves = {
   outdoorSeating: boolean;
   dogFriendly: boolean;
   kidFriendly: boolean;
-  wheelchairAccessible: boolean;
+  picnic: boolean;
+  walkInsWelcome: boolean;
 };
 
 export type QuizAnswers = {
-  selectedVarietals: Varietal[];
-  selectedVibes: Vibe[];
+  archetype: Archetype | null;
+  groupComposition: GroupComposition | null;
   budgetBand: BudgetBand | null;
   mustHaves: MustHaves;
+  skipVarietals: Varietal[];
   preferredRegions: Region[];
   numStops: number;
-  includeMembersOnly: boolean;
-  groupSize: number | null;
 };
 
 export type MatchResult = {
@@ -230,20 +242,24 @@ export type WineryForMatching = {
   regionSecondary: Region | null;
   reservationType: ReservationType;
   isMembersOnly: boolean;
-  groupSizeMax: number | null;
+  groupCapacity: number | null;
 
   varietals: Varietal[];
+  houseSpecialty: Varietal[];
 
   minFlightPrice: number | null;
 
   isDogFriendly: boolean;
-  isKidFriendly: boolean;
+  kidWelcome: boolean;
   isWheelchairAccessible: boolean;
   hasFoodPairing: boolean;
   hasOutdoorSeating: boolean;
   hasViews: boolean;
+  hasPicnic: boolean;
 
   styleScores: StyleScores;
+  archetypeScores: ArchetypeScores;
+  noiseLevel: NoiseLevel;
 
   qualityScore: number | null;
   popularityScore: number | null;
@@ -268,7 +284,7 @@ export type WineryForDisplay = {
   hours: WeeklyHours;
   reservationType: ReservationType;
   bookingUrl: string;
-  groupSizeMax: number | null;
+  groupCapacity: number | null;
   parking: string;
   noiseLevel: NoiseLevel;
   varietals: Varietal[];
@@ -280,11 +296,12 @@ export type WineryForDisplay = {
   ratingsCount: number | null;
 
   isDogFriendly: boolean;
-  isKidFriendly: boolean;
+  kidWelcome: boolean;
   isWheelchairAccessible: boolean;
   hasFoodPairing: boolean;
   hasOutdoorSeating: boolean;
   hasViews: boolean;
+  hasPicnic: boolean;
   isMembersOnly: boolean;
 };
 

@@ -14,11 +14,11 @@ function validateQuizAnswers(answers: unknown): asserts answers is QuizAnswers {
 
   const a = answers as Record<string, unknown>;
 
-  if (!Array.isArray(a.selectedVarietals)) {
-    throw new Error('Invalid quiz answers: selectedVarietals must be an array');
+  if (!Array.isArray(a.skipVarietals)) {
+    throw new Error('Invalid quiz answers: skipVarietals must be an array');
   }
-  if (!Array.isArray(a.selectedVibes)) {
-    throw new Error('Invalid quiz answers: selectedVibes must be an array');
+  if (!Array.isArray(a.preferredRegions)) {
+    throw new Error('Invalid quiz answers: preferredRegions must be an array');
   }
   if (typeof a.numStops !== 'number' || a.numStops < 1) {
     throw new Error('Invalid quiz answers: numStops must be a positive number');

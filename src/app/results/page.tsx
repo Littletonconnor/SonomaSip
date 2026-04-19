@@ -16,8 +16,8 @@ import type { MapItem } from '@/components/map/types';
 import type { QuizAnswers, MatchResult, MustHaves } from '@/lib/types';
 
 const defaultAnswers: QuizAnswers = {
-  selectedVarietals: [],
-  selectedVibes: [],
+  archetype: null,
+  groupComposition: null,
   budgetBand: null,
   mustHaves: {
     views: false,
@@ -25,12 +25,12 @@ const defaultAnswers: QuizAnswers = {
     outdoorSeating: false,
     dogFriendly: false,
     kidFriendly: false,
-    wheelchairAccessible: false,
+    picnic: false,
+    walkInsWelcome: false,
   },
+  skipVarietals: [],
   preferredRegions: [],
   numStops: 3,
-  includeMembersOnly: false,
-  groupSize: null,
 };
 
 const MUST_HAVE_LABELS: Record<keyof MustHaves, string> = {
@@ -39,7 +39,23 @@ const MUST_HAVE_LABELS: Record<keyof MustHaves, string> = {
   outdoorSeating: 'Outdoor',
   dogFriendly: 'Dogs',
   kidFriendly: 'Kids',
-  wheelchairAccessible: 'Accessible',
+  picnic: 'Picnic',
+  walkInsWelcome: 'Walk-ins',
+};
+
+const ARCHETYPE_LABELS: Record<NonNullable<QuizAnswers['archetype']>, string> = {
+  explorer: 'Explorer',
+  collector: 'Collector',
+  student: 'Student',
+  socializer: 'Socializer',
+  romantic: 'Romantic',
+};
+
+const GROUP_LABELS: Record<NonNullable<QuizAnswers['groupComposition']>, string> = {
+  solo: 'Solo',
+  couple: 'Couple',
+  small_group: 'Small group',
+  big_group: 'Big group',
 };
 
 export default function ResultsPage() {
@@ -64,9 +80,10 @@ export default function ResultsPage() {
   const hasAnswers = useMemo(() => {
     if (!hydrated) return false;
     return (
-      answers.selectedVarietals.length > 0 ||
-      answers.selectedVibes.length > 0 ||
+      answers.archetype !== null ||
+      answers.groupComposition !== null ||
       answers.budgetBand !== null ||
+      answers.skipVarietals.length > 0 ||
       answers.preferredRegions.length > 0 ||
       Object.values(answers.mustHaves).some(Boolean)
     );
@@ -74,15 +91,14 @@ export default function ResultsPage() {
 
   const preferenceBadges = useMemo(() => {
     const badges: string[] = [];
-    answers.selectedVarietals.forEach((v) => badges.push(v));
-    answers.selectedVibes.forEach((v) => badges.push(v));
+    if (answers.archetype) badges.push(ARCHETYPE_LABELS[answers.archetype]);
+    if (answers.groupComposition) badges.push(GROUP_LABELS[answers.groupComposition]);
     if (answers.budgetBand) badges.push(answers.budgetBand);
     answers.preferredRegions.forEach((r) => badges.push(r));
     Object.entries(answers.mustHaves).forEach(([key, val]) => {
       if (val) badges.push(MUST_HAVE_LABELS[key as keyof MustHaves]);
     });
-    if (answers.groupSize) badges.push(`${answers.groupSize}+ guests`);
-    if (answers.includeMembersOnly) badges.push('Members-only OK');
+    answers.skipVarietals.forEach((v) => badges.push(`No ${v}`));
     return badges;
   }, [answers]);
 
@@ -283,7 +299,7 @@ function ResultCard({
   if (winery.reservationType === 'appointment_only') featureBadges.push('Appointment');
   if (winery.isMembersOnly) featureBadges.push('Members Only');
   if (winery.isDogFriendly) featureBadges.push('Dog Friendly');
-  if (winery.isKidFriendly) featureBadges.push('Kid Friendly');
+  if (winery.kidWelcome) featureBadges.push('Kid Friendly');
   if (winery.hasFoodPairing) featureBadges.push('Food Pairing');
   if (winery.hasViews) featureBadges.push('Views');
 
@@ -454,11 +470,9 @@ function getEmptyStateTips(answers: QuizAnswers): string[] {
     const label = MUST_HAVE_LABELS[activeMustHaves[0][0] as keyof MustHaves];
     tips.push(`Try removing a must-have like "${label}"`);
   }
-  if (answers.selectedVarietals.length > 3) tips.push('Try selecting fewer grape varietals');
+  if (answers.skipVarietals.length > 0) tips.push('Try clearing your dealbreakers');
   if (answers.budgetBand === '$') tips.push('Expanding your budget range opens up more options');
   if (answers.preferredRegions.length >= 3) tips.push('Consider exploring all Sonoma regions');
-  if (tips.length === 0 && !answers.includeMembersOnly)
-    tips.push('Including members-only wineries can reveal hidden gems');
   if (tips.length === 0) tips.push('Try selecting fewer filters to see more wineries');
   return tips.slice(0, 3);
 }

@@ -165,7 +165,7 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
       ...(winery.isDogFriendly
         ? [{ '@type': 'LocationFeatureSpecification', name: 'Dog-friendly', value: true }]
         : []),
-      ...(winery.isKidFriendly
+      ...(winery.kidWelcome
         ? [{ '@type': 'LocationFeatureSpecification', name: 'Kid-friendly', value: true }]
         : []),
       ...(winery.isWheelchairAccessible
@@ -188,7 +188,7 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
     {
       icon: Users,
       label: 'Group size',
-      value: winery.groupSizeMax ? `Up to ${winery.groupSizeMax}` : 'No limit',
+      value: winery.groupCapacity ? `Up to ${winery.groupCapacity}` : 'No limit',
     },
     {
       icon: Volume2,
@@ -209,7 +209,7 @@ export default async function WineryDetailPage({ params }: { params: Promise<{ s
 
   const amenities = [
     { icon: Dog, label: 'Dog-friendly', active: winery.isDogFriendly },
-    { icon: Baby, label: 'Kid-friendly', active: winery.isKidFriendly },
+    { icon: Baby, label: 'Kid-friendly', active: winery.kidWelcome },
     { icon: Accessibility, label: 'Wheelchair accessible', active: winery.isWheelchairAccessible },
     { icon: UtensilsCrossed, label: 'Food pairing', active: winery.hasFoodPairing },
     { icon: TreePine, label: 'Outdoor seating', active: winery.hasOutdoorSeating },

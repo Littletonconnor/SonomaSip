@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import type { QuizAnswers, Winery, WineryForMatching } from '../types';
+import type { MustHaves, QuizAnswers, Winery, WineryForMatching } from '../types';
 import { recommend } from './index';
+
+const NO_MUST_HAVES: MustHaves = {
+  views: false,
+  foodPairing: false,
+  outdoorSeating: false,
+  dogFriendly: false,
+  kidFriendly: false,
+  picnic: false,
+  walkInsWelcome: false,
+};
 
 function makeWinery(id: string, overrides: Partial<WineryForMatching> = {}): WineryForMatching {
   return {
@@ -10,15 +20,17 @@ function makeWinery(id: string, overrides: Partial<WineryForMatching> = {}): Win
     regionSecondary: null,
     reservationType: 'walk_ins_welcome',
     isMembersOnly: false,
-    groupSizeMax: null,
+    groupCapacity: null,
     varietals: ['Pinot Noir', 'Chardonnay'],
+    houseSpecialty: [],
     minFlightPrice: 40,
     isDogFriendly: true,
-    isKidFriendly: true,
+    kidWelcome: true,
     isWheelchairAccessible: false,
     hasFoodPairing: true,
     hasOutdoorSeating: true,
     hasViews: true,
+    hasPicnic: false,
     styleScores: {
       styleRelaxed: 4,
       styleAdventurous: 2,
@@ -26,6 +38,8 @@ function makeWinery(id: string, overrides: Partial<WineryForMatching> = {}): Win
       styleCelebratory: 2,
       styleSocial: 3,
     },
+    archetypeScores: { explorer: 5, collector: 5, student: 5, socializer: 5, romantic: 5 },
+    noiseLevel: 'moderate',
     qualityScore: 4,
     popularityScore: 3,
     ratingGoogle: 4.5,
@@ -56,10 +70,11 @@ function makeFullWinery(id: string, region = 'Russian River Valley'): Winery {
     },
     reservationType: 'walk_ins_welcome',
     bookingUrl: '',
-    groupSizeMax: null,
+    groupCapacity: null,
     parking: '',
     varietals: ['Pinot Noir'],
     signatureVarietals: ['Pinot Noir'],
+    houseSpecialty: [],
     vibes: [],
     noiseLevel: 'moderate',
     styleScores: {
@@ -73,37 +88,32 @@ function makeFullWinery(id: string, region = 'Russian River Valley'): Winery {
     maxFlightPrice: 80,
     flights: [],
     isDogFriendly: true,
-    isKidFriendly: true,
+    kidWelcome: true,
     isWheelchairAccessible: false,
     hasFoodPairing: true,
     hasOutdoorSeating: true,
     hasViews: true,
+    hasPicnic: false,
     isMembersOnly: false,
     averageRating: 4.5,
     ratingsCount: 100,
     qualityScore: 4,
     popularityScore: 3,
     ratingGoogle: 4.5,
+    wineryScale: null,
+    archetypeScores: { explorer: 5, collector: 5, student: 5, socializer: 5, romantic: 5 },
   };
 }
 
 function makeAnswers(overrides: Partial<QuizAnswers> = {}): QuizAnswers {
   return {
-    selectedVarietals: [],
-    selectedVibes: [],
+    archetype: null,
+    groupComposition: null,
     budgetBand: null,
-    mustHaves: {
-      views: false,
-      foodPairing: false,
-      outdoorSeating: false,
-      dogFriendly: false,
-      kidFriendly: false,
-      wheelchairAccessible: false,
-    },
+    mustHaves: NO_MUST_HAVES,
+    skipVarietals: [],
     preferredRegions: [],
     numStops: 3,
-    includeMembersOnly: false,
-    groupSize: null,
     ...overrides,
   };
 }
@@ -134,7 +144,7 @@ describe('recommend', () => {
   it('produces deterministic results for same input', () => {
     const wineries = ['a', 'b', 'c', 'd', 'e'].map((id) => makeWinery(id));
     const lookup = buildLookup(wineries);
-    const answers = makeAnswers({ selectedVibes: ['Relaxed & Scenic'] });
+    const answers = makeAnswers({ archetype: 'romantic' });
 
     const run1 = recommend(wineries, answers, lookup);
     const run2 = recommend(wineries, answers, lookup);
@@ -144,19 +154,13 @@ describe('recommend', () => {
   it('scores are monotonically non-increasing', () => {
     const wineries = Array.from({ length: 10 }, (_, i) =>
       makeWinery(`w${i}`, {
-        styleScores: {
-          styleRelaxed: (i % 5) + 1,
-          styleAdventurous: 3,
-          styleEducational: 3,
-          styleCelebratory: 3,
-          styleSocial: 3,
-        },
+        archetypeScores: { explorer: (i % 5) * 2 + 1 },
       }),
     );
     const lookup = buildLookup(wineries);
     const results = recommend(
       wineries,
-      makeAnswers({ selectedVibes: ['Relaxed & Scenic'], numStops: 10 }),
+      makeAnswers({ archetype: 'explorer', numStops: 10 }),
       lookup,
     );
 
@@ -166,11 +170,11 @@ describe('recommend', () => {
   });
 
   it('includes match reasons', () => {
-    const wineries = [makeWinery('a')];
+    const wineries = [makeWinery('a', { archetypeScores: { romantic: 10 } })];
     const lookup = buildLookup(wineries);
     const results = recommend(
       wineries,
-      makeAnswers({ selectedVibes: ['Relaxed & Scenic'] }),
+      makeAnswers({ archetype: 'romantic' }),
       lookup,
     );
     expect(results[0].matchReasons.length).toBeGreaterThan(0);
@@ -214,11 +218,31 @@ describe('recommend', () => {
     expect(results).toHaveLength(2);
   });
 
-  it('relaxes filters when strict filtering returns no results', () => {
-    const wineries = [makeWinery('a', { varietals: ['Syrah'] })];
+  it('relaxes dealbreaker filter when strict filtering returns no results', () => {
+    const wineries = [makeWinery('a', { houseSpecialty: ['Zinfandel'] })];
     const lookup = buildLookup(wineries);
-    const results = recommend(wineries, makeAnswers({ selectedVarietals: ['Pinot Noir'] }), lookup);
+    const results = recommend(
+      wineries,
+      makeAnswers({ skipVarietals: ['Zinfandel'] }),
+      lookup,
+    );
     expect(results).toHaveLength(1);
-    expect(results[0].filtersRelaxed).toContain('varietal');
+    expect(results[0].filtersRelaxed).toContain('dealbreaker');
+  });
+
+  it('Explorer vs Student return different top-ranked wineries', () => {
+    const wineries = [
+      makeWinery('hidden-gem', {
+        archetypeScores: { explorer: 10, student: 2 },
+      }),
+      makeWinery('classroom', {
+        archetypeScores: { explorer: 2, student: 10 },
+      }),
+    ];
+    const lookup = buildLookup(wineries);
+    const explorerResults = recommend(wineries, makeAnswers({ archetype: 'explorer' }), lookup);
+    const studentResults = recommend(wineries, makeAnswers({ archetype: 'student' }), lookup);
+    expect(explorerResults[0].winery.id).toBe('hidden-gem');
+    expect(studentResults[0].winery.id).toBe('classroom');
   });
 });

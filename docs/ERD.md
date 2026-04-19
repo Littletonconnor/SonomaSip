@@ -36,7 +36,7 @@ erDiagram
         boolean has_food_pairing
         boolean has_outdoor_seating
         boolean is_dog_friendly
-        boolean is_kid_friendly
+        boolean kid_welcome
         boolean is_wheelchair_accessible
         boolean has_views
         numeric rating_google "1-5"

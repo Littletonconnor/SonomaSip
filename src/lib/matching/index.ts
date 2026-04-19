@@ -1,7 +1,7 @@
 import type { MatchResult, QuizAnswers, Winery, WineryForMatching } from '../types';
 import { applyFiltersWithRelaxation } from './filters';
 import { generateReasons } from './explain';
-import { computeUserWeights, scoreWinery } from './score';
+import { scoreWinery } from './score';
 
 type ScoredEntry = {
   winery: WineryForMatching;
@@ -72,11 +72,10 @@ export function recommend(
   const topN = options.topN ?? answers.numStops;
 
   const { filtered, relaxed } = applyFiltersWithRelaxation(wineries, answers, topN);
-  const userWeights = computeUserWeights(answers);
 
   const scored: ScoredEntry[] = filtered.map((w) => {
-    const breakdown = scoreWinery(w, answers, userWeights);
-    const reasons = generateReasons(w, answers, breakdown, userWeights);
+    const breakdown = scoreWinery(w, answers);
+    const reasons = generateReasons(w, answers, breakdown);
     return { winery: w, score: breakdown.total, reasons };
   });
 

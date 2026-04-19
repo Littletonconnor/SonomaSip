@@ -1,4 +1,9 @@
-import type { BudgetBand, QuizAnswers, WineryForMatching } from '../types';
+import type {
+  BudgetBand,
+  GroupComposition,
+  QuizAnswers,
+  WineryForMatching,
+} from '../types';
 
 const BUDGET_CEILING: Record<Exclude<BudgetBand, '$$$$'>, number> = {
   $: 35,
@@ -11,9 +16,22 @@ export function getBudgetCeiling(band: BudgetBand | null): number | null {
   return BUDGET_CEILING[band];
 }
 
-function passesVarietalFilter(winery: WineryForMatching, answers: QuizAnswers): boolean {
-  if (answers.selectedVarietals.length === 0) return true;
-  return answers.selectedVarietals.some((v) => winery.varietals.includes(v));
+const GROUP_MIN_CAPACITY: Record<GroupComposition, number> = {
+  solo: 0,
+  couple: 2,
+  small_group: 5,
+  big_group: 6,
+};
+
+function passesGroupCompositionFilter(
+  winery: WineryForMatching,
+  answers: QuizAnswers,
+): boolean {
+  if (!answers.groupComposition) return true;
+  const required = GROUP_MIN_CAPACITY[answers.groupComposition];
+  if (required === 0) return true;
+  if (winery.groupCapacity === null) return true;
+  return winery.groupCapacity >= required;
 }
 
 function passesBudgetFilter(winery: WineryForMatching, answers: QuizAnswers): boolean {
@@ -28,30 +46,28 @@ function passesRegionFilter(winery: WineryForMatching, answers: QuizAnswers): bo
   return answers.preferredRegions.some((r) => winery.region === r || winery.regionSecondary === r);
 }
 
-function passesMembersOnlyFilter(winery: WineryForMatching, answers: QuizAnswers): boolean {
-  if (!winery.isMembersOnly) return true;
-  return answers.includeMembersOnly;
-}
-
 function passesMustHavesFilter(winery: WineryForMatching, answers: QuizAnswers): boolean {
   const checks: [boolean, boolean][] = [
     [answers.mustHaves.views, winery.hasViews],
     [answers.mustHaves.foodPairing, winery.hasFoodPairing],
     [answers.mustHaves.outdoorSeating, winery.hasOutdoorSeating],
     [answers.mustHaves.dogFriendly, winery.isDogFriendly],
-    [answers.mustHaves.kidFriendly, winery.isKidFriendly],
-    [answers.mustHaves.wheelchairAccessible, winery.isWheelchairAccessible],
+    [answers.mustHaves.kidFriendly, winery.kidWelcome],
+    [answers.mustHaves.picnic, winery.hasPicnic],
+    [answers.mustHaves.walkInsWelcome, winery.reservationType === 'walk_ins_welcome'],
   ];
   return checks.every(([required, has]) => !required || has);
 }
 
-function passesGroupSizeFilter(winery: WineryForMatching, answers: QuizAnswers): boolean {
-  if (answers.groupSize === null || answers.groupSize < 8) return true;
-  if (winery.groupSizeMax === null) return true;
-  return winery.groupSizeMax >= answers.groupSize;
+function passesDealbreakerFilter(
+  winery: WineryForMatching,
+  answers: QuizAnswers,
+): boolean {
+  if (answers.skipVarietals.length === 0) return true;
+  return !answers.skipVarietals.some((v) => winery.houseSpecialty.includes(v));
 }
 
-export type FilterName = 'region' | 'mustHaves' | 'budget' | 'varietal';
+export type FilterName = 'region' | 'mustHaves' | 'budget' | 'dealbreaker';
 
 type NamedFilter = {
   name: FilterName;
@@ -62,10 +78,10 @@ const RELAXABLE_FILTERS: NamedFilter[] = [
   { name: 'region', fn: passesRegionFilter },
   { name: 'mustHaves', fn: passesMustHavesFilter },
   { name: 'budget', fn: passesBudgetFilter },
-  { name: 'varietal', fn: passesVarietalFilter },
+  { name: 'dealbreaker', fn: passesDealbreakerFilter },
 ];
 
-const ALWAYS_APPLIED = [passesMembersOnlyFilter, passesGroupSizeFilter];
+const ALWAYS_APPLIED = [passesGroupCompositionFilter];
 
 export function applyHardFilters(
   wineries: WineryForMatching[],
