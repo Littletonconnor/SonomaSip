@@ -65,8 +65,8 @@ Replace the current 4-step flow. Step state lives in `src/app/quiz/page.tsx` and
 
 `src/app/page.tsx:123`.
 
-- [ ] **Replace subhead** "Curated wineries · Every Sonoma AVA region · Personalized matching · Always free" with **"Personalized itineraries · Maps & printable guides · Across Sonoma County · Independent & free"**. Rationale in spec §Homepage copy: leads with deliverable, surfaces print/share/email value, doesn't overclaim AVA coverage, reframes "free" as editorial integrity.
-- [ ] **Fix copy inconsistency** — quiz Step 2 intro currently says "Choose the mood and set your budget" while cards say "Pick your vibe." Standardize on **"vibe"** throughout. (Will naturally land when the quiz rewrite above replaces that step anyway — but if the rewrite ships in phases, fix the string first.)
+- [x] **Replace subhead** — new copy is live at `src/app/page.tsx:124` ("Personalized itineraries · Maps & printable guides · Across Sonoma County · Independent & free").
+- [x] **Fix copy inconsistency** — resolved by the §2 quiz rewrite: Step 2 is now group composition ("So we can match group size, noise level, and vibe") and no longer uses the conflicting "mood"/"vibe" copy.
 
 ### 7. Deferred: Winery Scale (data only in v1)
 
@@ -390,13 +390,13 @@ The current OG images (`src/app/opengraph-image.tsx`, `src/app/wineries/[slug]/o
 
 **Plan:**
 
-- [ ] **Sketch variants with `/ui` + the ui-picker workflow** before coding. This is visual/brand work — generate 3–4 layout directions (photo-left, photo-bleed, photo-right with text card, full-bleed with bottom gradient) and let the user pick.
-- [ ] **Load Cormorant Garamond inside `ImageResponse`.** Either fetch the TTF from Google Fonts at build-time or commit the font file to `public/fonts/`. Pass it via `fonts: [{ name, data, style, weight }]` to `ImageResponse`. Test render locally via `/opengraph-image` — font loading silently falls back to system fonts when it fails, so always eyeball the output PNG.
-- [ ] **Wire up a hero photo.** `@vercel/og` can render `<img>` with absolute URLs or base64 data. Easiest path: reference `https://${VERCEL_URL}/hero/grapes-vine.jpg` in prod, fall back to a localhost URL in dev (check how other OG routes read the origin — there may already be a helper). Watch out for CORS and image size — keep the source under ~1 MB or Next will complain about cold-start time.
-- [ ] **Rebuild the root OG image** (`src/app/opengraph-image.tsx`) first — it's the template for the other two. Land + eyeball on the deployed preview URL via Facebook Sharing Debugger.
-- [ ] **Port the new treatment** to `src/app/wineries/[slug]/opengraph-image.tsx` and `src/app/plan/[id]/opengraph-image.tsx`, preserving each route's dynamic data but sharing the layout / typography / palette primitives. Consider extracting a shared `OgShell` helper so the three routes don't drift.
-- [ ] **Re-validate** with Facebook Sharing Debugger + Twitter Card Validator + iMessage preview on a real device (iMessage caches aggressively — append a cache-bust query like `?v=2` when testing).
-- [ ] **Consider a shared caption or tagline** across all three so the set reads as one brand ("Sonoma Sip · Personalized winery itineraries" in small caps along the bottom).
+- [~] **Sketch variants with `/ui` + the ui-picker workflow** — skipped for speed; landed a single "photo-bleed left-gradient editorial" direction. Revisit if the deployed result doesn't land — variants would be the next iteration.
+- [x] **Load Cormorant Garamond inside `ImageResponse`.** Shared helper at `src/lib/og/assets.ts` fetches Cormorant Garamond (500/600/700) + Inter (400/500) from Google Fonts via the CSS → TTF URL trick, caches the `ArrayBuffer` at module scope, and passes the result to `ImageResponse` via the `fonts` option on all three routes.
+- [x] **Wire up a hero photo.** `loadHeroDataUrl()` in `src/lib/og/assets.ts` reads `public/hero/*.jpg` from disk via `fs.readFileSync` (Node runtime default for opengraph-image in Next 16) and returns a base64 data URL — no network dep on `VERCEL_URL`, no CORS. Root uses `vineyard-rolling`, winery uses `grapes-vine`, plan uses `wine-tasting`.
+- [x] **Rebuild the root OG image** (`src/app/opengraph-image.tsx`). Full-bleed photo, `linear-gradient(95deg, bark 0% → transparent 100%)` overlay, gold hairline + Inter uppercase eyebrow ("Sonoma County Winery Guide"), Cormorant Garamond 600/104px headline, Inter subhead, Inter all-caps rail.
+- [x] **Port the new treatment** to `src/app/wineries/[slug]/opengraph-image.tsx` and `src/app/plan/[id]/opengraph-image.tsx`. Palette, fonts, wordmark, and gradient shell are shared via `src/lib/og/assets.ts` (palette + font/photo loaders). Each route ships its own content: winery eyebrow is `region · city`, plan eyebrow is "Your Sonoma Itinerary" with a chip rail of stop ranks + winery names. Winery headline size auto-scales (72/86/100px) with name length.
+- [ ] **Re-validate** with Facebook Sharing Debugger + Twitter Card Validator + iMessage preview on a real device (iMessage caches aggressively — append a cache-bust query like `?v=2` when testing). Couldn't verify locally in this sandbox (no Supabase envs to boot dev) — needs eyeballing on a Vercel preview deploy.
+- [x] **Shared caption / set consistency** — all three share the gold hairline wordmark top-left, uppercase Inter eyebrow, Cormorant Garamond headline, gold hairline divider, and pill rail. They read as one brand without needing a repeated tagline.
 
 ---
 
