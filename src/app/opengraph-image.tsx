@@ -1,93 +1,152 @@
 import { ImageResponse } from 'next/og';
+import { loadHeroDataUrl, loadOgFonts, OG_CONTENT_TYPE, OG_SIZE, PALETTE } from '@/lib/og/assets';
 
 export const alt = 'Sonoma Sip — Your Personalized Sonoma County Winery Guide';
-export const size = { width: 1200, height: 630 };
-export const contentType = 'image/png';
+export const size = OG_SIZE;
+export const contentType = OG_CONTENT_TYPE;
 
-export default function OGImage() {
+export default async function OGImage() {
+  const [hero, fonts] = await Promise.all([
+    Promise.resolve(loadHeroDataUrl('vineyard-rolling')),
+    loadOgFonts(),
+  ]);
+
   return new ImageResponse(
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #2D1A1E 0%, #722F37 40%, #4A1C22 100%)',
-        fontFamily: 'Georgia, serif',
-      }}
-    >
+    (
       <div
         style={{
+          width: '100%',
+          height: '100%',
           display: 'flex',
-          alignItems: 'center',
-          gap: '16px',
-          marginBottom: '32px',
+          position: 'relative',
+          background: PALETTE.barkDeep,
+          fontFamily: 'Inter',
         }}
       >
-        <svg
-          width="56"
-          height="56"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+        <img
+          src={hero}
+          alt=""
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(95deg, rgba(26,15,10,0.94) 0%, rgba(42,24,16,0.82) 42%, rgba(42,24,16,0.45) 78%, rgba(42,24,16,0.25) 100%)',
+          }}
+        />
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            padding: '64px 80px',
+            display: 'flex',
+            flexDirection: 'column',
+            color: PALETTE.cream,
+          }}
         >
-          <path d="M8 2h8l1 7c0 3.5-2.5 6-5 6s-5-2.5-5-6l1-7z" fill="rgba(255,255,255,0.85)" />
-          <path
-            d="M12 15v5"
-            stroke="rgba(255,255,255,0.85)"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <path d="M8 22h8" stroke="rgba(255,255,255,0.85)" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-      </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ width: 32, height: 1, background: PALETTE.gold }} />
+            <span
+              style={{
+                fontFamily: 'Inter',
+                fontWeight: 500,
+                fontSize: 18,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: PALETTE.goldLight,
+              }}
+            >
+              Sonoma Sip
+            </span>
+          </div>
 
-      <div
-        style={{
-          fontSize: 64,
-          fontWeight: 700,
-          color: '#F7F2EC',
-          letterSpacing: '-0.02em',
-          lineHeight: 1.1,
-          textAlign: 'center',
-          maxWidth: '900px',
-        }}
-      >
-        Sonoma Sip
-      </div>
+          <div style={{ flex: 1 }} />
 
-      <div
-        style={{
-          fontSize: 28,
-          color: 'rgba(247, 242, 236, 0.7)',
-          marginTop: '20px',
-          textAlign: 'center',
-          maxWidth: '700px',
-          lineHeight: 1.4,
-        }}
-      >
-        Your personalized guide to Sonoma County wineries
-      </div>
+          <span
+            style={{
+              fontFamily: 'Inter',
+              fontWeight: 500,
+              fontSize: 18,
+              letterSpacing: '0.24em',
+              textTransform: 'uppercase',
+              color: PALETTE.goldLight,
+              marginBottom: 24,
+            }}
+          >
+            Sonoma County Winery Guide
+          </span>
 
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '32px',
-          marginTop: '48px',
-          fontSize: 18,
-          color: 'rgba(247, 242, 236, 0.5)',
-        }}
-      >
-        <span>Take the Quiz</span>
-        <span style={{ color: 'rgba(247, 242, 236, 0.25)' }}>·</span>
-        <span>Get Matched</span>
-        <span style={{ color: 'rgba(247, 242, 236, 0.25)' }}>·</span>
-        <span>Plan Your Day</span>
+          <div
+            style={{
+              fontFamily: 'Cormorant Garamond',
+              fontWeight: 600,
+              fontSize: 104,
+              lineHeight: 1.0,
+              letterSpacing: '-0.02em',
+              color: PALETTE.cream,
+              maxWidth: 900,
+            }}
+          >
+            Plan your Sonoma wine day.
+          </div>
+
+          <div style={{ width: 72, height: 1, background: PALETTE.gold, marginTop: 32 }} />
+
+          <div
+            style={{
+              fontFamily: 'Inter',
+              fontWeight: 400,
+              fontSize: 26,
+              lineHeight: 1.4,
+              color: 'rgba(247, 242, 236, 0.82)',
+              marginTop: 28,
+              maxWidth: 780,
+            }}
+          >
+            A personalized itinerary from curated wineries — matched to your taste, budget, and
+            group.
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 44 }}>
+            {['Take the Quiz', 'Get Matched', 'Plan Your Day'].map((label, i) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                {i > 0 && (
+                  <span
+                    style={{
+                      fontSize: 18,
+                      color: 'rgba(196, 164, 105, 0.55)',
+                    }}
+                  >
+                    ·
+                  </span>
+                )}
+                <span
+                  style={{
+                    fontFamily: 'Inter',
+                    fontWeight: 500,
+                    fontSize: 18,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(247, 242, 236, 0.82)',
+                  }}
+                >
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>,
-    { ...size },
+    ),
+    { ...size, fonts },
   );
 }

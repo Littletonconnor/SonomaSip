@@ -1,118 +1,193 @@
 import { ImageResponse } from 'next/og';
 import { getPlan } from '@/lib/plan';
+import { loadHeroDataUrl, loadOgFonts, OG_CONTENT_TYPE, OG_SIZE, PALETTE } from '@/lib/og/assets';
 
 export const alt = 'Sonoma Sip — Wine Day Itinerary';
-export const size = { width: 1200, height: 630 };
-export const contentType = 'image/png';
+export const size = OG_SIZE;
+export const contentType = OG_CONTENT_TYPE;
 
 export default async function OGImage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const plan = await getPlan(id);
-  const stops = plan?.results.slice(0, 5) ?? [];
+  const stops = plan?.results.slice(0, 4) ?? [];
+  const stopCount = plan?.results.length ?? 0;
+
+  const regions = Array.from(new Set(stops.map((r) => r.winery.region)));
+  const regionSummary =
+    regions.length === 0
+      ? 'A curated Sonoma County wine day'
+      : regions.length === 1
+        ? `${stopCount} stops across ${regions[0]}`
+        : `${stopCount} stops across ${regions.slice(0, 2).join(' & ')}${regions.length > 2 ? ' + more' : ''}`;
+
+  const [hero, fonts] = await Promise.all([
+    Promise.resolve(loadHeroDataUrl('wine-tasting')),
+    loadOgFonts(),
+  ]);
 
   return new ImageResponse(
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        background: 'linear-gradient(135deg, #2D1A1E 0%, #722F37 40%, #4A1C22 100%)',
-        fontFamily: 'Georgia, serif',
-        padding: '60px 80px',
-      }}
-    >
+    (
       <div
         style={{
+          width: '100%',
+          height: '100%',
           display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
+          position: 'relative',
+          background: PALETTE.barkDeep,
+          fontFamily: 'Inter',
         }}
       >
-        <svg
-          width="32"
-          height="32"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M8 2h8l1 7c0 3.5-2.5 6-5 6s-5-2.5-5-6l1-7z" fill="rgba(255,255,255,0.7)" />
-          <path d="M12 15v5" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" />
-          <path d="M8 22h8" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-        <span style={{ fontSize: 20, color: 'rgba(247, 242, 236, 0.6)' }}>Sonoma Sip</span>
-      </div>
-
-      <div
-        style={{
-          fontSize: 48,
-          fontWeight: 700,
-          color: '#F7F2EC',
-          letterSpacing: '-0.02em',
-          lineHeight: 1.15,
-          marginTop: '32px',
-        }}
-      >
-        Wine Day Itinerary
-      </div>
-
-      <div
-        style={{
-          fontSize: 22,
-          color: 'rgba(247, 242, 236, 0.55)',
-          marginTop: '12px',
-        }}
-      >
-        {stops.length > 0
-          ? `${stops.length} curated stops in Sonoma County`
-          : 'A curated Sonoma County wine day'}
-      </div>
-
-      {stops.length > 0 && (
+        <img
+          src={hero}
+          alt=""
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
         <div
           style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(95deg, rgba(26,15,10,0.94) 0%, rgba(42,24,16,0.85) 48%, rgba(42,24,16,0.45) 85%, rgba(42,24,16,0.25) 100%)',
+          }}
+        />
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            padding: '64px 80px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px',
-            marginTop: '40px',
+            color: PALETTE.cream,
           }}
         >
-          {stops.map((r, i) => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ width: 32, height: 1, background: PALETTE.gold }} />
+            <span
+              style={{
+                fontFamily: 'Inter',
+                fontWeight: 500,
+                fontSize: 18,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: PALETTE.goldLight,
+              }}
+            >
+              Sonoma Sip
+            </span>
+          </div>
+
+          <div style={{ flex: 1 }} />
+
+          <span
+            style={{
+              fontFamily: 'Inter',
+              fontWeight: 500,
+              fontSize: 18,
+              letterSpacing: '0.24em',
+              textTransform: 'uppercase',
+              color: PALETTE.goldLight,
+              marginBottom: 22,
+            }}
+          >
+            Your Sonoma Itinerary
+          </span>
+
+          <div
+            style={{
+              fontFamily: 'Cormorant Garamond',
+              fontWeight: 600,
+              fontSize: 92,
+              lineHeight: 1.0,
+              letterSpacing: '-0.02em',
+              color: PALETTE.cream,
+              maxWidth: 900,
+            }}
+          >
+            A Wine Day, Personally Planned.
+          </div>
+
+          <div style={{ width: 72, height: 1, background: PALETTE.gold, marginTop: 28 }} />
+
+          <div
+            style={{
+              fontFamily: 'Inter',
+              fontWeight: 400,
+              fontSize: 26,
+              lineHeight: 1.4,
+              color: 'rgba(247, 242, 236, 0.82)',
+              marginTop: 24,
+              maxWidth: 820,
+              display: 'flex',
+            }}
+          >
+            {regionSummary}
+          </div>
+
+          {stops.length > 0 && (
             <div
-              key={i}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '16px',
+                gap: 12,
+                marginTop: 36,
+                flexWrap: 'wrap',
               }}
             >
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  background: 'rgba(196, 164, 105, 0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 18,
-                  fontWeight: 600,
-                  color: '#F7F2EC',
-                }}
-              >
-                {r.rank}
-              </div>
-              <span style={{ fontSize: 22, color: '#F7F2EC', fontWeight: 500 }}>
-                {r.winery.name}
-              </span>
-              <span style={{ fontSize: 18, color: 'rgba(247, 242, 236, 0.4)', marginLeft: '8px' }}>
-                {r.winery.region}
-              </span>
+              {stops.map((r) => (
+                <div
+                  key={r.rank}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    background: 'rgba(42, 24, 16, 0.55)',
+                    border: '1px solid rgba(196, 164, 105, 0.35)',
+                    padding: '10px 16px 10px 10px',
+                    borderRadius: 999,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: '50%',
+                      background: PALETTE.wine,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontFamily: 'Inter',
+                      fontWeight: 600,
+                      fontSize: 15,
+                      color: PALETTE.cream,
+                    }}
+                  >
+                    {r.rank}
+                  </div>
+                  <span
+                    style={{
+                      fontFamily: 'Inter',
+                      fontWeight: 500,
+                      fontSize: 18,
+                      color: PALETTE.cream,
+                      letterSpacing: '0.01em',
+                    }}
+                  >
+                    {r.winery.name}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
-      )}
-    </div>,
-    { ...size },
+      </div>
+    ),
+    { ...size, fonts },
   );
 }
