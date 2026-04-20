@@ -46,15 +46,21 @@ async function loadGoogleFont({ family, weight }: FontSpec): Promise<ArrayBuffer
   if (cached) return cached;
   const familyParam = family.replace(/ /g, '+');
   const cssUrl = `https://fonts.googleapis.com/css2?family=${familyParam}:wght@${weight}&display=swap`;
+  // Older Chrome UA forces Google Fonts to serve legacy formats (WOFF/TTF) —
+  // Satori (which powers @vercel/og) supports TTF/OTF/WOFF but not WOFF2.
   const css = await fetch(cssUrl, {
     headers: {
       'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36',
     },
   }).then((r) => r.text());
-  const match = css.match(/src:\s*url\((https:\/\/[^)]+)\)\s*format\(['"]?truetype['"]?\)/);
-  if (!match) throw new Error(`Could not resolve TTF for ${family} ${weight}`);
-  const data = await fetch(match[1]).then((r) => r.arrayBuffer());
+  // Google returns one @font-face block per subset (cyrillic, greek, latin, ...);
+  // we only need the latin block for our text.
+  const latinSplit = css.split(/\/\*\s*latin\s*\*\//i);
+  const block = latinSplit.length > 1 ? latinSplit[latinSplit.length - 1] : css;
+  const fontUrl = block.match(/src:\s*url\(([^)]+)\)/)?.[1];
+  if (!fontUrl) throw new Error(`Could not resolve font URL for ${family} ${weight}`);
+  const data = await fetch(fontUrl).then((r) => r.arrayBuffer());
   fontCache.set(key, data);
   return data;
 }
